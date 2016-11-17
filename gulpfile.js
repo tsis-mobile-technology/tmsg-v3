@@ -56,7 +56,6 @@ const config = {
 //---------------------------------------------------------
 gulp.task('clean', () => del(paths.target));
 
-
 gulp.task('lint:app', () => {
   return gulp.src(paths.src.app)
     .pipe(tslint())

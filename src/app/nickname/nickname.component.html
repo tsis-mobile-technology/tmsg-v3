@@ -1,10 +1,19 @@
-<h1>Nickname</h1>
-
-<p>
-    Please set your nick name in order to start chatting!
-</p>
-
-<p>
-    <input #focus [(ngModel)]="nickname" (keypress)="eventHandler($event)">
-    <button (click)="save()">Save</button>
-</p>
+<div class="loginbox">
+	<h1>Nickname</h1>
+	<h2>채팅상담 관리자 로그인</h2>
+	<p>
+	    <input #focus [(ngModel)]="nickname" (keypress)="eventHandler($event)" placeholder="로그인 아이디를 입력하세요!" required/>
+	    <input #focus [(ngModel)]="password" (keypress)="eventHandler($event)" placeholder="패스워드를 입력하세요!" />
+	    <button (click)="save()">Save</button>
+		<li>
+			<div class="chkform">
+				<input type="checkbox" class="input_chk_login" id="saveID">
+				<label for="saveID">아이디 저장</label>
+			</div>
+			<div class="chkform">
+				<input type="checkbox" class="input_chk_login" id="autoLogin">
+				<label for="autoLogin">로그인 상태 유지</label>
+			</div>
+		</li>
+	</p>
+</div>
