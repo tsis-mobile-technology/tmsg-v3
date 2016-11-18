@@ -11,3 +11,197 @@
     <input [(ngModel)]="newRoom" (keypress)="eventHandler($event)">
     <button (click)="create()">Create</button>
 </span>
+<!-- content -->
+<div id="content">
+    <!--	history pannel	-->
+    <div id="history_pannel">
+       <div class="pan_tit">
+           <ul>
+               <li><button type="button" class="btn btn_fil_tit active">전체</button></li>
+               <li><button type="button" class="btn btn_fil_tit">신규</button></li>
+               <li><button type="button" class="btn btn_fil_tit">읽음</button></li>
+               <li><button type="button" class="btn btn_fil_tit">보류</button></li>
+               <li><button type="button" class="btn btn_fil_tit">완료</button></li>
+           </ul>
+       </div>
+<!--        
+       <div class="searchbox">
+           <div class="searchbar">
+              <ul>
+                  <li><input type="text" class="input_txt" placeholder="검색어 입력"></li>
+                  <li><button type="button" class="btn btn_dark">검색</button></li>
+                  <li><button type="button" class="btn btn_gray"><i class="icon ion-loop"></i><span class="blind">초기화</span></button></li>
+              </ul>
+           </div>
+           <div class="sortbar">
+                <button type="button" class="btn btn_sort">최근 대화순 <i class="icon ion-android-arrow-dropdown"></i></button>
+                <button type="button" class="btn btn_sort">고객 이름순 <i class="icon ion-android-arrow-dropdown"></i></button>
+                <button type="button" class="btn btn_sort">상담 시간순 <i class="icon ion-android-arrow-dropdown"></i></button>
+           </div>
+       </div>
+-->
+      <div class="history_list">
+        <ul>
+          <li>
+            <a href="#" class="btn active">
+              <p class="bul bul_new">신규</p>
+              <div class="list_tit">
+                <span class="name">홍길동</span>
+                <span class="time">오전 10:24</span>
+                <p class="list_txt ellipsis">안녕하세요?</p>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- //history pannel   -->
+    
+    <!--	chat pannel	-->
+<!-- 
+    <div id="chat_pannel">
+        <div class="pan_tit">
+            <div class="list_tit">
+               <span class="name">홍길동</span>
+               <span class="time">상담 시작 2016.10.10 오전 10:24</span>
+           </div>
+        </div>
+        
+        <div class="chatbox">
+            <div class="chat_tit">
+                <input type="text" class="input_txt">
+                <button type="button" class="btn" title="검색"><i class="icon ion-ios-search-strong"></i><span class="blind">검색</span></button>
+                <button type="button" class="btn" title="메모"><i class="icon ion-clipboard"></i><span class="blind">메모</span></button>
+                <button type="button" class="btn" title="알람"><i class="icon ion-ios-bell"></i><span class="blind">알람</span></button>
+            </div>
+            
+            <div class="chat_area">
+                <div class="msg_in">
+                    <div class="photo">
+                        <img src="/tmsg/assets/img/img_face.jpg" alt="프로필사진">
+                    </div>
+                    <p class="name">홍길동</p>
+                    <div class="msgbox">
+                        <pre>안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.</pre>
+                        <p class="time">12.:45</p>
+                    </div>
+                </div>
+                
+                <div class="msg_out">
+                    <div class="msgbox">
+                        <p class="time">12.:45</p>
+						               <pre>안녕하세요? 반갑습니다.</pre>
+                    </div> 
+                </div>
+            </div>
+            
+            <div class="chat_form">
+                <div class="bookmark">
+                    <ul>
+                        <li>
+                            <input type="text" class="input_bookmark" value="자주 쓰는 질문입니다.">
+                            <button type="button" class="btn" title="수정"><i class="icon ion-edit"></i></button>
+                            <button type="button" class="btn" title="삭제"><i class="icon ion-close-round"></i></button>
+                        </li>
+                        <li>
+                            <input type="text" class="input_bookmark" value="자주 쓰는 질문입니다2">
+                            <button type="button" class="btn" title="수정"><i class="icon ion-edit"></i></button>
+                            <button type="button" class="btn" title="삭제"><i class="icon ion-close-round"></i></button>
+                        </li>
+                        <li>
+                            <input type="text" class="input_bookmark" value="자주 쓰는 질문입니다3.">
+                            <button type="button" class="btn" title="수정"><i class="icon ion-edit"></i></button>
+                            <button type="button" class="btn" title="삭제"><i class="icon ion-close-round"></i></button>
+                        </li>
+                    </ul>
+                    <button type="button" class="btn btn_add_bookmark"><i class="icon ion-plus-circled"></i> 자주 쓰는 문구</button>
+                </div>
+                <div class="add_file">
+                    <span class="file_wrap"><i class="icon ion-android-attach"></i>파일전송
+                        <input type="file" class="file_add" onChange="javascript:document.getElementById('fileup').value=this.value">
+                    </span>
+                    <input type="text" id="fileup" class="file_txt" readonly title="첨부된 파일경로">
+                </div>
+                <div class="sendbox">
+                    <div class="txtbox">
+                        <textarea class="txtarea"></textarea>
+                        <button type="button" class="btn btn_send">전송</button>
+                    </div>
+                </div>
+                <div class="send_setbox">
+                    <input type="checkbox" class="input_chk" id="chkEnterSend">
+                    <label for="chkEnterSend">엔터로 전송</label>
+                    <div class="btnbox">
+                        <button type="button" class="btn btn_sendset">악성</button>
+                        <button type="button" class="btn btn_sendset">보류</button>
+                        <button type="button" class="btn btn_sendset">상담종료</button>
+                    </div>
+                </div>
+            </div>
+        </div><       
+    </div>
+-->
+    <!-- //chat pannel   -->
+</div>
+
+<style>
+#history_pannel .pan_tit  { height: 80px; padding: 20px 20px 0; }
+#history_pannel .pan_tit li { float: left; width: 18%; height: 36px; margin: 0 1%; text-align: center; }
+#history_pannel .pan_tit li .btn_fil_tit { display: block; width: 100%; height: 100%; color: #ababab; border: 1px solid #ababab; font-size: 14px; }
+#history_pannel .pan_tit li .btn_fil_tit.active { color: #5a87b1; border: 2px solid #5a87b1; }
+#history_pannel .history_list { height: 115px; border-top: 1px solid #cacfd6; }
+#history_pannel .history_list li { border-bottom: 1px solid #cacfd6; }
+#history_pannel .history_list li > .btn { display: block; height: 89px; padding: 15px 5%; }
+#history_pannel .history_list li > .btn.active { background-color: #eef1f3; }
+#history_pannel .history_list li .bul { float: left; width: 60px; height: 60px; padding-top: 23px; border-radius: 50%; text-align: center; }
+#history_pannel .history_list li .bul.bul_new { background-color: #dedede; }
+#history_pannel .history_list li .bul.bul_read { background-color: #e4f2ea; }
+#history_pannel .history_list li .bul.bul_delay { background-color: #f1e4e4; }
+#history_pannel .history_list li .bul.bul_finish { background-color: #e4ecf1; }
+#history_pannel .history_list li .list_tit { padding: 5px 0 5px 85px; }
+#history_pannel .history_list li .list_tit .time { float: right; }
+#history_pannel .history_list li .list_tit .list_txt { padding-top: 20px; }
+
+#chat_pannel { border-left: 1px solid #cacfd6; border-right: 1px solid #cacfd6; }
+#chat_pannel .pan_tit { padding: 25px 20px 0; }
+#chat_pannel .pan_tit .name { display: inline-block; font-size: 18px; color: #666; }
+#chat_pannel .pan_tit .time { float: right; }
+#chat_pannel .chatbox {  }
+#chat_pannel .chatbox .chat_tit { padding: 15px 20px; }
+#chat_pannel .chatbox .chat_tit .input_txt { width: 430px; height: 26px; padding: 0; border: 0; }
+#chat_pannel .chatbox .chat_tit .btn { margin: 0 5px; font-size: 26px; color: #7394b3; vertical-align: middle; }
+#chat_pannel .chatbox .chat_area { height: 490px; overflow-y: auto; padding: 30px 20px; border-top: 1px solid #cacfd6; border-bottom: 2px solid #cacfd6; background-color: #e4e8ec; }
+#chat_pannel .chatbox .msg_in { overflow: hidden; margin: 5px 0; }
+#chat_pannel .chatbox .msg_in .photo { float: left; width: 50px; height: 50px; }
+#chat_pannel .chatbox .msg_in .photo img { border: 1px solid #bcbcbc;  border-radius: 50%; }
+#chat_pannel .chatbox .msg_in .name { padding-left: 65px; }
+#chat_pannel .chatbox .msg_in .msgbox { padding: 5px 5px 5px 65px; }
+#chat_pannel .chatbox .msg_in .msgbox pre { display: inline-block; position: relative; max-width: 300px; padding: 10px; font-size: 14px; border-radius: 4px; background-color: #fff; box-shadow: 2px 2px 2px rgba(0,0,0,0.2); white-space: pre-line; line-height: 1.2; }
+#chat_pannel .chatbox .msg_in .msgbox pre:after { content: ''; position: absolute; top: 5px; left: -10px; width: 0; height: 0; border-color: transparent transparent #fff transparent; border-style: solid; border-width: 0 5px 10px 5px; transform: rotate(-90deg); }
+#chat_pannel .chatbox .msg_in .time { display: inline-block; font-size: 12px; color: #999; vertical-align: bottom; }
+#chat_pannel .chatbox .msg_out { text-align: right; }
+#chat_pannel .chatbox .msg_out .msgbox { padding: 5px; }
+#chat_pannel .chatbox .msg_out .msgbox pre { display: inline-block; position: relative; max-width: 300px; padding: 10px; font-size: 14px; border-radius: 4px; background-color: #faf6c3; box-shadow: 2px 2px 2px rgba(0,0,0,0.2); white-space: pre-line; line-height: 1.2; }
+#chat_pannel .chatbox .msg_out .msgbox pre:after { content: ''; position: absolute; top: 5px; right: -10px; width: 0; height: 0; border-color: transparent transparent #faf6c3 transparent; border-style: solid; border-width: 0 5px 10px 5px; transform: rotate(90deg); }
+#chat_pannel .chatbox .msg_out .time { display: inline-block; font-size: 12px; color: #999; vertical-align: bottom; }
+#chat_pannel .chat_form { position: absolute; left: 0; bottom: 0; width: 100%; height: 310px; }
+#chat_pannel .chat_form .bookmark { position: relative; height: 80px; border-bottom: 1px solid #cacfd6; }
+#chat_pannel .chat_form .bookmark ul { width: 426px; overflow-y: auto; height: 80px; }
+#chat_pannel .chat_form .bookmark ul li { height: 40px; padding-left: 5px; border-bottom: 1px solid #cacfd6; }
+#chat_pannel .chat_form .bookmark ul li .input_bookmark { float: left; width: 330px; height: 39px; margin: 0; padding: 0; padding-left: 20px; border: 0; font-size: 14px; color: #666; }
+#chat_pannel .chat_form .bookmark ul li .btn { width: 30px; height: 30px; margin-top: 5px; font-size: 16px; color: #cecece; }
+#chat_pannel .chat_form .bookmark .btn_add_bookmark { position: absolute; top: 0; right: 0; width: 150px; height: 80px; border-left: 1px solid #cacfd6; font-size: 14px; }
+#chat_pannel .chat_form .bookmark .btn_add_bookmark .icon { color: #7394b3; }
+#chat_pannel .chat_form .add_file { position: relative; height: 40px; padding: 5px 20px 0; border-bottom: 1px solid #cacfd6; background-color: #eaebec; }
+.file_wrap{ display: inline-block; width: 80px; height: 28px; text-align: center; color: #666; padding-top: 6px; cursor: pointer; }
+.file_wrap > .icon { display: inline-block; font-size: 16px; transform: rotate(45deg); -webkit-transform: rotate(45deg); }
+.file_add{ position: absolute; top: 5px; left: 20px; filter:alpha(opacity:1); opacity: 0; width: 80px; height: 28px; cursor: pointer; }
+.file_txt { width: 300px; height: 28px; font-size: 12px; color: #666; border: 0; background: none; }
+#chat_pannel .chat_form .txtbox { position: relative; height: 148px; }
+#chat_pannel .chat_form .txtbox .txtarea { width: 426px; height: 148px; padding: 20px; font-size: 14px; border: 0; color: #666; resize: none; }
+#chat_pannel .chat_form .txtbox .btn_send { position: absolute; top: 0; right: 0; width: 150px; height: 148px; font-size: 18px; color: #fff; background-color: #88abcc; }
+#chat_pannel .chat_form .send_setbox { height: 42px; padding: 12px 20px 0; background-color: #263039; }
+#chat_pannel .chat_form .send_setbox > label { color: #fff; line-height: 21px; }
+#chat_pannel .chat_form .send_setbox .btnbox { float: right; }
+#chat_pannel .chat_form .send_setbox .btnbox .btn { margin-left: 3px; margin-top: -4px; padding: 8px 15px; color: #fff; background-color: #394651; }
+</style>

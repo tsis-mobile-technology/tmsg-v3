@@ -1,19 +1,47 @@
 <div class="loginbox">
-	<h1>Nickname</h1>
-	<h2>채팅상담 관리자 로그인</h2>
-	<p>
-	    <input #focus [(ngModel)]="nickname" (keypress)="eventHandler($event)" placeholder="로그인 아이디를 입력하세요!" required/>
-	    <input #focus [(ngModel)]="password" (keypress)="eventHandler($event)" placeholder="패스워드를 입력하세요!" />
-	    <button (click)="save()">Save</button>
-		<li>
-			<div class="chkform">
-				<input type="checkbox" class="input_chk_login" id="saveID">
-				<label for="saveID">아이디 저장</label>
-			</div>
-			<div class="chkform">
-				<input type="checkbox" class="input_chk_login" id="autoLogin">
-				<label for="autoLogin">로그인 상태 유지</label>
-			</div>
-		</li>
-	</p>
+    <h2>채팅상담 관리자 로그인</h2>
+    <ul class="form-group">
+        <li>
+            <label>
+                <input #focus [(ngModel)]="nickname" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="로그인 아이디를 입력하세요!" required/>
+            </label>
+        </li>
+        <li>
+            <label>
+                <input type="password" [(ngModel)]="nickname_password" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="패스워드를 입력하세요!" />
+            </label>
+        </li>
+        <li>
+            <button (click)="save()" class="btn btn_login">로그인</button>
+        </li>
+        <li>
+            <div class="chkform">
+                <input type="checkbox" [(ngModel)]="saveid" class="input_chk_login" id="saveID">
+                <label for="saveID">아이디 저장</label>
+            </div>
+            <div class="chkform">
+                <input type="checkbox" [(ngModel)]="autologin" class="input_chk_login" id="autoLogin">
+                <label for="autoLogin">로그인 상태 유지</label>
+            </div>
+        </li>
+    </ul>
+    <button (click)="gotoMain()">View Main</button>
 </div>
+
+<style>
+/* 로그인 */
+#wrap_login { width: 100%; height: 100%; min-height: 800px; background-color: #88abcc; }
+.loginbox { position: absolute; top: 50%; left: 50%; width: 300px; height: 500px; margin: -250px 0 0 -150px; }
+.loginbox .login_logo { text-align: center; }
+.loginbox h2 { padding: 75px 0 40px; font-size: 28px; text-align: center; color: #fff; }
+.loginbox li { margin-bottom: 10px; }
+.loginbox li:last-child { overflow: hidden; padding-top: 10px; }
+.loginbox .input_txt_login { width: 100%; height: 40px; padding: 0 15px;   line-height: 40px; font-size: 18px; border: 0; color: #fff; background-color: #a4cef5; }
+.loginbox .input_txt_login::-webkit-input-placeholder { color: #fff; }
+.loginbox .input_txt_login::-moz-placeholder { color: #fff; }
+.loginbox .input_txt_login::-ms-input-placeholder { color: #fff; }
+.loginbox .btn_login { width: 100%; height: 40px; text-align: center; color: #88abcc; font-size: 18px;  background-color: #fff; }
+.loginbox .chkform { float: left; width: 50%;  }
+.loginbox .chkform label { color: #fff; line-height: 21px; font-size: 14px; }
+.loginbox .input_chk_login { background-image: url(../img/bul_chk_login.png); }
+</style>
