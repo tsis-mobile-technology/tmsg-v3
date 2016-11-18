@@ -17,9 +17,9 @@
     <div id="history_pannel">
        <div class="pan_tit">
            <ul>
-               <li><button type="button" class="btn btn_fil_tit active">전체</button></li>
-               <li><button type="button" class="btn btn_fil_tit">신규</button></li>
-               <li><button type="button" class="btn btn_fil_tit">읽음</button></li>
+               <li><button (click)="create()" class="btn btn_fil_tit active">생성</button></li>
+               <li><button (click)="join()" class="btn btn_fil_tit active">접속</button></li>
+               <li><button (click)="remove()" class="btn btn_fil_tit active">삭제</button></li>
                <li><button type="button" class="btn btn_fil_tit">보류</button></li>
                <li><button type="button" class="btn btn_fil_tit">완료</button></li>
            </ul>
