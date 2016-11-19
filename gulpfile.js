@@ -23,6 +23,7 @@ dotenv.config();
 //---------------------------------------------------------
 const paths = {
     src: {
+        customer: ['src/customer.ts', 'src/app/**/*.ts'],
         app: ['src/main.ts', 'src/app/**/*.ts'],
         server: ['src/server.ts', 'src/server/**/*.ts'],
         common: ['src/models/**/*.ts', 'src/data/*.json', 'src/styles/**/*.styl']
@@ -46,7 +47,8 @@ const config = {
     webpack: {
         prod: './config/webpack.prod',
         dev: './config/webpack.dev',
-        server: './config/webpack.server'
+        server: './config/webpack.server',
+        customer: './config/webpack.customer'
     }
 };
 
@@ -74,9 +76,19 @@ gulp.task('lint:server', () => {
     ));
 });
 
+gulp.task('lint:customer', () => {
+  return gulp.src(paths.src.customer)
+    .pipe(tslint())
+    .pipe(tslint.report(
+      config.tslint.report.type,
+      config.tslint.report.options
+    ));
+});
+
 gulp.task('lint', gulp.series(
     'lint:app',
-    'lint:server'
+    'lint:server',
+    'lint:customer'
 ))
 
 // Webpack

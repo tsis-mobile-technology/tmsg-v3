@@ -74,7 +74,7 @@ class Server {
         //customer in
         customer.get('/customer', (request: express.Request, result: express.Response) => {
             //result.sendFile(path.join(this.root, '/customer.html'));
-            result.send("MELONG! Customer");
+            result.sendFile(path.join(this.root, '/customer.html'));
         });
 
         // Set app to use router as the default route
