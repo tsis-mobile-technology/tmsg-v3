@@ -55,7 +55,9 @@ module.exports = {
     },
 
     entry: {
-        'assets/js/customer.js': './src/customer'
+        'assets/js/customer.js': './src/customer',
+        'assets/js/vendor.js': './src/vendor',
+        'assets/js/polyfills.js': './src/polyfills'
     },
 
     externals: ['ws'],

@@ -57,31 +57,21 @@ class Server {
 
     // Configure routes
     private routes(): void {
-        let counselor: express.Router;
-        counselor = express.Router();
-        let customer: express.Router;
-        customer = express.Router();
+        let router: express.Router;
+        router = express.Router();
 
         // Static assets
         this.app.use('/assets', serveStatic(path.resolve(this.root, 'assets')));
 
         // Set router to serve index.html (e.g. single page app)
         // counseolor in
-        counselor.get('/counselor', (request: express.Request, result: express.Response) => {
+        router.get('/', (request: express.Request, result: express.Response) => {
             result.sendFile(path.join(this.root, '/index.html'));
-        });
-
-        //customer in
-        customer.get('/customer', (request: express.Request, result: express.Response) => {
-            //result.sendFile(path.join(this.root, '/customer.html'));
-            result.sendFile(path.join(this.root, '/customer.html'));
         });
 
         // Set app to use router as the default route
         // counselor
-        this.app.use('/', counselor);
-        // customer
-        this.app.use('/', customer);
+        this.app.use('*', router);
     }
 
     // Configure databases

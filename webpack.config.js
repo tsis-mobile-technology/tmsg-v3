@@ -3,8 +3,7 @@ switch (process.env.NODE_ENV) {
     case 'production':
         module.exports = [
             require('./config/webpack.server'),
-            require('./config/webpack.prod'),
-            require('./config/webpack.customer')
+            require('./config/webpack.prod')
         ];
         break;
     case 'test':
@@ -18,7 +17,6 @@ switch (process.env.NODE_ENV) {
     default:
         module.exports = [
             require('./config/webpack.server'),
-            require('./config/webpack.dev'),
-            require('./config/webpack.customer')
+            require('./config/webpack.dev')
         ];
 }

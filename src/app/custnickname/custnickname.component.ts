@@ -3,16 +3,16 @@ import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { UserService } from "../shared";
 
 declare var require;
-const styles: string = require('./nickname.component.scss');
-const template: string = require('./nickname.component.html');
+const styles: string = require('./custnickname.component.scss');
+const template: string = require('./custnickname.component.html');
 
 @Component({
-    selector: 'nickname',
+    selector: 'custnickname',
     styles: [styles],
     template
 })
 
-export class NicknameComponent implements AfterViewInit {
+export class CustnicknameComponent implements AfterViewInit {
     @ViewChild('focus') private focus: ElementRef;
     nickname: string;
     usertype: string;

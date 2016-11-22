@@ -1,0 +1,79 @@
+<!-- content -->
+<div id="content">
+    <!--	history pannel	-->
+    <div id="history_pannel">
+      <span>
+        <select [(ngModel)]="room">
+          <option value="">Select room...</option>
+          <option *ngFor="let room of roomService.rooms | async" [value]="room.name">{{room.name}}</option>
+        </select>
+      </span>
+       <div class="pan_tit">
+           <ul>
+               <li><button (click)="join()" class="btn btn_fil_tit active">접속</button></li>
+           </ul>
+       </div>
+    <!-- //chat pannel   -->
+</div>
+
+<style>
+#history_pannel .pan_tit  { height: 80px; padding: 20px 20px 0; }
+#history_pannel .pan_tit li { float: left; width: 18%; height: 36px; margin: 0 1%; text-align: center; }
+#history_pannel .pan_tit li .btn_fil_tit { display: block; width: 100%; height: 100%; color: #ababab; border: 1px solid #ababab; font-size: 14px; }
+#history_pannel .pan_tit li .btn_fil_tit.active { color: #5a87b1; border: 2px solid #5a87b1; }
+#history_pannel .history_list { height: 115px; border-top: 1px solid #cacfd6; }
+#history_pannel .history_list li { border-bottom: 1px solid #cacfd6; }
+#history_pannel .history_list li > .btn { display: block; height: 89px; padding: 15px 5%; }
+#history_pannel .history_list li > .btn.active { background-color: #eef1f3; }
+#history_pannel .history_list li .bul { float: left; width: 60px; height: 60px; padding-top: 23px; border-radius: 50%; text-align: center; }
+#history_pannel .history_list li .bul.bul_new { background-color: #dedede; }
+#history_pannel .history_list li .bul.bul_read { background-color: #e4f2ea; }
+#history_pannel .history_list li .bul.bul_delay { background-color: #f1e4e4; }
+#history_pannel .history_list li .bul.bul_finish { background-color: #e4ecf1; }
+#history_pannel .history_list li .list_tit { padding: 5px 0 5px 85px; }
+#history_pannel .history_list li .list_tit .time { float: right; }
+#history_pannel .history_list li .list_tit .list_txt { padding-top: 20px; }
+
+#chat_pannel { border-left: 1px solid #cacfd6; border-right: 1px solid #cacfd6; }
+#chat_pannel .pan_tit { padding: 25px 20px 0; }
+#chat_pannel .pan_tit .name { display: inline-block; font-size: 18px; color: #666; }
+#chat_pannel .pan_tit .time { float: right; }
+#chat_pannel .chatbox {  }
+#chat_pannel .chatbox .chat_tit { padding: 15px 20px; }
+#chat_pannel .chatbox .chat_tit .input_txt { width: 430px; height: 26px; padding: 0; border: 0; }
+#chat_pannel .chatbox .chat_tit .btn { margin: 0 5px; font-size: 26px; color: #7394b3; vertical-align: middle; }
+#chat_pannel .chatbox .chat_area { height: 490px; overflow-y: auto; padding: 30px 20px; border-top: 1px solid #cacfd6; border-bottom: 2px solid #cacfd6; background-color: #e4e8ec; }
+#chat_pannel .chatbox .msg_in { overflow: hidden; margin: 5px 0; }
+#chat_pannel .chatbox .msg_in .photo { float: left; width: 50px; height: 50px; }
+#chat_pannel .chatbox .msg_in .photo img { border: 1px solid #bcbcbc;  border-radius: 50%; }
+#chat_pannel .chatbox .msg_in .name { padding-left: 65px; }
+#chat_pannel .chatbox .msg_in .msgbox { padding: 5px 5px 5px 65px; }
+#chat_pannel .chatbox .msg_in .msgbox pre { display: inline-block; position: relative; max-width: 300px; padding: 10px; font-size: 14px; border-radius: 4px; background-color: #fff; box-shadow: 2px 2px 2px rgba(0,0,0,0.2); white-space: pre-line; line-height: 1.2; }
+#chat_pannel .chatbox .msg_in .msgbox pre:after { content: ''; position: absolute; top: 5px; left: -10px; width: 0; height: 0; border-color: transparent transparent #fff transparent; border-style: solid; border-width: 0 5px 10px 5px; transform: rotate(-90deg); }
+#chat_pannel .chatbox .msg_in .time { display: inline-block; font-size: 12px; color: #999; vertical-align: bottom; }
+#chat_pannel .chatbox .msg_out { text-align: right; }
+#chat_pannel .chatbox .msg_out .msgbox { padding: 5px; }
+#chat_pannel .chatbox .msg_out .msgbox pre { display: inline-block; position: relative; max-width: 300px; padding: 10px; font-size: 14px; border-radius: 4px; background-color: #faf6c3; box-shadow: 2px 2px 2px rgba(0,0,0,0.2); white-space: pre-line; line-height: 1.2; }
+#chat_pannel .chatbox .msg_out .msgbox pre:after { content: ''; position: absolute; top: 5px; right: -10px; width: 0; height: 0; border-color: transparent transparent #faf6c3 transparent; border-style: solid; border-width: 0 5px 10px 5px; transform: rotate(90deg); }
+#chat_pannel .chatbox .msg_out .time { display: inline-block; font-size: 12px; color: #999; vertical-align: bottom; }
+#chat_pannel .chat_form { position: absolute; left: 0; bottom: 0; width: 100%; height: 310px; }
+#chat_pannel .chat_form .bookmark { position: relative; height: 80px; border-bottom: 1px solid #cacfd6; }
+#chat_pannel .chat_form .bookmark ul { width: 426px; overflow-y: auto; height: 80px; }
+#chat_pannel .chat_form .bookmark ul li { height: 40px; padding-left: 5px; border-bottom: 1px solid #cacfd6; }
+#chat_pannel .chat_form .bookmark ul li .input_bookmark { float: left; width: 330px; height: 39px; margin: 0; padding: 0; padding-left: 20px; border: 0; font-size: 14px; color: #666; }
+#chat_pannel .chat_form .bookmark ul li .btn { width: 30px; height: 30px; margin-top: 5px; font-size: 16px; color: #cecece; }
+#chat_pannel .chat_form .bookmark .btn_add_bookmark { position: absolute; top: 0; right: 0; width: 150px; height: 80px; border-left: 1px solid #cacfd6; font-size: 14px; }
+#chat_pannel .chat_form .bookmark .btn_add_bookmark .icon { color: #7394b3; }
+#chat_pannel .chat_form .add_file { position: relative; height: 40px; padding: 5px 20px 0; border-bottom: 1px solid #cacfd6; background-color: #eaebec; }
+.file_wrap{ display: inline-block; width: 80px; height: 28px; text-align: center; color: #666; padding-top: 6px; cursor: pointer; }
+.file_wrap > .icon { display: inline-block; font-size: 16px; transform: rotate(45deg); -webkit-transform: rotate(45deg); }
+.file_add{ position: absolute; top: 5px; left: 20px; filter:alpha(opacity:1); opacity: 0; width: 80px; height: 28px; cursor: pointer; }
+.file_txt { width: 300px; height: 28px; font-size: 12px; color: #666; border: 0; background: none; }
+#chat_pannel .chat_form .txtbox { position: relative; height: 148px; }
+#chat_pannel .chat_form .txtbox .txtarea { width: 426px; height: 148px; padding: 20px; font-size: 14px; border: 0; color: #666; resize: none; }
+#chat_pannel .chat_form .txtbox .btn_send { position: absolute; top: 0; right: 0; width: 150px; height: 148px; font-size: 18px; color: #fff; background-color: #88abcc; }
+#chat_pannel .chat_form .send_setbox { height: 42px; padding: 12px 20px 0; background-color: #263039; }
+#chat_pannel .chat_form .send_setbox > label { color: #fff; line-height: 21px; }
+#chat_pannel .chat_form .send_setbox .btnbox { float: right; }
+#chat_pannel .chat_form .send_setbox .btnbox .btn { margin-left: 3px; margin-top: -4px; padding: 8px 15px; color: #fff; background-color: #394651; }
+</style>

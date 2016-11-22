@@ -7,16 +7,16 @@ import { IRoom } from "../../models";
 import { UserService } from "../shared";
 
 declare var require;
-const styles: string = require("./control.component.scss");
-const template: string = require("./control.component.html");
+const styles: string = require("./custcontrol.component.scss");
+const template: string = require("./custcontrol.component.html");
 
 @Component({
-    selector: "control",
+    selector: "custcontrol",
     styles: [styles],
     template
 })
 
-export class ControlComponent {
+export class CustcontrolComponent {
     room: string = "";
     newRoom: string = "";
 

@@ -4,13 +4,14 @@ import { UserService } from "./shared/user.service";
 
 declare var require;
 const styles: string = require("./app.component.scss");
+const template: string = require("./cust.component.html");
 
 @Component({
-    selector: "app",
+    selector: "cust",
     styles: [styles],
-    template:'<router-outlet></router-outlet>'
+    template
 })
 
-export class AppComponent {
+export class CustComponent {
     constructor(public userService: UserService) {}
 }

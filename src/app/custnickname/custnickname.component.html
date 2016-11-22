@@ -1,34 +1,18 @@
 <div class="loginbox">
-    <h2>채팅상담 관리자 로그인</h2>
+    <h2>채팅상담 접속</h2>
     <ul class="form-group">
         <li>
             <label>
-                <input #focus [(ngModel)]="nickname" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="로그인 아이디를 입력하세요!" required/>
+                <input #focus [(ngModel)]="nickname" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="원하시는 아이디를 입력하세요!" required/>
             </label>
         </li>
         <li>
-            <label>
-                <input type="password" [(ngModel)]="nickname_password" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="패스워드를 입력하세요!" />
-            </label>
+            <input type="hidden" [(ngModel)]="usertype" value="customer"/>
         </li>
         <li>
-            <input type="hidden" [(ngModel)]="usertype" value="counselor"/>
+            <button (click)="save()" class="btn btn_login">접속</button>
         </li>
-        <li>
-            <button (click)="save()" class="btn btn_login">로그인</button>
-        </li>
-        <li>
-            <div class="chkform">
-                <input type="checkbox" [(ngModel)]="saveid" class="input_chk_login" id="saveID">
-                <label for="saveID">아이디 저장</label>
-            </div>
-            <div class="chkform">
-                <input type="checkbox" [(ngModel)]="autologin" class="input_chk_login" id="autoLogin">
-                <label for="autoLogin">로그인 상태 유지</label>
-            </div>
-        </li>
-    </ul>
-    <button (click)="gotoMain()">View Main</button>
+    </ul>   
 </div>
 
 <style>

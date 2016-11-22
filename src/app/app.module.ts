@@ -5,6 +5,11 @@ import { FormsModule } from "@angular/forms";
 
 // App component
 import { AppComponent } from "./app.component";
+import { CallComponent } from "./call.component";
+import { CustComponent } from "./cust.component";
+
+// Routing Module
+import { AppRoutingModule } from "./app.routing";
 
 // Shared module
 import { SharedModule } from "./shared/shared.module";
@@ -14,20 +19,27 @@ import { ControlComponent } from "./control";
 import { NicknameComponent } from "./nickname";
 import { RoomComponent } from "./room";
 import { RoomsComponent } from "./rooms";
+import { CustnicknameComponent } from "./custnickname";
+import { CustcontrolComponent } from "./custcontrol";
 
 @NgModule({
     imports: [
         BrowserModule,
         CommonModule,
         FormsModule,
-        SharedModule
+        SharedModule,
+        AppRoutingModule
     ],
     declarations: [
         AppComponent,
+        CustComponent,
+        CallComponent,
         ControlComponent,
         NicknameComponent,
         RoomComponent,
-        RoomsComponent
+        RoomsComponent,
+        CustnicknameComponent,
+        CustcontrolComponent
     ],
     bootstrap: [
         AppComponent

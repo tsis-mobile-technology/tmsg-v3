@@ -23,7 +23,6 @@ dotenv.config();
 //---------------------------------------------------------
 const paths = {
     src: {
-        customer: ['src/customer.ts', 'src/app/**/*.ts'],
         app: ['src/main.ts', 'src/app/**/*.ts'],
         server: ['src/server.ts', 'src/server/**/*.ts'],
         common: ['src/models/**/*.ts', 'src/data/*.json', 'src/styles/**/*.styl']
@@ -47,8 +46,7 @@ const config = {
     webpack: {
         prod: './config/webpack.prod',
         dev: './config/webpack.dev',
-        server: './config/webpack.server',
-        customer: './config/webpack.customer'
+        server: './config/webpack.server'
     }
 };
 
@@ -76,19 +74,10 @@ gulp.task('lint:server', () => {
     ));
 });
 
-gulp.task('lint:customer', () => {
-  return gulp.src(paths.src.customer)
-    .pipe(tslint())
-    .pipe(tslint.report(
-      config.tslint.report.type,
-      config.tslint.report.options
-    ));
-});
 
 gulp.task('lint', gulp.series(
     'lint:app',
-    'lint:server',
-    'lint:customer'
+    'lint:server'
 ))
 
 // Webpack
@@ -109,6 +98,7 @@ gulp.task('webpack:app-dev', done => {
     });
     done();
 });
+
 
 gulp.task('webpack:server-prod', done => {
     let conf = require(config.webpack.server);
@@ -149,7 +139,7 @@ gulp.task('watch', done => {
         ignore: [
            paths.target + '/assets/js/app.js',
            paths.target + '/assets/js/vendor.js',
-           paths.target + '/assets/js/polyfills.js',
+           paths.target + '/assets/js/polyfills.js'
            paths.assets
         ]
     })

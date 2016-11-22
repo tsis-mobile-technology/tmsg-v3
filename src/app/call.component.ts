@@ -3,15 +3,15 @@ import { Component } from "@angular/core";
 import { UserService } from "./shared/user.service";
 
 declare var require;
-const styles: string = require("./customer.component.scss");
-const template: string = require("./customer.component.html");
+const styles: string = require("./app.component.scss");
+const template: string = require("./call.component.html");
 
 @Component({
-    selector: "customer",
+    selector: "call",
     styles: [styles],
     template
 })
 
-export class CustomerComponent {
+export class CallComponent {
     constructor(public userService: UserService) {}
 }
