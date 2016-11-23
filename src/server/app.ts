@@ -19,10 +19,12 @@ class Server {
 
     // Bootstrap the application.
     public static bootstrap(): Server {
+        console.log("Server bootstrap");
         return new Server();
     }
 
     constructor() {
+        console.log("Server constructor");
         // Create expressjs application
         this.app = express();
 
@@ -47,6 +49,7 @@ class Server {
 
     // Configuration
     private config(): void {
+        console.log("Server config");
         // By default the port should be 5000
         this.port = process.env.PORT || 5000;
 
@@ -57,6 +60,7 @@ class Server {
 
     // Configure routes
     private routes(): void {
+        console.log("Server routes");
         let router: express.Router;
         router = express.Router();
 
@@ -76,6 +80,7 @@ class Server {
 
     // Configure databases
     private databases(): void {
+        console.log("Server database");
         // MongoDB URL
         let mongoDBUrl = process.env.MONGODB_URI || 'mongodb://localhost/chat';
 
@@ -85,6 +90,7 @@ class Server {
 
     // Configure sockets
     private sockets(): void {
+        console.log("Server sockets");
         // Get socket.io handle
         this.io = socketIo(this.server);
         let roomSocket = new RoomSocket(this.io);
@@ -92,6 +98,7 @@ class Server {
     
     // Start HTTP server listening
     private listen(): void {
+        console.log("Server listen");
         //listen on provided ports
         this.server.listen(this.port);
 

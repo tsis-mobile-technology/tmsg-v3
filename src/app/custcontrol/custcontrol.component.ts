@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 
 import { RoomService } from "../shared";
 
-import { IRoom } from "../../models";
+import { IRoom, IUser } from "../../models";
 
 import { UserService } from "../shared";
 
@@ -23,14 +23,15 @@ export class CustcontrolComponent {
     constructor(
         public roomService: RoomService,
         public userService: UserService) {
-
+        console.log("CustcontrolComponent constructor");
         //IF userService.usertype == "counselor"
         //THEN auto create chat room 
-        if(userService.usertype == "counselor" && userService.nickname != null) this.room = userService.nickname;
+        if(userService.user.usertype == "counselor" && userService.user.nickname != null) this.room = userService.user.nickname;
     }
 
     // Join room, when Join-button is pressed
     join(): void {
+        console.log("Custcontrol join");
         console.log("room name : " + this.room );
         console.log("newRoom name : " + this.newRoom );
         this.roomService.join(this.room);
@@ -40,15 +41,18 @@ export class CustcontrolComponent {
     create(): void {
         //this.roomService.create(this.newRoom);
         //this.newRoom = "";
+        console.log("Custcontrol create");
         console.log("room name : " + this.room );
         console.log("newRoom name : " + this.newRoom );
-        this.roomService.create(this.userService.nickname);
-        this.newRoom = this.userService.nickname;
-        this.room = this.userService.nickname;
+        this.roomService.create(this.userService.user.nickname);
+        this.newRoom = this.userService.user.nickname;
+        this.room = this.userService.user.nickname;
+
     }
 
     // Remove room, when Remove-button is pressed and unset selected room
     remove(): void {
+        console.log("Custcontrol remove");
         console.log("room name : " + this.room );
         console.log("newRoom name : " + this.newRoom );
         this.roomService.remove(this.room);

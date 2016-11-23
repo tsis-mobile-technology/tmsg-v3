@@ -26,7 +26,7 @@ export class ControlComponent {
 
         //IF userService.usertype == "counselor"
         //THEN auto create chat room 
-        if(userService.usertype == "counselor" && userService.nickname != null) this.room = userService.nickname;
+        if(userService.user.usertype == "counselor" && userService.user.nickname != null) this.room = userService.user.nickname;
     }
 
     // Join room, when Join-button is pressed
@@ -42,9 +42,9 @@ export class ControlComponent {
         //this.newRoom = "";
         console.log("room name : " + this.room );
         console.log("newRoom name : " + this.newRoom );
-        this.roomService.create(this.userService.nickname);
-        this.newRoom = this.userService.nickname;
-        this.room = this.userService.nickname;
+        this.roomService.create(this.userService.user.nickname);
+        this.newRoom = this.userService.user.nickname;
+        this.room = this.userService.user.nickname;
     }
 
     // Remove room, when Remove-button is pressed and unset selected room

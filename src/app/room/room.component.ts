@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 
 import { RoomService, UserService, SocketService } from "../shared";
-import { IMessage, IRoom } from "../../models";
+import { IMessage, IRoom, IUser } from "../../models";
 
 import { MessageService } from "./message.service";
 
@@ -28,10 +28,11 @@ export class RoomComponent implements OnInit, AfterViewInit, OnDestroy {
         private roomService: RoomService,
         public userService: UserService,
         public socketService: SocketService
-    ) {}
+    ) {console.log("RoomComponent constructor");}
 
     // Handle keypress event, for saving nickname
     ngOnInit(): void {
+        console.log("RoomComponent ngOnInit");
         this.messageService = new MessageService(this.room.name);
         this.messageService.messages.subscribe(messages => {
             this.messages = messages;
@@ -39,16 +40,18 @@ export class RoomComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.scrollToBottom();
             }, 200);
         });
-        this.messageService.create(this.userService.nickname, "joined the channel");
+        this.messageService.create(this.userService.user.nickname, "joined the channel");
     }
 
     // After view initialized, focus on chat message text input
     ngAfterViewInit(): void {
+        console.log("RoomComponent ngAfterViewInit");
         this.focus.nativeElement.focus();
     }
 
     // When component is destroyed, ensure that leave message is sent
     ngOnDestroy(): void {
+        console.log("RoomComponent ngOnDestroy");
         if (!this.alreadyLeftChannel) {
             this.leave();
         }
@@ -56,14 +59,16 @@ export class RoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Send chat message, and reset message text input
     send(): void {
-        this.messageService.create(this.userService.nickname, this.message);
+        console.log("RoomComponent send");
+        this.messageService.create(this.userService.user.nickname, this.message);
         this.message = "";
     }
 
     // Leave room gracefully
     leave(): void {
+        console.log("RoomComponent leave");
         this.alreadyLeftChannel = true;
-        this.messageService.create(this.userService.nickname, "left the channel");
+        this.messageService.create(this.userService.user.nickname, "left the channel");
         this.roomService.leave(this.room.name);
     }
 

@@ -16,10 +16,12 @@ export class RoomService {
         private socketService: SocketService,
         private userService: UserService
     ) {
+        console.log("RoomService constructor");
         this.socketService
             .get("room")
             .subscribe(
                 (socketItem: ISocketItem) => {
+                    console.log("RoomService constructor ISocketItem:" + socketItem);
                     let room: IRoom = socketItem.item;
                     let index: number = this.findIndex(room.name);
                     if (socketItem.action === "remove") {
@@ -31,10 +33,12 @@ export class RoomService {
                             this.list = this.list.push(room);
                         } else {
                             // Update
-                            this.list = this.list.set(index, room)
+                            this.list = this.list.set(index, room);
                         }
                     }
                     this.rooms.next(this.list);
+                    console.log("RoomService constructor list:" + this.list);
+                    console.log("RoomService constructor rooms:" + this.rooms);
                 },
                 error => console.log(error)
             );
@@ -42,8 +46,9 @@ export class RoomService {
 
     // Join room
     join(name: string): void {
-        for (let roomIndex in this.userService.rooms) {
-            let room = this.userService.rooms[roomIndex];
+        console.log("RoomService join");
+        for (let roomIndex in this.userService.user.rooms) {
+            let room = this.userService.user.rooms[roomIndex];
             if (room.name === name) {
                 return;
             }
@@ -51,33 +56,36 @@ export class RoomService {
         let index = this.findIndex(name);
         if (index !== -1) {
             let room = this.list.get(index);
-            this.userService.rooms.push(room);
+            this.userService.user.rooms.push(room);
         }
     }
 
     // Leave room
     leave(name: string) {
+        console.log("RoomService leave");
         // First remove the room from user joined rooms
-        for (var i = 0; i < this.userService.rooms.length; i++) {
-            let room = this.userService.rooms[i];
+        for (var i = 0; i < this.userService.user.rooms.length; i++) {
+            let room = this.userService.user.rooms[i];
             if (room.name === name) {
-                this.userService.rooms.splice(i, 1);
+                this.userService.user.rooms.splice(i, 1);
             }
         }
     }
 
     // Create room
     create(name: string) {
+        console.log("RoomService create");
         this.socketService.create(name);
     }
 
     // Remove room
     remove(name: string) {
+        console.log("RoomService remove");
         // First remove the room from user joined rooms
-        for (var i = 0; i < this.userService.rooms.length; i++) {
-            let room = this.userService.rooms[i];
+        for (var i = 0; i < this.userService.user.rooms.length; i++) {
+            let room = this.userService.user.rooms[i];
             if (room.name === name) {
-                this.userService.rooms.splice(i, 1);
+                this.userService.user.rooms.splice(i, 1);
             }
         }
 

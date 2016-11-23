@@ -10,10 +10,11 @@ export class SocketService {
     private host: string = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
     socket: SocketIOClient.Socket;
 
-    constructor() {}
+    constructor() {console.log("SocketService constructor");}
 
     // Get items observable
     get(name: string): Observable<any> {
+        console.log("SocketService get, name:" + name);
         this.name = name;
         let socketUrl = this.host + "/" + this.name;
         this.socket = io.connect(socketUrl);
@@ -25,6 +26,7 @@ export class SocketService {
 
         // Return observable which follows "create" and "remove" signals from socket stream
         return Observable.create((observer: any) => {
+            console.log("SocketService Observable.create");
             this.socket.on("create", (item: any) => observer.next({ action: "create", item: item }) );
             this.socket.on("remove", (item: any) => observer.next({ action: "remove", item: item }) );
             return () => this.socket.close();
@@ -33,16 +35,19 @@ export class SocketService {
 
     // Create signal
     create(name: string) {
+        console.log("SocketService create");
         this.socket.emit("create", name);
     }
 
     // Remove signal
     remove(name: string) {
+        console.log("SocketService remove");
         this.socket.emit("remove", name);
     }
 
     // Handle connection opening
     private connect() {
+        console.log("SocketService connect");
         console.log(`Connected to "${this.name}"`);
 
         // Request initial list when connected
@@ -51,6 +56,7 @@ export class SocketService {
 
     // Handle connection closing
     private disconnect() {
+        console.log("SocketService disconnect");
         console.log(`Disconnected from "${this.name}"`);
     }
 }

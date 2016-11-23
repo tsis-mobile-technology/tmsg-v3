@@ -16,10 +16,11 @@ export class NicknameComponent implements AfterViewInit {
     @ViewChild('focus') private focus: ElementRef;
     nickname: string;
     usertype: string;
+    created: Date;
 
     constructor(public userService: UserService) {
         this.nickname = userService.nickname;
-        this.usertype = userService.usertype;
+        this.usertype = "conselor";
     }
 
     // After view initialised, focus on nickname text input
@@ -29,8 +30,7 @@ export class NicknameComponent implements AfterViewInit {
 
     // Save nickname to user store
     save(): void {
-        this.userService.nickname = this.nickname;
-        this.userService.usertype = this.usertype;
+        this.userService.save(this.nickname, this.usertype, new Date());
     }
 
     // Handle keypress event, for saving nickname

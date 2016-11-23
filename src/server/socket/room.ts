@@ -10,6 +10,7 @@ export class RoomSocket {
     rooms: any = {};
 
     constructor(private io: any) {
+        console.log("RoomSocket constructor");
         this.nsp = this.io.of("/room");
         this.nsp.on("connection", (socket: any) => {
             console.log("Client connected");
@@ -20,6 +21,7 @@ export class RoomSocket {
 
     // Add signal
     private listen(): void {
+        console.log("RoomSocket listen");
         this.socket.on("disconnect", () => this.disconnect());
         this.socket.on("create", (name: string) => this.create(name));
         this.socket.on("remove", (name: string) => this.remove(name));
@@ -28,11 +30,13 @@ export class RoomSocket {
 
     // Handle disconnect
     private disconnect(): void {
+        console.log("RoomSocket disconnect");
         console.log("Client disconnected");
     }
 
     // Create room and emit it
     private createRoom(room: IRoom): void {
+        console.log("RoomSocket createRoom");
         if (!this.rooms[room.name]) {
             console.log("Creating namespace for room:", room.name);
             this.rooms[room.name] = new MessageSocket(this.io, room.name);
@@ -42,6 +46,7 @@ export class RoomSocket {
 
     // Create a room
     private create(name: string): void {
+        console.log("RoomSocket create");
         Room.create({
             name: name,
             created: new Date(),
@@ -55,6 +60,7 @@ export class RoomSocket {
 
     // Remove a room
     private remove(name: string): void {
+        console.log("RoomSocket remove");
         // First remove room messages
         Message.remove({
             room: name
@@ -72,6 +78,7 @@ export class RoomSocket {
 
     // List all rooms
     private list(): void {
+        console.log("RoomSocket list");
         if (this.socket && this.socket.connected) {
             Room.find({}).exec( (error: any, rooms: IRoom[]) => {
                 for (let room of rooms) {
