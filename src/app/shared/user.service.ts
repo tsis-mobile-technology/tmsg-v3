@@ -57,6 +57,7 @@ export class UserService {
         } else {
             // exist nickname
             this.lists.delete(index);
+            this.nickname = "";
         }
     }
 

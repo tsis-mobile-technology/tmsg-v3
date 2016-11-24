@@ -26,7 +26,13 @@ export class CustcontrolComponent {
         console.log("CustcontrolComponent constructor");
         //IF userService.usertype == "counselor"
         //THEN auto create chat room 
-        if(userService.user.usertype == "counselor" && userService.user.nickname != null) this.room = userService.user.nickname;
+        if(userService.user.usertype == "customer" && userService.user.nickname != null) {
+            //chating room create
+            this.create();
+            if(this.room && this.room != "" ) {
+                this.join();
+            }
+        }
     }
 
     // Join room, when Join-button is pressed
@@ -65,4 +71,11 @@ export class CustcontrolComponent {
             this.create();
         }
     }
+
+    // Delete nickname to user store
+    userDelete(): void {
+        console.log("Custcontrol save userDelete:" + this.userService.user.nickname);
+        this.userService.delete(this.userService.user);
+    }
+
 }
