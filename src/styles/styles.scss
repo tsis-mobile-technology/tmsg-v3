@@ -1,9 +1,12 @@
+/*
 body {
     padding: 0;
     margin: 0;
     font-family: 'Arimo', sans-serif;
     background-color: #88abcc; 
 }
+*/
+
 /* reset css */
 html, body, div, span, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -78,8 +81,8 @@ input[type="checkbox"],
 input[type="radio"]{ width: 21px; height: 21px; margin:0; padding:0; border:0; border-radius:0; cursor:pointer; outline: 0; }
 input[type="checkbox"]:checked,
 input[type="radio"]:checked{ background-position: left bottom !important; }
-input[type="checkbox"]{background: url(/tmsg/assets/img/bul_chk.png) no-repeat; background-size:100% 200%;}
-input[type="radio"]{background: url(/tmsg/assets/img/bul_radio.png) no-repeat; background-size:100% 200%;}
+input[type="checkbox"]{background: url(http://hasegi.dothome.co.kr/tmsg/img/bul_chk.png) no-repeat; background-size:100% 200%;}
+input[type="radio"]{background: url(http://hasegi.dothome.co.kr/tmsg/img/bul_radio.png) no-repeat; background-size:100% 200%;}
 input,
 textarea {-moz-appearance:none; -webkit-appearance:none; appearance:none; box-sizing:border-box; -moz-box-sizing:border-box; -webkit-box-sizing:border-box;}
 input[type="number"] { line-height: 1.1; }
@@ -96,7 +99,7 @@ input[type="checkbox"] + label { line-height: 18px; }
     color: #707070;
     background-size:30px;
     -webkit-appearance: none;
-    background: url(/tmsg/assets/img/bul_sel.png) right center no-repeat #fff;
+    background: url(http://hasegi.dothome.co.kr/tmsg/img/bul_sel.png) right center no-repeat #fff;
     background-size: 20px 7px;
 }
 

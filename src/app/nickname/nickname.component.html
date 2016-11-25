@@ -1,31 +1,34 @@
-<div class="loginbox">
-    <h2>채팅상담 관리자 로그인</h2>
-    <ul class="form-group">
-        <li>
-            <label>
-                <input #focus [(ngModel)]="nickname" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="로그인 아이디를 입력하세요!" required/>
-            </label>
-        </li>
-        <li>
-            <label>
-                <input type="password" [(ngModel)]="nickname_password" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="패스워드를 입력하세요!" />
-            </label>
-        </li>
-        <li>
-            <button (click)="save()" class="btn btn_login">로그인</button>
-        </li>
-        <li>
-            <div class="chkform">
-                <input type="checkbox" [(ngModel)]="saveid" class="input_chk_login" id="saveID">
-                <label for="saveID">아이디 저장</label>
-            </div>
-            <div class="chkform">
-                <input type="checkbox" [(ngModel)]="autologin" class="input_chk_login" id="autoLogin">
-                <label for="autoLogin">로그인 상태 유지</label>
-            </div>
-        </li>
-    </ul>
-    <button (click)="gotoMain()">View Main</button>
+<div id="wrap_login">
+    <div class="loginbox">
+       <h1 class="login_logo"><img src="http://hasegi.dothome.co.kr/tmsg/img/logo.png" alt="CHAT"></h1>
+        <h2>채팅상담 관리자 로그인</h2>
+        <ul class="form-group">
+            <li>
+                <label>
+                    <input #focus [(ngModel)]="nickname" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="로그인 아이디를 입력하세요!" required/>
+                </label>
+            </li>
+            <li>
+                <label>
+                    <input type="password" [(ngModel)]="nickname_password" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="패스워드를 입력하세요!" />
+                </label>
+            </li>
+            <li>
+                <button (click)="save()" class="btn btn_login">로그인</button>
+            </li>
+            <li>
+                <div class="chkform">
+                    <input type="checkbox" [(ngModel)]="saveid" class="input_chk_login" id="saveID">
+                    <label for="saveID">아이디 저장</label>
+                </div>
+                <div class="chkform">
+                    <input type="checkbox" [(ngModel)]="autologin" class="input_chk_login" id="autoLogin">
+                    <label for="autoLogin">로그인 상태 유지</label>
+                </div>
+            </li>
+        </ul>
+        <button (click)="gotoMain()">View Main</button>
+    </div>
 </div>
 
 <style>
@@ -43,5 +46,5 @@
 .loginbox .btn_login { width: 100%; height: 40px; text-align: center; color: #88abcc; font-size: 18px;  background-color: #fff; }
 .loginbox .chkform { float: left; width: 50%;  }
 .loginbox .chkform label { color: #fff; line-height: 21px; font-size: 14px; }
-.loginbox .input_chk_login { background-image: url(../img/bul_chk_login.png); }
+.loginbox .input_chk_login { background-image: url(http://hasegi.dothome.co.kr/tmsg/img/bul_chk_login.png); }
 </style>
