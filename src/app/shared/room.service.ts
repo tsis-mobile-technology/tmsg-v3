@@ -47,8 +47,8 @@ export class RoomService {
     // Join room
     join(name: string): void {
         console.log("RoomService join");
-        for (let roomIndex in this.userService.user.rooms) {
-            let room = this.userService.user.rooms[roomIndex];
+        for (let roomIndex in this.userService.rooms) {
+            let room = this.userService.rooms[roomIndex];
             if (room.name === name) {
                 return;
             }
@@ -56,7 +56,7 @@ export class RoomService {
         let index = this.findIndex(name);
         if (index !== -1) {
             let room = this.list.get(index);
-            this.userService.user.rooms.push(room);
+            this.userService.rooms.push(room);
         }
     }
 
@@ -64,10 +64,10 @@ export class RoomService {
     leave(name: string) {
         console.log("RoomService leave");
         // First remove the room from user joined rooms
-        for (var i = 0; i < this.userService.user.rooms.length; i++) {
-            let room = this.userService.user.rooms[i];
+        for (var i = 0; i < this.userService.rooms.length; i++) {
+            let room = this.userService.rooms[i];
             if (room.name === name) {
-                this.userService.user.rooms.splice(i, 1);
+                this.userService.rooms.splice(i, 1);
             }
         }
     }
@@ -82,10 +82,10 @@ export class RoomService {
     remove(name: string) {
         console.log("RoomService remove");
         // First remove the room from user joined rooms
-        for (var i = 0; i < this.userService.user.rooms.length; i++) {
-            let room = this.userService.user.rooms[i];
+        for (var i = 0; i < this.userService.rooms.length; i++) {
+            let room = this.userService.rooms[i];
             if (room.name === name) {
-                this.userService.user.rooms.splice(i, 1);
+                this.userService.rooms.splice(i, 1);
             }
         }
 

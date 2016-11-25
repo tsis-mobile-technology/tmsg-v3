@@ -4,5 +4,5 @@ export interface IUser {
     nickname: string;
     usertype: string; // type : "counselor",  "customer"
     created: Date;
-    rooms: IRoom[];
+    room: IRoom;
 }

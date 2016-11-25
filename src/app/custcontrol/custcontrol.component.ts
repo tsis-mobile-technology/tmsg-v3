@@ -75,6 +75,12 @@ export class CustcontrolComponent {
     // Delete nickname to user store
     userDelete(): void {
         console.log("Custcontrol save userDelete:" + this.userService.user.nickname);
+        if(this.userService.user.usertype == "customer" && this.userService.user.nickname != null) {
+            //chating room create
+            if(this.room && this.room != "" ) {
+                this.remove();
+            }
+        }
         this.userService.delete(this.userService.user);
     }
 

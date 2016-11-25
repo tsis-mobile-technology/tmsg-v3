@@ -7,6 +7,7 @@ import { IRoom, IUser } from "../../models";
 @Injectable()
 export class UserService {
     nickname: string = "";
+    rooms: IRoom[] = [];
 	user: IUser;
 	private existUser: IUser;
 
@@ -28,10 +29,10 @@ export class UserService {
 
         let index: number = this.findIndex(nickname);
         console.log("UserService save index:" + index);
-        let rooms: IRoom[] = [];
+        let room: IRoom;
         if (index === -1) {
             // Create
-            this.user = {nickname, usertype, created, rooms};
+            this.user = {nickname, usertype, created, room};
             // this.user.nickname = nickname;
             this.nickname = nickname;
             // this.user.usertype = usertype;
@@ -44,7 +45,7 @@ export class UserService {
             console.log("IUser nickname:" + this.existUser.nickname);
             console.log("IUser usertype:" + this.existUser.usertype);
             console.log("IUser created:" + this.existUser.created);
-            console.log("IUser rooms:" + this.existUser.rooms);
+            console.log("IUser rooms:" + this.existUser.room);
             this.nickname = this.existUser.nickname;
         }
     }
