@@ -7,6 +7,10 @@ import { IRoom, IUser } from "../../models";
 @Injectable()
 export class UserService {
     nickname: string = "";
+    usertype: string = "";
+    room: IRoom;
+    status: number;    // (0: 로그인, 1: 상담 중, 2: 대기, 3: 후처리, 4: 휴식, 5: 상담실 입장(customer))
+
     rooms: IRoom[] = [];
 	user: IUser;
 	private existUser: IUser;
@@ -21,6 +25,8 @@ export class UserService {
         // let irooms: IRoom[] = [];
         let iuser: IUser; 
         this.user === iuser;
+        let iroom: IRoom; 
+        this.room === iroom;
     }
 
     save(nickname: string, usertype: string, created: Date): void {
@@ -30,11 +36,14 @@ export class UserService {
         let index: number = this.findIndex(nickname);
         console.log("UserService save index:" + index);
         let room: IRoom;
+        let status: number = 0;
         if (index === -1) {
             // Create
-            this.user = {nickname, usertype, created, room};
+            this.user = {nickname, usertype, created, room, status};
             // this.user.nickname = nickname;
             this.nickname = nickname;
+            this.usertype = usertype;
+            this.status = status;
             // this.user.usertype = usertype;
             // this.user.created = created;
             this.lists = this.lists.push(this.user);
@@ -47,6 +56,8 @@ export class UserService {
             console.log("IUser created:" + this.existUser.created);
             console.log("IUser rooms:" + this.existUser.room);
             this.nickname = this.existUser.nickname;
+            this.usertype = this.existUser.usertype;
+            this.status = 0;
         }
     }
 

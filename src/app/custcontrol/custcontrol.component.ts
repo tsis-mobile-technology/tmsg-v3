@@ -26,13 +26,17 @@ export class CustcontrolComponent {
         console.log("CustcontrolComponent constructor");
         //IF userService.usertype == "counselor"
         //THEN auto create chat room 
-        if(userService.user.usertype == "customer" && userService.user.nickname != null) {
+        if(this.userService.usertype == "customer" && this.userService.nickname != null) {
             //chating room create
-            this.create();
-            if(this.room && this.room != "" ) {
-                this.join();
-            }
+            //this.wait(this.userService.nickname);
+            console.log("this is ...");
         }
+    }
+
+    wait(name: string): void {
+        console.log("Custcontrol wait");
+        this.roomService.create(name);
+        // this.userService.room = this.roomService.directJoin(name);
     }
 
     // Join room, when Join-button is pressed
@@ -82,6 +86,17 @@ export class CustcontrolComponent {
             }
         }
         this.userService.delete(this.userService.user);
+    }
+
+    // status Change
+    changeStatus(status: number): void {
+        console.log("ControlComponent changeStatus:" + status);
+        this.userService.status = status;
+    }
+
+    // status check
+    checkStatus(): void {
+        console.log("ControlComponent checkStatus:" + this.userService.status);
     }
 
 }

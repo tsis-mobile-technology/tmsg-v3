@@ -20,7 +20,7 @@ export class NicknameComponent implements AfterViewInit {
 
     constructor(public userService: UserService) {
         this.nickname = userService.nickname;
-        this.usertype = "conselor";
+        this.usertype = "counselor";
     }
 
     // After view initialised, focus on nickname text input

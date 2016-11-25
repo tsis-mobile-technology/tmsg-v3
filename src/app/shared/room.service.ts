@@ -21,7 +21,6 @@ export class RoomService {
             .get("room")
             .subscribe(
                 (socketItem: ISocketItem) => {
-                    console.log("RoomService constructor ISocketItem:" + socketItem);
                     let room: IRoom = socketItem.item;
                     let index: number = this.findIndex(room.name);
                     if (socketItem.action === "remove") {
@@ -30,6 +29,7 @@ export class RoomService {
                     } else {
                         if (index === -1) {
                             // Create
+                            room.status = 0; // 생성
                             this.list = this.list.push(room);
                         } else {
                             // Update
@@ -37,8 +37,12 @@ export class RoomService {
                         }
                     }
                     this.rooms.next(this.list);
-                    console.log("RoomService constructor list:" + this.list);
-                    console.log("RoomService constructor rooms:" + this.rooms);
+
+                    //directory join chatroom & wait counselor
+                    if( this.userService.usertype == "customer") {
+                        this.userService.room = this.directJoin(this.userService.nickname);    
+                    }
+                    console.log("RoomService constructor userService:" + this.userService.room);
                 },
                 error => console.log(error)
             );
@@ -50,6 +54,8 @@ export class RoomService {
         for (let roomIndex in this.userService.rooms) {
             let room = this.userService.rooms[roomIndex];
             if (room.name === name) {
+                // status control
+                this.userService.status = 5;
                 return;
             }
         }
@@ -60,6 +66,33 @@ export class RoomService {
         }
     }
 
+    // DirectJoin room
+    directJoin(name: string): IRoom {
+        console.log("RoomService directJoin");
+        //nickname's room create
+        this.create(name);
+
+        for (let roomIndex in this.userService.rooms) {
+            let room = this.userService.rooms[roomIndex];
+            room.status = 1; // 고객 입장
+            if (room.name === name) {
+                // status control
+console.log("RoomService directJoin:exists:status:" + this.userService.status);
+                this.userService.status = 5;
+                return room;
+            }
+        }
+        let index = this.findIndex(name);
+        if (index !== -1) {
+            let room = this.list.get(index);
+            room.status = 1; // 고객 입장
+            this.userService.rooms.push(room);
+        }
+console.log("RoomService directJoin:new:status:" + this.userService.status);
+        this.userService.status = 5;
+        return this.userService.rooms[index];
+    }
+
     // Leave room
     leave(name: string) {
         console.log("RoomService leave");
@@ -67,6 +100,8 @@ export class RoomService {
         for (var i = 0; i < this.userService.rooms.length; i++) {
             let room = this.userService.rooms[i];
             if (room.name === name) {
+                if (this.userService.usertype === "customer") room.status = 4; //고객 퇴장
+                else room.status = 3; // 상담사 퇴장 
                 this.userService.rooms.splice(i, 1);
             }
         }
@@ -85,6 +120,7 @@ export class RoomService {
         for (var i = 0; i < this.userService.rooms.length; i++) {
             let room = this.userService.rooms[i];
             if (room.name === name) {
+                room.status = 5; // 종료 
                 this.userService.rooms.splice(i, 1);
             }
         }

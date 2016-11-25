@@ -24,6 +24,16 @@
                <li><button type="button" class="btn btn_fil_tit">완료</button></li>
            </ul>
        </div>
+       <div class="pan_tit">
+           <ul>
+               <li><button (click)="changeStatus(0)" class="btn btn_fil_tit active">로그인</button></li>
+               <li><button (click)="changeStatus(1)" class="btn btn_fil_tit active">상담 중</button></li>
+               <li><button (click)="changeStatus(2)" class="btn btn_fil_tit active">상담 대기</button></li>
+               <li><button (click)="changeStatus(3)" class="btn btn_fil_tit active">후처리</button></li>
+               <li><button (click)="changeStatus(4)" class="btn btn_fil_tit active">휴식</button></li>
+               <li><button (click)="checkStatus()" class="btn btn_fil_tit active">상태체크</button></li>
+           </ul>
+       </div>
 <!--        
        <div class="searchbox">
            <div class="searchbar">
