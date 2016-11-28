@@ -1,22 +1,19 @@
-<!-- content -->
-<div id="content">
-    <!--	history pannel	-->
-    <div id="history_pannel">
+<header id="header">
+	<h1 class="logo">채팅상담 Cust 화면</h1>
+	
       <span>
         <select [(ngModel)]="room">
           <option value="">Select room...</option>
           <option *ngFor="let room of roomService.rooms | async" [value]="room.name">{{room.name}}</option>
         </select>
       </span>
-       <div class="pan_tit">
+          
+      <div class="mr_ko_btn">
            <ul>
                <li><button (click)="directJoin()" class="btn btn_fil_tit active">상담사 연결</button></li>
-           </ul>
-           <ul>
                <li><button (click)="userDelete()" class="btn btn_fil_tit active">채팅 종료</button></li>
            </ul>
-       </div>
-       <div class="pan_tit">
+
            <ul>
                <li><button (click)="changeStatus(0)" class="btn btn_fil_tit active">로그인</button></li>
                <li><button (click)="changeStatus(1)" class="btn btn_fil_tit active">상담 중</button></li>
@@ -26,9 +23,17 @@
                <li><button (click)="checkStatus()" class="btn btn_fil_tit active">상태체크</button></li>
            </ul>
        </div>
-    <!-- //chat pannel   -->
-</div>
+       <style>
+       .mr_ko_btn,
+       .mr_ko_btn li { display: inline-block; }
+       .mr_ko_btn li .btn { padding: 2px 3px; background-color: cornflowerblue; }
+       .mr_ko_btn li .btn:before { content: '['; }
+       .mr_ko_btn li .btn:after { content: ']'; }
+    </style>
+</header>
 <style>
+#header { min-width: 900px; }
+#header .logo { display: inline-block; color: #fff; font-weight: normal; font-size: 24px; }
 #history_pannel .pan_tit  { height: 80px; padding: 20px 20px 0; }
 #history_pannel .pan_tit li { float: left; width: 18%; height: 36px; margin: 0 1%; text-align: center; }
 #history_pannel .pan_tit li .btn_fil_tit { display: block; width: 100%; height: 100%; color: #ababab; border: 1px solid #ababab; font-size: 14px; }

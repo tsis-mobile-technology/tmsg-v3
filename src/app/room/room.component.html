@@ -19,8 +19,8 @@
             <div class="message" ngClass="msg_out" *ngFor="let item of messages | orderBy:'created':false">
                 <p class="name">{{item.from}}</p>
                 <div class="msgbox">
-                    <span class="time">{{item.created}}</span>
                     <pre>{{item.message}}</pre>
+                    <span class="time">{{item.created}}</span>
                 </div>
             </div>
             
@@ -42,62 +42,8 @@
 <pre>안녕하세요? 반갑습니다.</pre>
                 </div> 
             </div>
-
-            <div class="msg_in">
-                <div class="photo">
-                    <img src="http://hasegi.dothome.co.kr/tmsg/img/img_face.jpg" alt="프로필사진">
-                </div>
-                <p class="name">홍길동</p>
-                <div class="msgbox">
-<pre>반갑습니다.안녕하세요? 반갑습니다.</pre>
-                    <p class="time">12.:45</p>
-                </div>
-            </div>
-
-            <div class="msg_out">
-                <div class="msgbox">
-                    <p class="time">12.:45</p>
-<pre>안녕하세요? 반갑습니다.
-하고싶은 말을 쓰세요.</pre>
-                </div> 
-            </div>
-
-            <div class="msg_in">
-                <div class="photo">
-                    <img src="http://hasegi.dothome.co.kr/tmsg/img/img_face.jpg" alt="프로필사진">
-                </div>
-                <p class="name">홍길동</p>
-                <div class="msgbox">
-<pre>네.</pre>
-                    <p class="time">12.:45</p>
-                </div>
-            </div>
-
-            <div class="msg_out">
-                <div class="msgbox">
-                    <p class="time">12.:45</p>
-<pre>안녕하세요? 반갑습니다.</pre>
-                </div> 
-            </div>
-
-            <div class="msg_in">
-                <div class="photo">
-                    <img src="http://hasegi.dothome.co.kr/tmsg/img/img_face.jpg" alt="프로필사진">
-                </div>
-                <p class="name">홍길동</p>
-                <div class="msgbox">
-<pre>안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.</pre>
-                    <p class="time">12.:45</p>
-                </div>
-            </div>
-
-            <div class="msg_out">
-                <div class="msgbox">
-                    <p class="time">12.:45</p>
-<pre>안녕하세요? 반갑습니다.</pre>
-                </div> 
-            </div>
 -->
+  
         </div><!-- //chat_area -->
 
         <div class="chat_form">

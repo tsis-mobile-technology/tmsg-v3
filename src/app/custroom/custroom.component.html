@@ -1,3 +1,80 @@
+<!--	chat pannel	-->
+<div id="chat_pannel" class="box">
+    <div class="pan_tit">
+        <div class="list_tit">
+           <span class="name">{{room.name}}</span>
+           <span class="time">상담 시작 {{room.created}}</span>
+       </div>
+    </div>
+
+    <div class="chatbox">
+        
+        <div class="chat_area messages" #scroll>
+            <div class="message" ngClass="msg_out" *ngFor="let item of messages | orderBy:'created':false">
+                <p class="name">{{item.from}}</p>
+                <div class="msgbox">
+                    <pre>{{item.message}}</pre>
+                    <span class="time">{{item.created}}</span>
+                </div>
+            </div>
+            
+<!--
+            <div class="msg_in">
+                <div class="photo">
+                    <img src="http://hasegi.dothome.co.kr/tmsg/img/img_face.jpg" alt="프로필사진">
+                </div>
+                <p class="name">홍길동</p>
+                <div class="msgbox">
+                    <pre>안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.</pre>
+                    <p class="time">12.:45</p>
+                </div>
+            </div>
+
+            <div class="msg_out">
+                <div class="msgbox">
+                    <p class="time">12.:45</p>
+<pre>안녕하세요? 반갑습니다.</pre>
+                </div> 
+            </div>
+-->
+  
+        </div><!-- //chat_area -->
+
+        <div class="chat_form">
+            <div class="add_file">
+<!--                        <input type="file" class="input_file">-->
+                <span class="file_wrap"><i class="icon ion-android-attach"></i> 파일전송
+                    <input type="file" class="file_add" onChange="javascript:document.getElementById('fileup').value=this.value">
+                </span>
+                <input type="text" id="fileup" class="file_txt" readonly title="첨부된 파일경로">
+            </div>
+            <div class="sendbox">
+                <div class="txtbox">
+                    <textarea class="txtarea" #focus [(ngModel)]="message" (keypress)="eventHandler($event)"></textarea>
+<!--                    <textarea class="txtarea"></textarea>-->
+                    <button type="button" class="btn btn_send" (click)="send()">전송</button>
+                </div>
+            </div>
+<!--
+            <div class="send_setbox">
+                <input type="checkbox" class="input_chk" id="chkEnterSend">
+                <label for="chkEnterSend">엔터로 전송</label>
+                <div class="btnbox">
+                    <button type="button" class="btn btn_sendset">악성</button>
+                    <button type="button" class="btn btn_sendset">보류</button>
+                    <button type="button" class="btn btn_sendset" (click)="leave(room)">상담종료</button>
+                </div>
+            </div>
+-->
+        </div>
+    </div><!-- //chatbox -->            
+</div>
+<!-- //chat pannel   -->
+
+
+<!--
+
+
 <div class="box">
     <button class="leave" (click)="leave(room)">leave</button>
     <h1>
@@ -17,7 +94,9 @@
         <button (click)="send()">Send</button>
     </h3>
 </div>
+-->
+<!--
 <style>
 .messages .message pre { display: inline-block; position: relative; max-width: 300px; padding: 10px; font-size: 14px; border-radius: 4px; background-color: #fff; box-shadow: 2px 2px 2px rgba(0,0,0,0.2); white-space: pre-line; line-height: 1.2; }
 .messages .message  pre:after { content: ''; position: absolute; top: 5px; left: -10px; width: 0; height: 0; border-color: transparent transparent #fff transparent; border-style: solid; border-width: 0 5px 10px 5px; transform: rotate(-90deg); }
-</style>
+</style>-->

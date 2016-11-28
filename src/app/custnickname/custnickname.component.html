@@ -1,21 +1,23 @@
-<div class="loginbox">
-    <h2>채팅상담 접속</h2>
-    <ul class="form-group">
-        <li>
-            <label>
-                <input #focus [(ngModel)]="nickname" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="원하시는 아이디를 입력하세요!" required/>
-            </label>
-        </li>
-        <li>
-            <button (click)="save()" class="btn btn_login">접속</button>
-        </li>
-    </ul>   
+<div id="wrap_login">
+   <div class="loginbox">
+        <h2>채팅상담 접속</h2>
+        <ul class="form-group">
+            <li>
+                <label>
+                    <input #focus [(ngModel)]="nickname" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="원하시는 대화명을 입력하세요!" required/>
+                </label>
+            </li>
+            <li>
+                <button (click)="save()" class="btn btn_login">접속</button>
+            </li>
+        </ul>   
+    </div>
 </div>
 
 <style>
 /* 로그인 */
 #wrap_login { width: 100%; height: 100%; min-height: 800px; background-color: #88abcc; }
-.loginbox { position: absolute; top: 50%; left: 50%; width: 300px; height: 500px; margin: -250px 0 0 -150px; }
+.loginbox { position: absolute; top: 50%; left: 50%; width: 300px; height: 300px; margin: -150px 0 0 -150px; }
 .loginbox .login_logo { text-align: center; }
 .loginbox h2 { padding: 75px 0 40px; font-size: 28px; text-align: center; color: #fff; }
 .loginbox li { margin-bottom: 10px; }
