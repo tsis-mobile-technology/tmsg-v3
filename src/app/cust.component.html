@@ -1,4 +1,4 @@
 <h1>t-MSG Version.1 Cust</h1>
 <custnickname *ngIf="!userService.nickname || userService.nickname === ''"></custnickname>
 <custcontrol *ngIf="userService.nickname && userService.nickname !== ''"></custcontrol>
-<rooms *ngIf="userService.nickname && userService.nickname !== ''"></rooms>
+<custrooms *ngIf="userService.nickname && userService.nickname !== ''"></custrooms>
