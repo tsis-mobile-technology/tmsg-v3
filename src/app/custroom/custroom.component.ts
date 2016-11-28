@@ -3,25 +3,25 @@ import { Component, Input, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChi
 import { RoomService, UserService, SocketService } from "../shared";
 import { IMessage, IRoom, IUser } from "../../models";
 
-import { MessageService } from "./message.service";
+import { CustMessageService } from "./custmessage.service";
 
 declare var require;
 const styles: string = require('./custroom.component.scss');
 const template: string = require('./custroom.component.html');
 
 @Component({
-    selector: 'room',
+    selector: 'custroom',
     styles: [styles],
     template
 })
 
-export class CustRoomComponent implements OnInit, AfterViewInit, OnDestroy {
+export class CustroomComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('scroll') private scroll: ElementRef;
     @ViewChild('focus') private focus: ElementRef;
     @Input() room: IRoom;
     message: string = "";
     messages: IMessage[];
-    private messageService: MessageService;
+    private custMessageService: CustMessageService;
     private alreadyLeftChannel: boolean = false;
 
     constructor(
@@ -33,14 +33,14 @@ export class CustRoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // Handle keypress event, for saving nickname
     ngOnInit(): void {
         console.log("CustRoomComponent ngOnInit");
-        this.messageService = new MessageService(this.room.name);
-        this.messageService.messages.subscribe(messages => {
+        this.custMessageService = new CustMessageService(this.room.name);
+        this.custMessageService.messages.subscribe(messages => {
             this.messages = messages;
             setTimeout( () => {
                 this.scrollToBottom();
             }, 200);
         });
-        this.messageService.create(this.userService.user.nickname, "joined the channel");
+        this.custMessageService.create(this.userService.user.nickname, "joined the channel");
         // status control
         // status: 5 -> 2(상담실 입장 -> 대기)
 console.log("CustRoomComponent ngOnInit:status:" + this.userService.status);
@@ -66,7 +66,7 @@ console.log("CustRoomComponent ngOnInit:status:" + this.userService.status);
     // Send chat message, and reset message text input
     send(): void {
         console.log("CustRoomComponent send");
-        this.messageService.create(this.userService.user.nickname, this.message);
+        this.custMessageService.create(this.userService.user.nickname, this.message);
         this.message = "";
     }
 
@@ -74,7 +74,7 @@ console.log("CustRoomComponent ngOnInit:status:" + this.userService.status);
     leave(): void {
         console.log("CustRoomComponent leave");
         this.alreadyLeftChannel = true;
-        this.messageService.create(this.userService.user.nickname, "left the channel");
+        this.custMessageService.create(this.userService.user.nickname, "left the channel");
 console.log("CustRoomComponent leave:status:" + this.userService.status);
         this.userService.status = 3;
         this.roomService.leave(this.room.name);

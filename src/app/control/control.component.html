@@ -29,6 +29,31 @@
         <button (click)="create()">Create</button>
     </span>
 	
+	
+	
+	<div class="mr_ko_btn">
+       <ul>
+           <li><button (click)="create()" class="btn btn_fil_tit active">생성</button></li>
+           <li><button (click)="join()" class="btn btn_fil_tit active">접속</button></li>
+           <li><button (click)="remove()" class="btn btn_fil_tit active">삭제</button></li>
+           <li><button type="button" class="btn btn_fil_tit">보류</button></li>
+           <li><button type="button" class="btn btn_fil_tit">완료</button></li>
+       </ul>
+       <ul>
+           <li><button (click)="changeStatus(0)" class="btn btn_fil_tit active">로그인</button></li>
+           <li><button (click)="changeStatus(1)" class="btn btn_fil_tit active">상담 중</button></li>
+           <li><button (click)="changeStatus(2)" class="btn btn_fil_tit active">상담 대기</button></li>
+           <li><button (click)="changeStatus(3)" class="btn btn_fil_tit active">후처리</button></li>
+           <li><button (click)="changeStatus(4)" class="btn btn_fil_tit active">휴식</button></li>
+           <li><button (click)="checkStatus()" class="btn btn_fil_tit active">상태체크</button></li>
+       </ul>
+   </div>
+   <style>
+       .mr_ko_btn,
+       .mr_ko_btn li { display: inline-block; }
+       .mr_ko_btn li:before { content: '['; }
+       .mr_ko_btn li:after { content: ']'; }
+    </style>
 </header>
 
 <!-- container -->
@@ -65,26 +90,6 @@
 	<!-- content -->
 	<div id="content">
         
-        
-       <div class="pan_tit">
-           <ul>
-               <li><button (click)="create()" class="btn btn_fil_tit active">생성</button></li>
-               <li><button (click)="join()" class="btn btn_fil_tit active">접속</button></li>
-               <li><button (click)="remove()" class="btn btn_fil_tit active">삭제</button></li>
-               <li><button type="button" class="btn btn_fil_tit">보류</button></li>
-               <li><button type="button" class="btn btn_fil_tit">완료</button></li>
-           </ul>
-       </div>
-       <div class="pan_tit">
-           <ul>
-               <li><button (click)="changeStatus(0)" class="btn btn_fil_tit active">로그인</button></li>
-               <li><button (click)="changeStatus(1)" class="btn btn_fil_tit active">상담 중</button></li>
-               <li><button (click)="changeStatus(2)" class="btn btn_fil_tit active">상담 대기</button></li>
-               <li><button (click)="changeStatus(3)" class="btn btn_fil_tit active">후처리</button></li>
-               <li><button (click)="changeStatus(4)" class="btn btn_fil_tit active">휴식</button></li>
-               <li><button (click)="checkStatus()" class="btn btn_fil_tit active">상태체크</button></li>
-           </ul>
-       </div>
             
 	</div>
 	<!-- //content -->

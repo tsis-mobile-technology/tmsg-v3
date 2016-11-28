@@ -5,7 +5,7 @@ import { SocketService } from "../shared";
 
 import { IMessage, ISocketItem } from "../../models";
 
-export class MessageService {
+export class CustMessageService {
     messages: ReplaySubject<any> = new ReplaySubject(1);
     private list: List<any> = List();
     private socketService: SocketService;

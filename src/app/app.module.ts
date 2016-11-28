@@ -21,6 +21,8 @@ import { RoomComponent } from "./room";
 import { RoomsComponent } from "./rooms";
 import { CustnicknameComponent } from "./custnickname";
 import { CustcontrolComponent } from "./custcontrol";
+import { CustroomComponent } from "./custroom";
+import { CustroomsComponent } from "./custrooms";
 
 @NgModule({
     imports: [
@@ -39,7 +41,9 @@ import { CustcontrolComponent } from "./custcontrol";
         RoomComponent,
         RoomsComponent,
         CustnicknameComponent,
-        CustcontrolComponent
+        CustcontrolComponent,
+        CustroomComponent,
+        CustroomsComponent
     ],
     bootstrap: [
         AppComponent

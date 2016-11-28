@@ -8,11 +8,11 @@ const styles: string = require("./custrooms.component.scss");
 const template: string = require("./custrooms.component.html");
 
 @Component({
-    selector: "rooms",
+    selector: "custrooms",
     styles: [styles],
     template
 })
 
-export class CustRoomsComponent {
+export class CustroomsComponent {
     constructor(public userService: UserService) {}
 }
