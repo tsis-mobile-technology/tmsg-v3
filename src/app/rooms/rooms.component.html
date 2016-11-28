@@ -1,3 +1,134 @@
 <template ngFor let-room [ngForOf]="userService.rooms">
+    <!--	history pannel	-->
+    <div id="history_pannel">
+        <div class="pan_tit">
+           <ul>
+              <li><button (click)="create()" class="btn btn_fil_tit">생성</button></li>
+               <li><button (click)="join()" class="btn btn_fil_tit">접속</button></li>
+               <li><button (click)="remove()" class="btn btn_fil_tit">삭제</button></li>
+               <li><button type="button" class="btn btn_fil_tit">보류</button></li>
+               <li><button type="button" class="btn btn_fil_tit">완료</button></li>
+           </ul>
+       </div>
+
+       <div class="searchbox">
+           <div class="searchbar">
+              <ul>
+                  <li><input type="text" class="input_txt" placeholder="검색어 입력"></li>
+                  <li><button type="button" class="btn btn_dark">검색</button></li>
+                  <li><button type="button" class="btn btn_gray"><i class="icon ion-loop"></i><span class="blind">초기화</span></button></li>
+              </ul>
+           </div>
+           <div class="sortbar">
+                <button type="button" class="btn btn_sort">최근 대화순 <i class="icon ion-android-arrow-dropdown"></i></button>
+                <button type="button" class="btn btn_sort">고객 이름순 <i class="icon ion-android-arrow-dropdown"></i></button>
+                <button type="button" class="btn btn_sort">상담 시간순 <i class="icon ion-android-arrow-dropdown"></i></button>
+           </div>
+       </div>
+
+       <div class="history_list">
+           <ul>
+               <li><a href="#" class="btn active">
+                   <p class="bul bul_new">신규</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">오전 10:24</span>
+                       <p class="list_txt ellipsis">안녕하세요?</p>
+                   </div>
+               </a></li>
+               <li><a href="#" class="btn">
+                   <p class="bul bul_read">읽음</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">오전 10:24</span>
+                       <p class="list_txt ellipsis">안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요?</p>
+                   </div>
+               </a></li>
+               <li><a href="#" class="btn">
+                   <p class="bul bul_delay">보류</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">어제</span>
+                       <p class="list_txt ellipsis">안녕하세요? 안녕하세요?</p>
+                   </div>
+               </a></li>
+               <li><a href="#" class="btn">
+                   <p class="bul bul_finish">완료</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">16.10.26</span>
+                       <p class="list_txt ellipsis">안녕하세요? 안녕하세요? 안녕하세요?</p>
+                   </div>
+               </a></li>
+               <li><a href="#" class="btn">
+                   <p class="bul bul_new">신규</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">오전 10:24</span>
+                       <p class="list_txt ellipsis">안녕하세요?</p>
+                   </div>
+               </a></li>
+               <li><a href="#" class="btn">
+                   <p class="bul bul_read">읽음</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">오전 10:24</span>
+                       <p class="list_txt ellipsis">안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요?</p>
+                   </div>
+               </a></li>
+               <li><a href="#" class="btn">
+                   <p class="bul bul_delay">보류</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">어제</span>
+                       <p class="list_txt ellipsis">안녕하세요? 안녕하세요?</p>
+                   </div>
+               </a></li>
+               <li><a href="#" class="btn">
+                   <p class="bul bul_finish">완료</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">16.10.26</span>
+                       <p class="list_txt ellipsis">안녕하세요? 안녕하세요? 안녕하세요?</p>
+                   </div>
+               </a></li>
+               <li><a href="#" class="btn">
+                   <p class="bul bul_new">신규</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">오전 10:24</span>
+                       <p class="list_txt ellipsis">안녕하세요?</p>
+                   </div>
+               </a></li>
+               <li><a href="#" class="btn">
+                   <p class="bul bul_read">읽음</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">오전 10:24</span>
+                       <p class="list_txt ellipsis">안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요? 안녕하세요?</p>
+                   </div>
+               </a></li>
+               <li><a href="#" class="btn">
+                   <p class="bul bul_delay">보류</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">어제</span>
+                       <p class="list_txt ellipsis">안녕하세요? 안녕하세요?</p>
+                   </div>
+               </a></li>
+               <li><a href="#" class="btn">
+                   <p class="bul bul_finish">완료</p>
+                   <div class="list_tit">
+                       <span class="name">홍길동</span>
+                       <span class="time">16.10.26</span>
+                       <p class="list_txt ellipsis">안녕하세요? 안녕하세요? 안녕하세요?</p>
+                   </div>
+               </a></li>
+           </ul>
+       </div> 
+   </div>
+    <!-- //history pannel   -->
+    
     <room [room]="room"></room>
 </template>
+

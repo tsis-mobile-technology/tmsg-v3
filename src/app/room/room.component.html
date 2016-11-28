@@ -1,4 +1,321 @@
-<div class="box">
+<!--	chat pannel	-->
+<div id="chat_pannel" class="box">
+    <div class="pan_tit">
+        <div class="list_tit">
+           <span class="name">{{room.name}}</span>
+           <span class="time">상담 시작 {{room.created}}</span>
+       </div>
+    </div>
+
+    <div class="chatbox">
+        <div class="chat_tit">
+            <input type="text" class="input_txt">
+            <button type="button" class="btn" title="검색"><i class="icon ion-ios-search-strong"></i><span class="blind">검색</span></button>
+            <button type="button" class="btn" title="메모"><i class="icon ion-clipboard"></i><span class="blind">메모</span></button>
+            <button type="button" class="btn" title="알람"><i class="icon ion-ios-bell"></i><span class="blind">알람</span></button>
+        </div>
+
+        <div class="chat_area messages" #scroll>
+            <div class="message msg_out" *ngFor="let item of messages | orderBy:'created':false">
+                <p class="name">{{item.from}}</p>
+                <div class="msgbox">
+                    <span class="time">{{item.created}}</span>
+                    <pre>{{item.message}}</pre>
+                </div>
+            </div>
+            
+<!--
+            <div class="msg_in">
+                <div class="photo">
+                    <img src="http://hasegi.dothome.co.kr/tmsg/img/img_face.jpg" alt="프로필사진">
+                </div>
+                <p class="name">홍길동</p>
+                <div class="msgbox">
+                    <pre>안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.</pre>
+                    <p class="time">12.:45</p>
+                </div>
+            </div>
+
+            <div class="msg_out">
+                <div class="msgbox">
+                    <p class="time">12.:45</p>
+<pre>안녕하세요? 반갑습니다.</pre>
+                </div> 
+            </div>
+
+            <div class="msg_in">
+                <div class="photo">
+                    <img src="http://hasegi.dothome.co.kr/tmsg/img/img_face.jpg" alt="프로필사진">
+                </div>
+                <p class="name">홍길동</p>
+                <div class="msgbox">
+<pre>반갑습니다.안녕하세요? 반갑습니다.</pre>
+                    <p class="time">12.:45</p>
+                </div>
+            </div>
+
+            <div class="msg_out">
+                <div class="msgbox">
+                    <p class="time">12.:45</p>
+<pre>안녕하세요? 반갑습니다.
+하고싶은 말을 쓰세요.</pre>
+                </div> 
+            </div>
+
+            <div class="msg_in">
+                <div class="photo">
+                    <img src="http://hasegi.dothome.co.kr/tmsg/img/img_face.jpg" alt="프로필사진">
+                </div>
+                <p class="name">홍길동</p>
+                <div class="msgbox">
+<pre>네.</pre>
+                    <p class="time">12.:45</p>
+                </div>
+            </div>
+
+            <div class="msg_out">
+                <div class="msgbox">
+                    <p class="time">12.:45</p>
+<pre>안녕하세요? 반갑습니다.</pre>
+                </div> 
+            </div>
+
+            <div class="msg_in">
+                <div class="photo">
+                    <img src="http://hasegi.dothome.co.kr/tmsg/img/img_face.jpg" alt="프로필사진">
+                </div>
+                <p class="name">홍길동</p>
+                <div class="msgbox">
+<pre>안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.안녕하세요? 반갑습니다.</pre>
+                    <p class="time">12.:45</p>
+                </div>
+            </div>
+
+            <div class="msg_out">
+                <div class="msgbox">
+                    <p class="time">12.:45</p>
+<pre>안녕하세요? 반갑습니다.</pre>
+                </div> 
+            </div>
+-->
+        </div><!-- //chat_area -->
+
+        <div class="chat_form">
+            <div class="bookmark">
+                <ul>
+                    <li>
+                        <input type="text" class="input_bookmark" value="자주 쓰는 질문입니다.">
+                        <button type="button" class="btn" title="수정"><i class="icon ion-edit"></i></button>
+                        <button type="button" class="btn" title="삭제"><i class="icon ion-close-round"></i></button>
+                    </li>
+                    <li>
+                        <input type="text" class="input_bookmark" value="자주 쓰는 질문입니다2">
+                        <button type="button" class="btn" title="수정"><i class="icon ion-edit"></i></button>
+                        <button type="button" class="btn" title="삭제"><i class="icon ion-close-round"></i></button>
+                    </li>
+                    <li>
+                        <input type="text" class="input_bookmark" value="자주 쓰는 질문입니다3.">
+                        <button type="button" class="btn" title="수정"><i class="icon ion-edit"></i></button>
+                        <button type="button" class="btn" title="삭제"><i class="icon ion-close-round"></i></button>
+                    </li>
+                </ul>
+                <button type="button" class="btn btn_add_bookmark"><i class="icon ion-plus-circled"></i> 자주 쓰는 문구</button>
+            </div>
+            <div class="add_file">
+<!--                        <input type="file" class="input_file">-->
+                <span class="file_wrap"><i class="icon ion-android-attach"></i> 파일전송
+                    <input type="file" class="file_add" onChange="javascript:document.getElementById('fileup').value=this.value">
+                </span>
+                <input type="text" id="fileup" class="file_txt" readonly title="첨부된 파일경로">
+            </div>
+            <div class="sendbox">
+                <div class="txtbox">
+                    <textarea class="txtarea" #focus [(ngModel)]="message" (keypress)="eventHandler($event)"></textarea>
+<!--                    <textarea class="txtarea"></textarea>-->
+                    <button type="button" class="btn btn_send" (click)="send()">전송</button>
+                </div>
+            </div>
+            <div class="send_setbox">
+                <input type="checkbox" class="input_chk" id="chkEnterSend">
+                <label for="chkEnterSend">엔터로 전송</label>
+                <div class="btnbox">
+                    <button type="button" class="btn btn_sendset">악성</button>
+                    <button type="button" class="btn btn_sendset">보류</button>
+                    <button type="button" class="btn btn_sendset" (click)="leave(room)">상담종료</button>
+                </div>
+            </div>
+        </div>
+    </div><!-- //chatbox -->            
+</div>
+<!-- //chat pannel   -->
+
+<!--	info pannel	-->
+<div id="info_pannel">
+     <div class="pan_tit">
+        <ul class="tab_tit">
+            <li><a href="#tab1" class="btn btn_tab active">고객 파라미터</a></li>
+            <li><a href="#tab2" class="btn btn_tab">상품 정보</a></li>
+            <li><a href="#tab3" class="btn btn_tab">상담이력</a></li>
+        </ul>
+    </div>
+    <div class="tab_con" id="tab1">
+        <div class="btnbox">
+            <button type="button" class="btn btn_dark">고객정보 조회</button>
+        </div>
+        <table class="tbl tbl_row">
+            <caption class="blind">고객 파라미터</caption>
+            <tbody>
+                <tr>
+                    <th scope="row">상담제목</th>
+                    <td class="input"><input type="text" class="input_txt input_full"></td>
+                </tr>
+                <tr>
+                    <th scope="row">상담사</th>
+                    <td>이쁜이</td>
+                </tr>
+                <tr>
+                    <th scope="row">고객명</th>
+                    <td>홍길동</td>
+                </tr>
+                <tr>
+                    <th scope="row">등록일</th>
+                    <td>2016-10-10</td>
+                </tr>
+                <tr>
+                    <th scope="row">휴대폰 번호</th>
+                    <td class="input">
+                        <input type="tel" class="input_txt input_tel"> -
+                        <input type="tel" class="input_txt input_tel"> -
+                        <input type="tel" class="input_txt input_tel">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">유형</th>
+                    <td class="input"><input type="text" class="input_txt"></td>
+                </tr>
+                <tr>
+                    <th scope="row">종류</th>
+                    <td class="input"><input type="text" class="input_txt"></td>
+                </tr>
+                <tr>
+                    <th scope="row">고유값</th>
+                    <td class="input"><input type="text" class="input_txt input_full"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="btnarea">
+            <button type="button" class="btn btn_blue">저장</button>
+            <button type="button" class="btn btn_gray">취소</button>
+        </div>
+    </div><!-- //tab1 -->
+
+    <div class="qnabox">
+       <div class="qna_tit">
+            <h5>상담 템플릿</h5>
+            <a href="#" class="btn btn_dark btn_sm">관리</a>
+        </div>
+        <div class="searchbar">
+           <ul>
+              <li>
+                <select class="input_sel">
+                    <option value="">고객 질문</option>
+                </select>
+              </li>
+              <li><input type="text" class="input_txt" placeholder="검색어 입력"></li>
+              <li><button type="button" class="btn btn_dark">검색</button></li>
+              <li><button type="button" class="btn btn_gray"><i class="icon ion-loop"></i><span class="blind">초기화</span></button></li>
+          </ul>
+        </div>
+        <div class="qna_list">
+            <ul>
+                <li class="acco_item">
+                    <a href="#" class="btn btn_acco">
+                        <i class="icon ion-ios-arrow-down"></i>
+                        <p class="acco_tit"><i class="bul_q">Q</i> 문의드립니다.</p>
+                    </a>
+                    <div class="acco_con">
+고객님, 안녕하세요.<br>
+문의하신 내용에 답변 드립니다.
+                    </div>
+                </li>
+                <li class="acco_item">
+                    <a href="#" class="btn btn_acco">
+                        <i class="icon ion-ios-arrow-down"></i>
+                        <p class="acco_tit"><i class="bul_q">Q</i> 문의드립니다.</p>
+                    </a>
+                    <div class="acco_con">
+문의하신 내용에 답변 드립니다.
+                    </div>
+                </li>
+                <li class="acco_item">
+                    <a href="#" class="btn btn_acco">
+                        <i class="icon ion-ios-arrow-down"></i>
+                        <p class="acco_tit"><i class="bul_q">Q</i> 문의드립니다.</p>
+                    </a>
+                    <div class="acco_con">
+고객님, 안녕하세요.<br>
+문의하신 내용에 답변 드립니다.
+                    </div>
+                </li>
+                <li class="acco_item">
+                    <a href="#" class="btn btn_acco">
+                        <i class="icon ion-ios-arrow-down"></i>
+                        <p class="acco_tit"><i class="bul_q">Q</i> 문의드립니다.</p>
+                    </a>
+                    <div class="acco_con">
+문의하신 내용에 답변 드립니다.
+                    </div>
+                </li>
+                <li class="acco_item">
+                    <a href="#" class="btn btn_acco">
+                        <i class="icon ion-ios-arrow-down"></i>
+                        <p class="acco_tit"><i class="bul_q">Q</i> 문의드립니다.</p>
+                    </a>
+                    <div class="acco_con">
+고객님, 안녕하세요.<br>
+문의하신 내용에 답변 드립니다.
+                    </div>
+                </li>
+                <li class="acco_item">
+                    <a href="#" class="btn btn_acco">
+                        <i class="icon ion-ios-arrow-down"></i>
+                        <p class="acco_tit"><i class="bul_q">Q</i> 문의드립니다.</p>
+                    </a>
+                    <div class="acco_con">
+문의하신 내용에 답변 드립니다.
+                    </div>
+                </li>
+                <li class="acco_item">
+                    <a href="#" class="btn btn_acco">
+                        <i class="icon ion-ios-arrow-down"></i>
+                        <p class="acco_tit"><i class="bul_q">Q</i> 문의드립니다.</p>
+                    </a>
+                    <div class="acco_con">
+고객님, 안녕하세요.<br>
+문의하신 내용에 답변 드립니다.
+                    </div>
+                </li>
+                <li class="acco_item">
+                    <a href="#" class="btn btn_acco">
+                        <i class="icon ion-ios-arrow-down"></i>
+                        <p class="acco_tit"><i class="bul_q">Q</i> 문의드립니다.</p>
+                    </a>
+                    <div class="acco_con">
+문의하신 내용에 답변 드립니다.
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- //info pannel   -->
+   
+
+   
+   
+   
+<!--
+   <div class="box">
     <button class="leave" (click)="leave(room)">leave</button>
     <h1>
         {{room.name}}
@@ -17,7 +334,10 @@
         <button (click)="send()">Send</button>
     </h3>
 </div>
+-->
+<!--
+
 <style>
 .messages .message pre { display: inline-block; position: relative; max-width: 300px; padding: 10px; font-size: 14px; border-radius: 4px; background-color: #fff; box-shadow: 2px 2px 2px rgba(0,0,0,0.2); white-space: pre-line; line-height: 1.2; }
 .messages .message  pre:after { content: ''; position: absolute; top: 5px; left: -10px; width: 0; height: 0; border-color: transparent transparent #fff transparent; border-style: solid; border-width: 0 5px 10px 5px; transform: rotate(-90deg); }
-</style>
+</style>-->

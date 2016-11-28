@@ -1,7 +1,6 @@
 :host {
-    display: block;
-    padding: 0.25em;
-    margin: 0;
+//    position: relative; float: left; width: 33%; min-height: 926px; height: 100%;
+    position: absolute; top: 80px; left: 200px; width: 1700px; min-height: 926px; height: 100%;
     &:after {
         content: " ";
         clear: both;
