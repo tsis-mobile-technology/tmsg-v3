@@ -41,6 +41,12 @@ export class RoomComponent implements OnInit, AfterViewInit, OnDestroy {
             }, 200);
         });
         this.messageService.create(this.userService.user.nickname, "joined the channel");
+        // status control
+        // status: 5 -> 2(상담실 입장 -> 대기)
+console.log("RoomComponent ngOnInit:status:" + this.userService.status);
+        if( this.userService.status == 5) {
+            this.userService.status = 2;
+        }
     }
 
     // After view initialized, focus on chat message text input
@@ -69,7 +75,11 @@ export class RoomComponent implements OnInit, AfterViewInit, OnDestroy {
         console.log("RoomComponent leave");
         this.alreadyLeftChannel = true;
         this.messageService.create(this.userService.user.nickname, "left the channel");
+console.log("RoomComponent leave:status:" + this.userService.status);
+        this.userService.status = 3;
         this.roomService.leave(this.room.name);
+console.log("RoomComponent leave:status:" + this.userService.status);
+        this.userService.status = 0;
     }
 
     //* Scroll to bottom (this is called when new message is received)

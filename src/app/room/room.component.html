@@ -16,7 +16,7 @@
         </div>
 
         <div class="chat_area messages" #scroll>
-            <div class="message msg_out" *ngFor="let item of messages | orderBy:'created':false">
+            <div class="message" ngClass="msg_out" *ngFor="let item of messages | orderBy:'created':false">
                 <p class="name">{{item.from}}</p>
                 <div class="msgbox">
                     <span class="time">{{item.created}}</span>
