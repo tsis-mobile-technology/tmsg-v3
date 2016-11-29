@@ -22,6 +22,8 @@ export class RoomService {
             .subscribe(
                 (socketItem: ISocketItem) => {
                     let room: IRoom = socketItem.item;
+console.log("subscribe:room.name:" + room.name);                    
+console.log("subscribe:room.name:index:" + this.findIndex(room.name));                    
                     let index: number = this.findIndex(room.name);
                     if (socketItem.action === "remove") {
                         // Remove
@@ -31,15 +33,18 @@ export class RoomService {
                             // Create
                             room.status = 0; // 생성
                             this.list = this.list.push(room);
+console.log("if");
                         } else {
                             // Update
                             this.list = this.list.set(index, room);
+console.log("else");
                         }
                         if( this.userService.usertype == "customer" && room.status == 0 && this.userService.status == 0) {
                             console.log("RoomService constructor nickname:" + this.userService.nickname + "'s chat wait....");
                             console.log("RoomService constructor room name:" + room.name);
-                            room.status = 1;
-                            this.join(room.name);
+                            console.log("RoomService constructor room status:" + room.status);
+                            // room.status = 1;
+                            this.checkRooms(room.name);
                         }
                     }
                     this.rooms.next(this.list);
@@ -48,31 +53,33 @@ export class RoomService {
             );
     }
 
-    joinCust(): void {
-        this.socketService
-            .get("room")
-            .subscribe(
-                (socketItem: ISocketItem) => {
-                    let room: IRoom = socketItem.item;
-                    let index: number = this.findIndex(room.name);
-                    if (socketItem.action === "remove") {
-                        // Remove
-                        this.list = this.list.delete(index);
-                    } else {
-                        if (index === -1) {
-                            // Create
-                            room.status = 0; // 생성
-                            this.list = this.list.push(room);
-                        } else {
-                            // Update
-                            this.list = this.list.set(index, room);
-                        }
-                    }
-                    this.rooms.next(this.list);
-                },
-                function(error) { console.log("Error happened" + error)},
-                function() { console.log("the subscription is completed")}
-            );
+    // Join room
+    joinCust(name: string): number {
+        console.log("RoomService joinCust");
+
+        let roomIndex: number = this.userService.rooms.length;
+console.log("room index size !!!!!:" + roomIndex);        
+        while (roomIndex > 0) {
+            if(this.userService.rooms[roomIndex].name == name) {
+                console.log("already join!!!!!:" + name );
+                return -1;
+            }
+            roomIndex = roomIndex - 1;
+        }
+
+        let index = this.findIndex(name);
+console.log("join?......index:" + index );
+        if (index !== -1) {
+            let room = this.list.get(index);
+console.log("before?......index:name:" + room.name );
+console.log("before?......index:status:" + room.status );
+            this.userService.status = 5;
+            room.status = 1;
+            this.userService.rooms.push(room);
+console.log("after?......index:name:" + room.name );
+console.log("after?......index:status:" + room.status );
+        }
+        return index;
     }
 
     // Join room
@@ -80,27 +87,41 @@ export class RoomService {
         console.log("RoomService join");
         for (let roomIndex in this.userService.rooms) {
             let room = this.userService.rooms[roomIndex];
-            if (room.name === name) {
+console.log("join?......name:" + room.name );
+console.log("join?......status:" + room.status );
+            if (room.name == name && room.status == 0) {
                 // status control
                 this.userService.status = 5;
+                this.userService.rooms[roomIndex].status = 1;
+
+                return;
+            } else {
+                console.log("join?......");
                 return;
             }
         }
         let index = this.findIndex(name);
+console.log("join?......index:" + index );
         if (index !== -1) {
             let room = this.list.get(index);
             this.userService.rooms.push(room);
+console.log("join?......index:name:" + room.name );
+console.log("join?......index:status:" + room.status );
+
         }
     }
 
     checkRooms(name: string): void {
-        console.log("RoomService checkRooms");
+        var millisecondsToWait = 2000;
 
-        let index = this.findIndex(name);
-        if (index !== -1) {
-            let room = this.list.get(index);
-            console.log("RoomService checkRooms:" + room);
-        }
+        let rtnNum = this.joinCust(name);
+        
+        // while(rtnNum < -1) {
+        //     setTimeout(function() {
+        //         console.log("channel check.....");
+        //     }, millisecondsToWait);
+        //     rtnNum = this.joinCust(name);
+        // }
     }
 
     // DirectJoin room
@@ -169,6 +190,7 @@ console.log("RoomService directJoin:new:status:" + this.userService.status);
     // Find matching room
     private findIndex(name: string): number {
         return this.list.findIndex((room: IRoom) => {
+            console.log("findIndex name:" + name);
             return room.name === name;
         });
     }
