@@ -3,24 +3,26 @@ import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { UserService } from "../shared";
 
 declare var require;
-const styles: string = require('./custnickname.component.scss');
-const template: string = require('./custnickname.component.html');
+const styles: string = require('./users.component.scss');
+const template: string = require('./users.component.html');
 
 @Component({
-    selector: 'custnickname',
+    selector: 'users',
     styles: [styles],
     template
 })
 
-export class CustnicknameComponent implements AfterViewInit {
+export class UsersComponent implements AfterViewInit {
     @ViewChild('focus') private focus: ElementRef;
     nickname: string;
     usertype: string;
+    password: string;
     created: Date;
+    status: number;
 
     constructor(public userService: UserService) {
         this.nickname = userService.nickname;
-        this.usertype = "customer";
+        this.usertype = "counselor";
     }
 
     // After view initialised, focus on nickname text input
@@ -29,16 +31,14 @@ export class CustnicknameComponent implements AfterViewInit {
     }
 
     // Save nickname to user store
-    save(): void {
-        console.log("CustnicknameComponent save nickname:" + this.nickname);
-        console.log("CustnicknameComponent save usertype:" + this.usertype);
-        this.userService.login(this.nickname, this.usertype, new Date());
+    counselorSave(): void {
+        this.userService.save(this.nickname, this.password, this.usertype, new Date());
     }
 
     // Handle keypress event, for saving nickname
     eventHandler(event: KeyboardEvent): void {
         if (event.key === "Enter") {
-            this.save();
+            this.counselorSave();
         }
     }
 }

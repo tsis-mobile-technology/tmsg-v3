@@ -1,34 +1,39 @@
 <div id="wrap_login">
     <div class="loginbox">
-       <h1 class="login_logo"><img src="http://hasegi.dothome.co.kr/tmsg/img/logo.png" alt="CHAT"></h1>
-        <h2>채팅상담 관리자 로그인</h2>
+        <h2>상담사 관리</h2>
         <ul class="form-group">
             <li>
                 <label>
-                    <input #focus [(ngModel)]="nickname" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="로그인 아이디를 입력하세요!" required/>
+                    <input #focus [(ngModel)]="nickname" class="input_txt_login" placeholder="로그인 아이디" required/>
                 </label>
             </li>
             <li>
                 <label>
-                    <input type="password" [(ngModel)]="nickname_password" (keypress)="eventHandler($event)" class="input_txt_login" placeholder="패스워드를 입력하세요!" />
+                    <input [(ngModel)]="password" class="input_txt_login" placeholder="패스워드" required/>
                 </label>
             </li>
             <li>
-                <button (click)="counselorLogin()" class="btn btn_login">로그인</button>
+                <label>
+                    <input [(ngModel)]="usertype" class="input_txt_login" value="counselor" readonly/>
+                </label>
             </li>
             <li>
-                <div class="chkform">
-                    <input type="checkbox" [(ngModel)]="saveid" class="input_chk_login" id="saveID">
-                    <label for="saveID">아이디 저장</label>
-                </div>
-                <div class="chkform">
-                    <input type="checkbox" [(ngModel)]="autologin" class="input_chk_login" id="autoLogin">
-                    <label for="autoLogin">로그인 상태 유지</label>
-                </div>
+                <button (click)="counselorSave()" class="btn btn_login">등록</button>
             </li>
         </ul>
-        <button (click)="gotocust()">goto cust</button>
-        <button (click)="gotouser()">goto user</button>
+    </div>
+    <div class="counselor_list">
+        <div class="counseolor" *ngFor="let user of users | orderBy:'created':false">
+            <li>
+                <label>
+                    <input class="input_txt_login" value="{{user.nickname}}" readonly/>
+                    <input class="input_txt_login" value="{{user.password}}" readonly/>
+                    <input class="input_txt_login" value="{{user.usertype}}" readonly/>
+                    <input class="input_txt_login" value="{{user.created}}" readonly/>
+                    <input class="input_txt_login" value="{{user.status}}" readonly/>
+                </label>
+            </li>
+        </div>
     </div>
 </div>
 

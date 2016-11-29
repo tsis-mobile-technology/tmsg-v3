@@ -1,7 +1,5 @@
-
 <header id="header">
 	<h1 class="logo">채팅상담 관리자 화면</h1>
-		
 	<!-- util_menu -->
 	<div class="util_menu">
 		<ul>
@@ -9,36 +7,26 @@
 				<a href="#" class="btn">환경설정</a>
 			</li>
 			<li>
-                <button type="button" class="btn">로그아웃</button>
+        <button type="button" class="btn">로그아웃</button>
 			</li>
 		</ul>
 	</div>
-	<!-- //util_menu -->
-	
-	<span>
-        <select [(ngModel)]="room">
-            <option value="">Select room...</option>
-            <option *ngFor="let room of roomService.rooms | async" [value]="room.name">{{room.name}}</option>
-        </select>
-        <button (click)="join()">Join</button>
-        <button (click)="remove()">Remove</button>
-    </span>
-    <span>
-        New room:
-        <input [(ngModel)]="newRoom" (keypress)="eventHandler($event)">
-        <button (click)="create()">Create</button>
-    </span>
-	
-	
-	
+	<!-- //util_menu -->	
+<span>
+  <select [(ngModel)]="room">
+    <option value="">Select room...</option>
+    <option *ngFor="let room of roomService.rooms | async" [value]="room.name">{{room.name}}</option>
+  </select>
+  <button (click)="join()">Join</button>
+  <button (click)="remove()">Remove</button>
+  </span>
+  <span>
+    New room:
+    <input [(ngModel)]="newRoom" (keypress)="eventHandler($event)">
+    <button (click)="create()">Create</button>
+</span>
+
 	<div class="mr_ko_btn">
-       <ul>
-           <li><button (click)="create()" class="btn btn_fil_tit active">생성</button></li>
-           <li><button (click)="join()" class="btn btn_fil_tit active">접속</button></li>
-           <li><button (click)="remove()" class="btn btn_fil_tit active">삭제</button></li>
-           <li><button type="button" class="btn btn_fil_tit">보류</button></li>
-           <li><button type="button" class="btn btn_fil_tit">완료</button></li>
-       </ul>
        <ul>
            <li><button (click)="changeStatus(0)" class="btn btn_fil_tit active">로그인</button></li>
            <li><button (click)="changeStatus(1)" class="btn btn_fil_tit active">상담 중</button></li>

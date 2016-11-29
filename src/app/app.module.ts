@@ -7,6 +7,7 @@ import { FormsModule } from "@angular/forms";
 import { AppComponent } from "./app.component";
 import { CallComponent } from "./call.component";
 import { CustComponent } from "./cust.component";
+import { UserComponent } from "./user.component";
 
 // Routing Module
 import { AppRoutingModule } from "./app.routing";
@@ -23,6 +24,8 @@ import { CustnicknameComponent } from "./custnickname";
 import { CustcontrolComponent } from "./custcontrol";
 import { CustroomComponent } from "./custroom";
 import { CustroomsComponent } from "./custrooms";
+import { UsersComponent } from "./users";
+
 
 @NgModule({
     imports: [
@@ -36,6 +39,7 @@ import { CustroomsComponent } from "./custrooms";
         AppComponent,
         CustComponent,
         CallComponent,
+        UserComponent,
         ControlComponent,
         NicknameComponent,
         RoomComponent,
@@ -43,7 +47,8 @@ import { CustroomsComponent } from "./custrooms";
         CustnicknameComponent,
         CustcontrolComponent,
         CustroomComponent,
-        CustroomsComponent
+        CustroomsComponent,
+        UsersComponent
     ],
     bootstrap: [
         AppComponent

@@ -57,16 +57,6 @@ console.log("else");
     joinCust(name: string): number {
         console.log("RoomService joinCust");
 
-        let roomIndex: number = this.userService.rooms.length;
-console.log("room index size !!!!!:" + roomIndex);        
-        while (roomIndex > 0) {
-            if(this.userService.rooms[roomIndex].name == name) {
-                console.log("already join!!!!!:" + name );
-                return -1;
-            }
-            roomIndex = roomIndex - 1;
-        }
-
         let index = this.findIndex(name);
 console.log("join?......index:" + index );
         if (index !== -1) {
@@ -104,15 +94,24 @@ console.log("join?......status:" + room.status );
 console.log("join?......index:" + index );
         if (index !== -1) {
             let room = this.list.get(index);
+console.log("join?......index:status:" + this.userService.rooms.length );
             this.userService.rooms.push(room);
 console.log("join?......index:name:" + room.name );
-console.log("join?......index:status:" + room.status );
+console.log("join?......index:status:" + this.userService.rooms.length );
 
         }
     }
 
     checkRooms(name: string): void {
         var millisecondsToWait = 2000;
+
+        for (var i = 0; i <= this.userService.rooms.length; i++) {
+            let room = this.userService.rooms[i];
+            if (room != null && room.name === name) {
+                console.log("room is full...")
+                return;
+            }
+        }
 
         let rtnNum = this.joinCust(name);
         
