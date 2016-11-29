@@ -16,7 +16,39 @@ export class RoomService {
         private socketService: SocketService,
         private userService: UserService
     ) {
-        console.log("RoomService constructor");
+        console.log("RoomService constructor here?");
+        this.socketService
+            .get("room")
+            .subscribe(
+                (socketItem: ISocketItem) => {
+                    let room: IRoom = socketItem.item;
+                    let index: number = this.findIndex(room.name);
+                    if (socketItem.action === "remove") {
+                        // Remove
+                        this.list = this.list.delete(index);
+                    } else {
+                        if (index === -1) {
+                            // Create
+                            room.status = 0; // 생성
+                            this.list = this.list.push(room);
+                        } else {
+                            // Update
+                            this.list = this.list.set(index, room);
+                        }
+                        if( this.userService.usertype == "customer" && room.status == 0 && this.userService.status == 0) {
+                            console.log("RoomService constructor nickname:" + this.userService.nickname + "'s chat wait....");
+                            console.log("RoomService constructor room name:" + room.name);
+                            room.status = 1;
+                            this.join(room.name);
+                        }
+                    }
+                    this.rooms.next(this.list);
+                }, error => {console.log(error);},
+                () => {console.log("completed");}
+            );
+    }
+
+    joinCust(): void {
         this.socketService
             .get("room")
             .subscribe(
@@ -37,14 +69,9 @@ export class RoomService {
                         }
                     }
                     this.rooms.next(this.list);
-
-                    //directory join chatroom & wait counselor
-                    if( this.userService.usertype == "customer") {
-                        this.userService.room = this.directJoin(this.userService.nickname);    
-                    }
-                    console.log("RoomService constructor userService:" + this.userService.room);
                 },
-                error => console.log(error)
+                function(error) { console.log("Error happened" + error)},
+                function() { console.log("the subscription is completed")}
             );
     }
 
@@ -63,6 +90,16 @@ export class RoomService {
         if (index !== -1) {
             let room = this.list.get(index);
             this.userService.rooms.push(room);
+        }
+    }
+
+    checkRooms(name: string): void {
+        console.log("RoomService checkRooms");
+
+        let index = this.findIndex(name);
+        if (index !== -1) {
+            let room = this.list.get(index);
+            console.log("RoomService checkRooms:" + room);
         }
     }
 

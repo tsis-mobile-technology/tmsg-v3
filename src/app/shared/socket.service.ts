@@ -35,13 +35,13 @@ export class SocketService {
 
     // Create signal
     create(name: string) {
-        console.log("SocketService create");
+        console.log("SocketService create:" + name);
         this.socket.emit("create", name);
     }
 
     // Remove signal
     remove(name: string) {
-        console.log("SocketService remove");
+        console.log("SocketService remove:" + name);
         this.socket.emit("remove", name);
     }
 

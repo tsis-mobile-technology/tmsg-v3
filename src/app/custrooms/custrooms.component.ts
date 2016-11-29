@@ -1,6 +1,6 @@
-import { Component } from "@angular/core";
+import { Component, OnInit, AfterViewInit, OnDestroy } from "@angular/core";
 
-import { UserService } from "../shared";
+import { UserService, RoomService } from "../shared";
 import { IRoom } from "../../models";
 
 declare var require;
@@ -14,5 +14,21 @@ const template: string = require("./custrooms.component.html");
 })
 
 export class CustroomsComponent {
-    constructor(public userService: UserService) {}
+    constructor(public userService: UserService,public roomService: RoomService) {
+    	console.log("CustroomsComponent constructor");
+    }
+
+    ngOnInit(): void {
+        console.log("CustroomsComponent ngOnInit");
+
+        //directory join chatroom & wait counselor
+        // if( this.userService.usertype == "customer") {
+        //     this.userService.room = this.roomService.directJoin(this.userService.nickname);    
+        // }
+        // console.log("RoomService constructor userService:" + this.userService.room);
+    }
+
+    ngAfterViewInit(): void {
+        console.log("CustroomsComponent ngAfterViewInit");        
+    }
 }

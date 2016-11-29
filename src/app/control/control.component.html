@@ -66,9 +66,9 @@
             <p class="img"><img src="http://hasegi.dothome.co.kr/tmsg/img/img_facesam.png" alt="프로필 사진"></p>
             <p class="name">김초초미녀 상담사님 <a href="#" class="btn btn_set">관리</a></p>
             <div class="state_sel">
-                <select class="input_sel">
-                    <option value="">상담 중</option>
-                    <option value="">대기 중</option>
+                <select class="input_sel" name="statusObj" ngModel>
+                  <option value="" disabled>Choose a status</option>
+                  <option *ngFor="let statusObj of statusObjs" [ngValue]="statusObj">{{ statusObj.value }}</option>
                 </select>
             </div>
         </div>

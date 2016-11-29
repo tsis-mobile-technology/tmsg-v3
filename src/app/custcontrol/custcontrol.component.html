@@ -1,6 +1,5 @@
 <header id="header">
 	<h1 class="logo">채팅상담 Cust 화면</h1>
-	
       <span>
         <select [(ngModel)]="room">
           <option value="">Select room...</option>
@@ -10,8 +9,9 @@
           
       <div class="mr_ko_btn">
            <ul>
-               <li><button (click)="directJoin()" class="btn btn_fil_tit active">상담사 연결</button></li>
-               <li><button (click)="userDelete()" class="btn btn_fil_tit active">채팅 종료</button></li>
+              <li><button (click)="joinCust()" class="btn btn_fil_tit active">연결</button></li>
+              <li><button (click)="directJoin()" class="btn btn_fil_tit active">상담사 연결</button></li>
+              <li><button (click)="userDelete()" class="btn btn_fil_tit active">채팅 종료</button></li>
            </ul>
 
            <ul>

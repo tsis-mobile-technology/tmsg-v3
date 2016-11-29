@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import {FormControl, FormGroup} from '@angular/forms';
 
 import { RoomService } from "../shared";
 
@@ -9,6 +10,10 @@ import { UserService } from "../shared";
 declare var require;
 const styles: string = require("./control.component.scss");
 const template: string = require("./control.component.html");
+interface IStatus {
+    value: string;
+    key: number;
+}
 
 @Component({
     selector: "control",
@@ -19,6 +24,8 @@ const template: string = require("./control.component.html");
 export class ControlComponent {
     room: string = "";
     newRoom: string = "";
+    statusObj: IStatus;
+    statusObjs: IStatus[] = [{value: "로그인", key: 0}, {value: "상담 중", key: 1}, {value: "상담 대기", key: 2}, {value: "후처리", key: 3}, {value: "휴식", key: 4}]; 
 
     constructor(
         public roomService: RoomService,
@@ -27,6 +34,7 @@ export class ControlComponent {
         //IF userService.usertype == "counselor"
         //THEN auto create chat room 
         //if(userService.user.usertype == "counselor" && userService.user.nickname != null) this.room = userService.user.nickname;
+        this.statusObj = this.statusObjs.find((obj:IStatus) => obj.key === this.userService.status);
     }
 
     // Join room, when Join-button is pressed
@@ -61,6 +69,13 @@ export class ControlComponent {
         }
     }
 
+    onChange(event: Event): void {
+        let value: string = (<HTMLSelectElement>event.srcElement).value;
+        this.statusObj = this.statusObjs.find((obj:IStatus) => obj.value === value);
+
+        this.userService.status = this.statusObj.key;
+    }
+
     // status Change
     changeStatus(status: number): void {
         console.log("ControlComponent changeStatus:" + status);
@@ -71,4 +86,5 @@ export class ControlComponent {
     checkStatus(): void {
         console.log("ControlComponent checkStatus:" + this.userService.status);
     }
+
 }

@@ -1,10 +1,8 @@
-import { Component } from "@angular/core";
-
-import { RoomService } from "../shared";
+import { Component, OnInit, AfterViewInit, OnDestroy } from "@angular/core";
 
 import { IRoom, IUser } from "../../models";
 
-import { UserService } from "../shared";
+import { UserService, RoomService } from "../shared";
 
 declare var require;
 const styles: string = require("./custcontrol.component.scss");
@@ -21,16 +19,40 @@ export class CustcontrolComponent {
     newRoom: string = "";
 
     constructor(
-        public roomService: RoomService,
-        public userService: UserService) {
+        public userService: UserService,
+        public roomService: RoomService) {
         console.log("CustcontrolComponent constructor");
         //IF userService.usertype == "counselor"
         //THEN auto create chat room 
-        if(this.userService.usertype == "customer" && this.userService.nickname != null) {
-            //chating room create
-            //this.wait(this.userService.nickname);
-            console.log("this is ...");
-        }
+        // if(this.userService.usertype == "customer" && this.userService.nickname != null) {
+        //     //chating room create
+        //     //this.wait(this.userService.nickname);
+        //     console.log("this is ...");
+        // }
+    }
+
+    // ngOnInit(): void {
+    //     console.log("CustcontrolComponent ngOnInit");
+
+    // }
+
+    // ngAfterViewInit(): void {
+    //     console.log("CustcontrolComponent ngAfterViewInit");
+    //     //directory join chatroom & wait counselor
+    //     if( this.userService.usertype == "customer") {
+    //         this.roomService.checkRooms(this.userService.nickname);
+    //         //this.roomService.joinCust();
+    //         //this.userService.room = this.roomService.directJoin(this.userService.nickname);    
+    //     }
+    //     console.log("RoomService constructor userService:" + this.userService.room);
+    // }
+
+    // ngOnDestory(): void {
+    //     console.log("CustcontrolComponent ngOnDestory");   
+    // }
+
+    joinCust(): void {
+        this.roomService.joinCust();
     }
 
     wait(name: string): void {
