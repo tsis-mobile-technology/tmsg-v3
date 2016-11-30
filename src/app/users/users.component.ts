@@ -19,6 +19,7 @@ export class UsersComponent implements AfterViewInit {
     password: string;
     created: Date;
     status: number;
+    users: any;
 
     constructor(public userService: UserService) {
         this.nickname = userService.nickname;
@@ -32,7 +33,7 @@ export class UsersComponent implements AfterViewInit {
 
     // Save nickname to user store
     counselorSave(): void {
-        this.userService.save(this.nickname, this.password, this.usertype, new Date());
+        this.userService.create(this.nickname, this.password, this.usertype, new Date());
     }
 
     // Handle keypress event, for saving nickname

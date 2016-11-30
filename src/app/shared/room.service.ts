@@ -94,7 +94,6 @@ console.log("join?......status:" + room.status );
 console.log("join?......index:" + index );
         if (index !== -1) {
             let room = this.list.get(index);
-console.log("join?......index:status:" + this.userService.rooms.length );
             this.userService.rooms.push(room);
 console.log("join?......index:name:" + room.name );
 console.log("join?......index:status:" + this.userService.rooms.length );

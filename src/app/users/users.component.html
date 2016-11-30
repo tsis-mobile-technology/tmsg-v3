@@ -23,7 +23,7 @@
         </ul>
     </div>
     <div class="counselor_list">
-        <div class="counseolor" *ngFor="let user of users | orderBy:'created':false">
+        <div class="counseolor" *ngFor="let user of users">
             <li>
                 <label>
                     <input class="input_txt_login" value="{{user.nickname}}" readonly/>

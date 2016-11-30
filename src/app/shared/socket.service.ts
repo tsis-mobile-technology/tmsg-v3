@@ -28,6 +28,7 @@ export class SocketService {
         return Observable.create((observer: any) => {
             console.log("SocketService Observable.create");
             this.socket.on("create", (item: any) => observer.next({ action: "create", item: item }) );
+            this.socket.on("usercreate", (item: any) => observer.next({ action: "usercreate", item: item }) );
             this.socket.on("remove", (item: any) => observer.next({ action: "remove", item: item }) );
             return () => this.socket.close();
         });
@@ -37,6 +38,12 @@ export class SocketService {
     create(name: string) {
         console.log("SocketService create:" + name);
         this.socket.emit("create", name);
+    }
+
+    // Create signal
+    usercreate(name: string, type: string, pass: string) {
+        console.log("SocketService create:" + name);
+        this.socket.emit("create", name, type, pass);
     }
 
     // Remove signal

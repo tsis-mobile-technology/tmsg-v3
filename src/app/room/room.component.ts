@@ -40,7 +40,7 @@ export class RoomComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.scrollToBottom();
             }, 200);
         });
-        this.messageService.create(this.userService.user.nickname, "joined the channel");
+        this.messageService.create(this.userService.nickname, "joined the channel");
         // status control
         // status: 5 -> 2(상담실 입장 -> 대기)
 console.log("RoomComponent ngOnInit:status:" + this.userService.status);
@@ -66,7 +66,7 @@ console.log("RoomComponent ngOnInit:status:" + this.userService.status);
     // Send chat message, and reset message text input
     send(): void {
         console.log("RoomComponent send");
-        this.messageService.create(this.userService.user.nickname, this.message);
+        this.messageService.create(this.userService.nickname, this.message);
         this.message = "";
     }
 
@@ -74,7 +74,7 @@ console.log("RoomComponent ngOnInit:status:" + this.userService.status);
     leave(): void {
         console.log("RoomComponent leave");
         this.alreadyLeftChannel = true;
-        this.messageService.create(this.userService.user.nickname, "left the channel");
+        this.messageService.create(this.userService.nickname, "left the channel");
 console.log("RoomComponent leave:status:" + this.userService.status);
         this.userService.status = 3;
         this.roomService.leave(this.room.name);

@@ -17,4 +17,6 @@ export var UserSchema = new mongoose.Schema({
 	status: Number
 });
 
+// var db = mongoose.createConnection('localhost', 'chat');
+
 export var User = mongoose.model<IUserModel>("User", UserSchema);

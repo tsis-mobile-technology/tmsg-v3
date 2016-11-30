@@ -11,8 +11,8 @@ import { UserService } from "./user.service";
     ],
     providers: [
         RoomService,
-        SocketService,
-        UserService
+        UserService,
+        SocketService
     ],
     exports: [
         OrderByPipe

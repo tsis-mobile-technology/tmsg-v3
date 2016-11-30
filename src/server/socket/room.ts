@@ -82,6 +82,7 @@ export class RoomSocket {
         if (this.socket && this.socket.connected) {
             Room.find({}).exec( (error: any, rooms: IRoom[]) => {
                 for (let room of rooms) {
+                    console.log("RoomSocket list:room:" + room.name);
                     this.createRoom(room);
                 }
             });

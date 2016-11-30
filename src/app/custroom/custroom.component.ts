@@ -40,7 +40,7 @@ export class CustroomComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.scrollToBottom();
             }, 200);
         });
-        this.custMessageService.create(this.userService.user.nickname, "joined the channel");
+        this.custMessageService.create(this.userService.nickname, "joined the channel");
         // status control
         // status: 5 -> 2(상담실 입장 -> 대기)
 console.log("CustRoomComponent ngOnInit:status:" + this.userService.status);
@@ -66,7 +66,7 @@ console.log("CustRoomComponent ngOnInit:status:" + this.userService.status);
     // Send chat message, and reset message text input
     send(): void {
         console.log("CustRoomComponent send");
-        this.custMessageService.create(this.userService.user.nickname, this.message);
+        this.custMessageService.create(this.userService.nickname, this.message);
         this.message = "";
     }
 
@@ -74,7 +74,7 @@ console.log("CustRoomComponent ngOnInit:status:" + this.userService.status);
     leave(): void {
         console.log("CustRoomComponent leave");
         this.alreadyLeftChannel = true;
-        this.custMessageService.create(this.userService.user.nickname, "left the channel");
+        this.custMessageService.create(this.userService.nickname, "left the channel");
 console.log("CustRoomComponent leave:status:" + this.userService.status);
         this.userService.status = 3;
         this.roomService.leave(this.room.name);

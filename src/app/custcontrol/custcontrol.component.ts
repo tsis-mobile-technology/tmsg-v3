@@ -76,9 +76,9 @@ export class CustcontrolComponent {
         console.log("Custcontrol create");
         console.log("room name : " + this.room );
         console.log("newRoom name : " + this.newRoom );
-        this.roomService.create(this.userService.user.nickname);
-        this.newRoom = this.userService.user.nickname;
-        this.room = this.userService.user.nickname;
+        this.roomService.create(this.userService.nickname);
+        this.newRoom = this.userService.nickname;
+        this.room = this.userService.nickname;
 
     }
 
@@ -100,14 +100,14 @@ export class CustcontrolComponent {
 
     // Delete nickname to user store
     userDelete(): void {
-        console.log("Custcontrol save userDelete:" + this.userService.user.nickname);
-        if(this.userService.user.usertype == "customer" && this.userService.user.nickname != null) {
+        console.log("Custcontrol save userDelete:" + this.userService.nickname);
+        if(this.userService.usertype == "customer" && this.userService.nickname != null) {
             //chating room create
             if(this.room && this.room != "" ) {
                 this.remove();
             }
         }
-        this.userService.delete(this.userService.user);
+        this.userService.logout(this.userService.nickname);
     }
 
     // status Change

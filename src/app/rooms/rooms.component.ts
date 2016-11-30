@@ -34,10 +34,10 @@ export class RoomsComponent {
         //this.roomService.create(this.newRoom);
         //this.newRoom = "";
         console.log("room name : " + this.room );
-        console.log("this.userService.user.nickname : " + this.userService.user.nickname);
-        this.roomService.create(this.userService.user.nickname);
-        this.newRoom = this.userService.user.nickname;
-        this.room = this.userService.user.nickname;
+        console.log("this.userService.user.nickname : " + this.userService.nickname);
+        this.roomService.create(this.userService.nickname);
+        this.newRoom = this.userService.nickname;
+        this.room = this.userService.nickname;
         this.changeStatus(2);
     }
 
