@@ -2,14 +2,15 @@ import { Injectable } from "@angular/core";
 
 import { List } from "immutable";
 
-import { IRoom, IUser } from "../../models";
+import { IRoom, IUser, User } from "../../models";
 
 @Injectable()
 export class UserService {
     nickname: string = "";
     usertype: string = "";
-    room: IRoom;
+    password: string = "";
     status: number;    // (0: 로그인, 1: 상담 중, 2: 대기, 3: 후처리, 4: 휴식, 5: 상담실 입장(customer))
+    room: IRoom;
 
     rooms: IRoom[] = [];
 	user: IUser;
@@ -29,17 +30,27 @@ export class UserService {
         this.room === iroom;
     }
 
-    save(nickname: string, usertype: string, created: Date): void {
-        console.log("UserService save nickname:" + nickname);
-        console.log("UserService save usertype:" + usertype);
+    save(name: string, pass: string, type: string, datetime: Date) {
+        console.log("UserService save :" + name + "," + pass + "," + type + "," + datetime);
+    
+        // let user = new User({nickname: name, usertype: type, password: pass, created: datetime, status: 0});
+        // user.save(function(err) {
+        //     if( err ) return this.handleError(err);
+        // })
+    }
+
+    login(nickname: string, usertype: string, created: Date): void {
+        console.log("UserService login nickname:" + nickname);
+        console.log("UserService login usertype:" + usertype);
 
         let index: number = this.findIndex(nickname);
-        console.log("UserService save index:" + index);
+        console.log("UserService login index:" + index);
         let room: IRoom;
         let status: number = 0;
+        let password: string = "";
         if (index === -1) {
             // Create
-            this.user = {nickname, usertype, created, room, status};
+            this.user = {nickname, usertype, password, created, status};
             // this.user.nickname = nickname;
             this.nickname = nickname;
             this.usertype = usertype;
@@ -54,7 +65,6 @@ export class UserService {
             console.log("IUser nickname:" + this.existUser.nickname);
             console.log("IUser usertype:" + this.existUser.usertype);
             console.log("IUser created:" + this.existUser.created);
-            console.log("IUser rooms:" + this.existUser.room);
             this.nickname = this.existUser.nickname;
             this.usertype = this.existUser.usertype;
             this.status = 0;
@@ -78,5 +88,11 @@ export class UserService {
         return this.lists.findIndex((user: IUser) => {
             return user.nickname === name;
         });
+    }
+
+    private handleError(err) {
+        console.log("UserService handleError");
+        console.log(`Connected to "${err}"`);
+        //http://stackoverflow.com/questions/34513558/angular-2-0-and-modal-dialog
     }
 }

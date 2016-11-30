@@ -51,7 +51,7 @@ class Server {
     private config(): void {
         console.log("Server config");
         // By default the port should be 5000
-        this.port = process.env.PORT || 5000;
+        this.port = process.env.PORT || 3000;
 
         // root path is under ../../target
         this.root = path.join(path.resolve(__dirname, '../../target'));

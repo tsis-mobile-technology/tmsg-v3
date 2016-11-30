@@ -41,6 +41,7 @@ export class ControlComponent {
     join(): void {
         console.log("ControlComponent join : " + this.room );
         this.roomService.join(this.room);
+        this.changeStatus(2);
     }
 
     // Create room, when Create-button is pressed and empty newRoom text input
@@ -53,6 +54,7 @@ export class ControlComponent {
         this.roomService.create(this.userService.user.nickname);
         this.newRoom = this.userService.user.nickname;
         this.room = this.userService.user.nickname;
+        this.changeStatus(2);
     }
 
     // Remove room, when Remove-button is pressed and unset selected room
@@ -60,6 +62,7 @@ export class ControlComponent {
         console.log("ControlComponent remove : " + this.room );
         this.roomService.remove(this.room);
         this.room = "";
+        this.changeStatus(3);
     }
 
     // Handle keypress event (for creating a new room)

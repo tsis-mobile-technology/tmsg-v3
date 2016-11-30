@@ -52,7 +52,7 @@ export class CustcontrolComponent {
     // }
 
     joinCust(): void {
-        this.roomService.joinCust();
+        //this.roomService.joinCust();
     }
 
     wait(name: string): void {

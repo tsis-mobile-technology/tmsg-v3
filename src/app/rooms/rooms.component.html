@@ -1,5 +1,3 @@
-<template ngFor let-room [ngForOf]="userService.rooms">
-
     <!--	history pannel	-->
     <div id="history_pannel">
         <div class="pan_tit">
@@ -129,6 +127,6 @@
        </div> 
    </div>
     <!-- //history pannel   -->
-    
-    <room [room]="room"></room>
+<template ngFor let-room [ngForOf]="userService.rooms">
+  <room [room]="room"></room>
 </template>

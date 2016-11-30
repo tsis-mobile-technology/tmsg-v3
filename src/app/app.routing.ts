@@ -5,11 +5,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { AppComponent } from "./app.component";
 import { CustComponent } from "./cust.component";
 import { CallComponent } from "./call.component";
+import { UserComponent } from "./user.component";
 
 const appRoutes: Routes = [
   { path: '', redirectTo: '/call', pathMatch: 'full' },
   { path: 'call',	component: CallComponent },
-  { path: 'cust',	component: CustComponent }
+  { path: 'cust',	component: CustComponent },
+  { path: 'user',	component: UserComponent }
 ];
 
 @NgModule({

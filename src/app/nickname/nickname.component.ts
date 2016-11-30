@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-
+import { Router } from '@angular/router';
 import { UserService } from "../shared";
 
 declare var require;
@@ -18,7 +18,7 @@ export class NicknameComponent implements AfterViewInit {
     usertype: string;
     created: Date;
 
-    constructor(public userService: UserService) {
+    constructor(public userService: UserService, public router: Router) {
         this.nickname = userService.nickname;
         this.usertype = "counselor";
     }
@@ -29,14 +29,22 @@ export class NicknameComponent implements AfterViewInit {
     }
 
     // Save nickname to user store
-    save(): void {
-        this.userService.save(this.nickname, this.usertype, new Date());
+    counselorLogin(): void {
+        this.userService.login(this.nickname, this.usertype, new Date());
     }
 
     // Handle keypress event, for saving nickname
     eventHandler(event: KeyboardEvent): void {
         if (event.key === "Enter") {
-            this.save();
+            this.counselorLogin();
         }
+    }
+
+    gotocust(): void {
+        this.router.navigateByUrl("/cust");
+    }
+
+    gotouser(): void {
+        this.router.navigateByUrl("/user");
     }
 }
