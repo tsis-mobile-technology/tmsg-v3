@@ -90,16 +90,14 @@ export class UserSocket {
     }
 
     // List all rooms
-    private alllist(): IUser[] {
+    private alllist(): void {
         console.log("UserSocket alllist");
-        let users: IUser[] = [];
         User.find({}).exec( (error: any, users: IUser[]) => {
             for (let user of users) {
                 console.log("UserSocket alllist:nickname:" + user.nickname);
+                console.log("UserSocket alllist:usertype:" + user.usertype);
+                console.log("UserSocket alllist:password:" + user.password);
             }
-            this.users = users;
         });
-        console.log("UserSocket alllist:" + this.users);
-        return this.users;
     }
 }

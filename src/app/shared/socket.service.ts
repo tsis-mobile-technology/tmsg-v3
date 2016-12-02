@@ -29,7 +29,7 @@ export class SocketService {
             console.log("SocketService Observable.create");
             this.socket.on("create", (item: any) => observer.next({ action: "create", item: item }) );
             this.socket.on("usercreate", (item: any) => observer.next({ action: "usercreate", item: item }) );
-            this.socket.on("userlist", (item: any) => observer.next({ action: "userlist", item: item }) );
+            this.socket.on("userlist", (item: any) => observer.next({ action: "userlist", item: item }));
             this.socket.on("remove", (item: any) => observer.next({ action: "remove", item: item }) );
             return () => this.socket.close();
         });
@@ -65,7 +65,7 @@ export class SocketService {
         console.log(`Connected to "${this.name}"`);
 
         // Request initial list when connected
-        this.socket.emit("list");
+        this.socket.emit("list"); // /server/socket으로 list를 호출(분출)한다.user.ts, room.ts, message.ts 
     }
 
     // Handle connection closing

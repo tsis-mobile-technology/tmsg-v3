@@ -29,7 +29,7 @@ export class CustnicknameComponent implements AfterViewInit {
     }
 
     // Save nickname to user store
-    save(): void {
+    login(): void {
         console.log("CustnicknameComponent save nickname:" + this.nickname);
         console.log("CustnicknameComponent save usertype:" + this.usertype);
         this.userService.login(this.nickname, this.usertype, new Date());
@@ -38,7 +38,7 @@ export class CustnicknameComponent implements AfterViewInit {
     // Handle keypress event, for saving nickname
     eventHandler(event: KeyboardEvent): void {
         if (event.key === "Enter") {
-            this.save();
+            this.login();
         }
     }
 }

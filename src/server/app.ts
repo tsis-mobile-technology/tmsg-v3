@@ -118,13 +118,13 @@ class Server {
             result.status(200).send(resultString);
         });
 
-        router.get('/keyboard', (request: express.Request, result: express.Response) => {
-            console.log("kakaoRoutes keyboard");
-            let re: any = {type:'text'};
-            //re.data = result;
-            result.status(200).send(re);
+        // router.get('/keyboard', (request: express.Request, result: express.Response) => {
+        //     console.log("kakaoRoutes keyboard");
+        //     let re: any = {type:'text'};
+        //     //re.data = result;
+        //     result.status(200).send(re);
 
-        });
+        // });
 
         // Set app to use router as the default route
         // counselor
@@ -156,7 +156,7 @@ class Server {
     
     // Configure sockets
     private kakaoSockets(): void {
-        console.log("Server sockets");
+        console.log("Server kakaoSockets");
         // Get socket.io handle
         this.kakao_io = socketIo(this.kakao_server);
         let kakaoSocket = new KakaoSocket(this.kakao_io);

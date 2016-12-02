@@ -22,8 +22,10 @@ export class UserService {
             .get("users")
             .subscribe(
                 (socketItem: ISocketItem) => {
+                    console.log("UserService constructor subscribe calling.....");
                     let user: IUser = socketItem.item;
                     let index: number = this.findIndex(user.nickname);
+                    console.log("UserService constructor: socketItem.action:" + socketItem.action + ",index:" + index);
                     if (socketItem.action === "remove") {
                         // Remove
                         this.list = this.list.delete(index);
@@ -58,12 +60,13 @@ export class UserService {
 
     // get user list
     userlist() {
-        console.log("UserService getlist");
+        console.log("UserService userlist");
         // Send signal to remove the user
         this.socketService.userlist();
     }
 
     login(nickname: string, usertype: string, created: Date): void {
+        console.log("UserService login");
         let index: number = this.findIndex(nickname);
         let status: number = 0;
         if (index === -1) {
@@ -71,6 +74,9 @@ export class UserService {
             this.nickname = nickname;
             this.usertype = usertype;
             this.status = status;
+        }
+        else {
+            console.log("UserService already login");
         }
     }
 
