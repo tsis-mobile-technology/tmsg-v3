@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import * as io from "socket.io-client";
 
-import { IMessage, ISocketItem } from "../../models";
+import { IMessage, ISocketItem, IUser } from "../../models";
 
 @Injectable()
 export class SocketService {
@@ -29,6 +29,7 @@ export class SocketService {
             console.log("SocketService Observable.create");
             this.socket.on("create", (item: any) => observer.next({ action: "create", item: item }) );
             this.socket.on("usercreate", (item: any) => observer.next({ action: "usercreate", item: item }) );
+            this.socket.on("userlist", (item: any) => observer.next({ action: "userlist", item: item }) );
             this.socket.on("remove", (item: any) => observer.next({ action: "remove", item: item }) );
             return () => this.socket.close();
         });
@@ -42,8 +43,14 @@ export class SocketService {
 
     // Create signal
     usercreate(name: string, type: string, pass: string) {
-        console.log("SocketService create:" + name);
-        this.socket.emit("create", name, type, pass);
+        console.log("SocketService usercreate:" + name);
+        this.socket.emit("usercreate", name, type, pass);
+    }
+
+    // Create signal
+    userlist(){
+        console.log("SocketService userlist");
+        this.socket.emit("alllist");
     }
 
     // Remove signal

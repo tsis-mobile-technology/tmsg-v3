@@ -36,6 +36,11 @@ export class UsersComponent implements AfterViewInit {
         this.userService.create(this.nickname, this.password, this.usertype, new Date());
     }
 
+    // user list
+    userlist(): void {
+        this.userService.userlist();
+    }
+
     // Handle keypress event, for saving nickname
     eventHandler(event: KeyboardEvent): void {
         if (event.key === "Enter") {

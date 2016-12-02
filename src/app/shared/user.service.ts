@@ -56,11 +56,11 @@ export class UserService {
         this.socketService.remove(name);
     }
 
-    // Remove user
-    getlist() {
-        console.log("UserService remove");
+    // get user list
+    userlist() {
+        console.log("UserService getlist");
         // Send signal to remove the user
-        this.list;
+        this.socketService.userlist();
     }
 
     login(nickname: string, usertype: string, created: Date): void {
