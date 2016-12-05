@@ -1,6 +1,8 @@
-import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Observable } from "rxjs";
 
 import { UserService } from "../shared";
+import { IUser } from "../../models";
 
 declare var require;
 const styles: string = require('./users.component.scss');
@@ -12,24 +14,28 @@ const template: string = require('./users.component.html');
     template
 })
 
-export class UsersComponent implements AfterViewInit {
+export class UsersComponent implements OnInit, AfterViewInit {
     @ViewChild('focus') private focus: ElementRef;
     nickname: string;
     usertype: string;
     password: string;
     created: Date;
     status: number;
-    users: any;
+    users: IUser[];
 
     constructor(public userService: UserService) {
         this.nickname = userService.nickname;
         this.usertype = "counselor";
     }
 
+    // On Init
+    ngOnInit(): void {
+        this.users = this.userService.userlist();
+    }
+
     // After view initialised, focus on nickname text input
     ngAfterViewInit(): void {
         this.focus.nativeElement.focus();
-        this.users = this.userlist();
     }
 
     // Save nickname to user store
@@ -39,8 +45,9 @@ export class UsersComponent implements AfterViewInit {
 
     // user list
     userlist(): void {
-       this.users = this.userService.userlist();
-       console.log("this.users:" + this.users);
+       // userlist call?
+       // this.users = this.userService.userlist();
+       console.log(this.users);
     }
 
     // Handle keypress event, for saving nickname

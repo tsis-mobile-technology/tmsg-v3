@@ -26,7 +26,7 @@
         </ul>
     </div>
     <div>
-        <li *ngFor="let user of users">
+        <li *ngFor="let user of users$ | async">
             {{user.nickname}}
         </li>
     </div>

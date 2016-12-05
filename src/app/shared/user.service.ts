@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { ReplaySubject } from "rxjs";
+import { ReplaySubject, Observable } from "rxjs";
 import { List } from "immutable";
 
 import { SocketService } from "./socket.service";
@@ -40,6 +40,7 @@ export class UserService {
                         }
                     }
                     this.users.next(this.list);
+                    console.log("UserService constructor: socketService subscribe");
                 }, error => {console.log(error);},
                 () => {console.log("completed");}
             );

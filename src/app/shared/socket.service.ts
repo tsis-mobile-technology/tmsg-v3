@@ -23,12 +23,13 @@ export class SocketService {
         this.socket.on("error", (error: string) => {
             console.log(`ERROR: "${error}" (${socketUrl})`);
         });
-        this.socket.on("usercreate", (name: string, type: string, pass: string) => this.usercreate(name, type, pass));
         // Return observable which follows "create" and "remove" signals from socket stream
         return Observable.create((observer: any) => {
             console.log("SocketService Observable.create");
             this.socket.on("create", (item: any) => observer.next({ action: "create", item: item }) );
             this.socket.on("remove", (item: any) => observer.next({ action: "remove", item: item }) );
+            this.socket.on("usercreate", (name: string, type: string, pass: string) => this.usercreate(name, type, pass));
+            this.socket.on("userlist", (item: any) => observer.next({ action: "userlist", item: item }) );
             return () => this.socket.close();
         });
     }
@@ -57,7 +58,6 @@ export class SocketService {
                 console.log("UserSocket alllist:usertype:" + user.usertype);
                 console.log("UserSocket alllist:password:" + user.password);
             }
-
             return data;
         });
 
