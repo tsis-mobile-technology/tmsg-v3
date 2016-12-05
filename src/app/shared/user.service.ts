@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { ReplaySubject, Observable } from "rxjs";
 import { List } from "immutable";
 
-import { SocketService } from "./socket.service";
+import { UserSocketService } from "./user-socket.service";
 
 import { IRoom, IUser, User, ISocketItem } from "../../models";
 
@@ -16,9 +16,9 @@ export class UserService {
     users: ReplaySubject<any> = new ReplaySubject(1);
     private list: List<any> = List();
 
-    constructor(private socketService: SocketService) {
+    constructor(private userSocketService: UserSocketService) {
         console.log("UserService constructor here?");
-        this.socketService
+        this.userSocketService
             .get("users")
             .subscribe(
                 (socketItem: ISocketItem) => {
@@ -40,7 +40,7 @@ export class UserService {
                         }
                     }
                     this.users.next(this.list);
-                    console.log("UserService constructor: socketService subscribe");
+                    console.log("UserService constructor: userSocketService subscribe");
                 }, error => {console.log(error);},
                 () => {console.log("completed");}
             );
@@ -49,35 +49,45 @@ export class UserService {
     // Create user
     create(name: string, pass: string, type: string, datetime: Date) {
         console.log("UserService create :" + name + "," + pass + "," + type + "," + datetime);
-        this.socketService.usercreate(name, pass, type);
+        this.userSocketService.usercreate(name, pass, type);
     }
 
     // Remove user
     remove(name: string) {
         console.log("UserService remove");
         // Send signal to remove the user
-        this.socketService.remove(name);
+        this.userSocketService.remove(name);
     }
 
     // get user list
     userlist(): IUser[] {
         console.log("UserService userlist");
         // Send signal to remove the user
-        return this.socketService.userlist();
+        return this.userSocketService.userlist();
     }
 
     login(nickname: string, usertype: string, created: Date): void {
         console.log("UserService login");
         let index: number = this.findIndex(nickname);
         let status: number = 0;
-        if (index === -1) {
-            // Create
+
+        if(usertype == "customer") {
+            this.userSocketService.create(nickname);
             this.nickname = nickname;
             this.usertype = usertype;
             this.status = status;
-        }
-        else {
-            console.log("UserService already login");
+        } else {
+            if (index === -1) {
+                console.log("UserService Not found User counselor");
+            }
+            else {
+                // Create
+                this.nickname = nickname;
+                this.usertype = usertype;
+                this.status = status;
+                let user: IUser = this.list.get(index);
+                console.log("UserService exist user:pwd:" + user.password);
+            }
         }
     }
 

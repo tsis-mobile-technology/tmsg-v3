@@ -4,6 +4,7 @@ import { OrderByPipe } from "./order-by.pipe";
 import { RoomService } from "./room.service";
 import { SocketService } from "./socket.service";
 import { UserService } from "./user.service";
+import { UserSocketService } from "./user-socket.service";
 
 @NgModule({
     declarations: [
@@ -12,7 +13,8 @@ import { UserService } from "./user.service";
     providers: [
         RoomService,
         UserService,
-        SocketService
+        SocketService,
+        UserSocketService
     ],
     exports: [
         OrderByPipe

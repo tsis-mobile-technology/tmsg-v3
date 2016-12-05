@@ -53,6 +53,7 @@ export class CustcontrolComponent {
 
     joinCust(): void {
         //this.roomService.joinCust();
+        this.roomService.join(this.room);
     }
 
     wait(name: string): void {
