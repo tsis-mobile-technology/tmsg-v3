@@ -24,7 +24,7 @@ export class UserSocket {
         console.log("UserSocket listen");
         this.socket.on("disconnect", () => this.disconnect());
         this.socket.on("usercreate", (name: string, type: string, pass: string) => this.usercreate(name, type, pass));
-        this.socket.on("alllist", (name: string, type: string, pass: string) => this.alllist());
+        this.socket.on("alllist", () => this.alllist());
         this.socket.on("remove", (name: string) => this.remove(name));
         this.socket.on("list", () => this.list());
     }
@@ -37,9 +37,9 @@ export class UserSocket {
 
     // Create room and emit it
     private createUser(user: IUser): void {
-        console.log("UserSocket createRoom");
+        console.log("UserSocket createUser");
         if (!this.users[user.nickname]) {
-            console.log("Creating namespace for room:", user.nickname);
+            console.log("UserSocket createUser:Creating namespace for room:", user.nickname);
             this.users[user.nickname] = new MessageSocket(this.io, user.nickname);
         }
         this.nsp.emit("create", user);        
@@ -98,6 +98,7 @@ export class UserSocket {
                 console.log("UserSocket alllist:usertype:" + user.usertype);
                 console.log("UserSocket alllist:password:" + user.password);
             }
+            this.socket.emit("alllist_succeed", users);
         });
     }
 }

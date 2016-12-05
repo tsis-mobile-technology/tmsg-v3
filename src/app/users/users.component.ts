@@ -29,6 +29,7 @@ export class UsersComponent implements AfterViewInit {
     // After view initialised, focus on nickname text input
     ngAfterViewInit(): void {
         this.focus.nativeElement.focus();
+        this.users = this.userlist();
     }
 
     // Save nickname to user store
@@ -38,7 +39,8 @@ export class UsersComponent implements AfterViewInit {
 
     // user list
     userlist(): void {
-        this.userService.userlist();
+       this.users = this.userService.userlist();
+       console.log("this.users:" + this.users);
     }
 
     // Handle keypress event, for saving nickname

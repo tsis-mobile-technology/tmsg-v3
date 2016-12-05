@@ -29,15 +29,8 @@ export class KakaoSocket {
     private keyboard(): void {
         console.log("KakaoSocket listen");
         let result: any = {type:'text'};
-        this.socket.status(200).send(result);
-        this.nsp.emit("keyboard", "<html><body><h1>test</h1></body></html>");
-        // router.get('/keyboard', (request: express.Request, result: express.Response) => {
-        //     console.log("kakaoRoutes keyboard");
-        //     let re: any = {type:'text'};
-        //     //re.data = result;
-        //     result.status(200).send(re);
 
-        // });
+        this.socket.emit("keyboard", result);
     }
 
     // Handle disconnect

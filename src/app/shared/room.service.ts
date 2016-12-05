@@ -21,9 +21,7 @@ export class RoomService {
             .get("room")
             .subscribe(
                 (socketItem: ISocketItem) => {
-                    let room: IRoom = socketItem.item;
-console.log("subscribe:room.name:" + room.name);                    
-console.log("subscribe:room.name:index:" + this.findIndex(room.name));                    
+                    let room: IRoom = socketItem.item;                 
                     let index: number = this.findIndex(room.name);
                     if (socketItem.action === "remove") {
                         // Remove
@@ -33,16 +31,11 @@ console.log("subscribe:room.name:index:" + this.findIndex(room.name));
                             // Create
                             room.status = 0; // 생성
                             this.list = this.list.push(room);
-console.log("if");
                         } else {
                             // Update
                             this.list = this.list.set(index, room);
-console.log("else");
                         }
                         if( this.userService.usertype == "customer" && room.status == 0 && this.userService.status == 0) {
-                            console.log("RoomService constructor nickname:" + this.userService.nickname + "'s chat wait....");
-                            console.log("RoomService constructor room name:" + room.name);
-                            console.log("RoomService constructor room status:" + room.status);
                             // room.status = 1;
                             this.checkRooms(room.name);
                         }

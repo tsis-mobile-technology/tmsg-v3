@@ -59,10 +59,10 @@ export class UserService {
     }
 
     // get user list
-    userlist() {
+    userlist(): IUser[] {
         console.log("UserService userlist");
         // Send signal to remove the user
-        this.socketService.userlist();
+        return this.socketService.userlist();
     }
 
     login(nickname: string, usertype: string, created: Date): void {

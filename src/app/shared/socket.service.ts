@@ -23,13 +23,11 @@ export class SocketService {
         this.socket.on("error", (error: string) => {
             console.log(`ERROR: "${error}" (${socketUrl})`);
         });
-
+        this.socket.on("usercreate", (name: string, type: string, pass: string) => this.usercreate(name, type, pass));
         // Return observable which follows "create" and "remove" signals from socket stream
         return Observable.create((observer: any) => {
             console.log("SocketService Observable.create");
             this.socket.on("create", (item: any) => observer.next({ action: "create", item: item }) );
-            this.socket.on("usercreate", (item: any) => observer.next({ action: "usercreate", item: item }) );
-            this.socket.on("userlist", (item: any) => observer.next({ action: "userlist", item: item }));
             this.socket.on("remove", (item: any) => observer.next({ action: "remove", item: item }) );
             return () => this.socket.close();
         });
@@ -48,9 +46,22 @@ export class SocketService {
     }
 
     // Create signal
-    userlist(){
+    userlist(): IUser[] {
         console.log("SocketService userlist");
         this.socket.emit("alllist");
+        this.socket.on('alllist_succeed', function(data){
+        //... handle message from server ...
+            console.log("SocketService userlist:data:" + data);
+            for (let user of data) {
+                console.log("UserSocket alllist:nickname:" + user.nickname);
+                console.log("UserSocket alllist:usertype:" + user.usertype);
+                console.log("UserSocket alllist:password:" + user.password);
+            }
+
+            return data;
+        });
+
+        return [];
     }
 
     // Remove signal
