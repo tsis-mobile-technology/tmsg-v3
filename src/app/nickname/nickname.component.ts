@@ -16,6 +16,7 @@ export class NicknameComponent implements AfterViewInit {
     @ViewChild('focus') private focus: ElementRef;
     nickname: string;
     usertype: string;
+    nickname_password: string;
     created: Date;
 
     constructor(public userService: UserService, public router: Router) {
@@ -30,7 +31,7 @@ export class NicknameComponent implements AfterViewInit {
 
     // Save nickname to user store
     counselorLogin(): void {
-        this.userService.login(this.nickname, this.usertype, new Date());
+        this.userService.login(this.nickname, this.usertype, this.nickname_password, new Date());
     }
 
     // Handle keypress event, for saving nickname

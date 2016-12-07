@@ -21,7 +21,8 @@ export class UsersComponent implements OnInit, AfterViewInit {
     password: string;
     created: Date;
     status: number;
-    users: IUser[];
+    //users: IUser[];
+    users: Observable<IUser[]>;
 
     constructor(public userService: UserService) {
         this.nickname = userService.nickname;
@@ -30,7 +31,8 @@ export class UsersComponent implements OnInit, AfterViewInit {
 
     // On Init
     ngOnInit(): void {
-        this.users = this.userService.userlist();
+        this.userService.userlist();
+        this.users = this.userService.users;
     }
 
     // After view initialised, focus on nickname text input
@@ -43,10 +45,16 @@ export class UsersComponent implements OnInit, AfterViewInit {
         this.userService.create(this.nickname, this.password, this.usertype, new Date());
     }
 
+    // Delete nickname to user store
+    counselorDelete(nickname: string): void {
+        this.userService.remove(nickname);
+    }
+
     // user list
     userlist(): void {
        // userlist call?
        // this.users = this.userService.userlist();
+       this.users = this.userService.users;
        console.log(this.users);
     }
 

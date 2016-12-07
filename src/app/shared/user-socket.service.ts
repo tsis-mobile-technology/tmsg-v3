@@ -47,21 +47,24 @@ export class UserSocketService {
     }
 
     // Create signal
-    userlist(): IUser[] {
+    userlist(): Observable<any> {
         console.log("UserSocketService userlist");
         this.socket.emit("alllist");
-        this.socket.on('alllist_succeed', function(data){
-        //... handle message from server ...
-            console.log("UserSocketService userlist:data:" + data);
-            for (let user of data) {
-                console.log("UserSocket alllist:nickname:" + user.nickname);
-                console.log("UserSocket alllist:usertype:" + user.usertype);
-                console.log("UserSocket alllist:password:" + user.password);
-            }
-            return data;
-        });
 
-        return [];
+        return Observable.create((observer: any) => {
+            this.socket.on("alllist_success", (data) => observer.next(data) );
+        });
+        // this.socket.on('alllist_succeed', function(data){
+        // //... handle message from server ...
+        //     console.log("UserSocketService userlist:data:" + data);
+        //     for (let user of data) {
+        //         console.log("UserSocket alllist:nickname:" + user.nickname);
+        //         console.log("UserSocket alllist:usertype:" + user.usertype);
+        //         console.log("UserSocket alllist:password:" + user.password);
+        //     }
+        //     return data;
+        // });
+        // return [];
     }
 
     // Remove signal

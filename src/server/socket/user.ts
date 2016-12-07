@@ -98,7 +98,7 @@ export class UserSocket {
                 console.log("UserSocket alllist:usertype:" + user.usertype);
                 console.log("UserSocket alllist:password:" + user.password);
             }
-            this.socket.emit("alllist_succeed", users);
+            this.socket.emit("alllist_success", users);
         });
     }
 }

@@ -25,6 +25,7 @@ import { CustcontrolComponent } from "./custcontrol";
 import { CustroomComponent } from "./custroom";
 import { CustroomsComponent } from "./custrooms";
 import { UsersComponent } from "./users";
+import { ErrorComponent } from "./common";
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import { UsersComponent } from "./users";
         CustcontrolComponent,
         CustroomComponent,
         CustroomsComponent,
-        UsersComponent
+        UsersComponent,
+        ErrorComponent
     ],
     bootstrap: [
         AppComponent

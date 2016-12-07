@@ -25,9 +25,12 @@
             </li>
         </ul>
     </div>
-    <div>
-        <li *ngFor="let user of users$ | async">
-            {{user.nickname}}
+    <div class="form-group">
+        <li *ngFor="let user of users | async">
+            <label>
+                {{user.nickname}}/{{user.usertype}}/{{user.created}}/{{user.password}}/{{user.status}}
+                <button (click)="counselorDelete(user.nickname)" class="btn btn_login">삭제</button>
+            </label>
         </li>
     </div>
 </div>

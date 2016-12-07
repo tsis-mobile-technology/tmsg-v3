@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { ReplaySubject, Observable } from "rxjs";
+import { ReplaySubject, Observable, BehaviorSubject } from "rxjs";
 import { List } from "immutable";
 
 import { UserSocketService } from "./user-socket.service";
@@ -13,16 +13,26 @@ export class UserService {
     password: string = "";
     status: number;    // (0: 로그인, 1: 상담 중, 2: 대기, 3: 후처리, 4: 휴식, 5: 상담실 입장(customer))
     rooms: IRoom[] = [];
-    users: ReplaySubject<any> = new ReplaySubject(1);
+    users: Observable<IUser[]>;
+    private _users: BehaviorSubject<IUser[]>;
+    // data observe 처리 : https://coryrylan.com/blog/angular-2-observable-data-services
+    private dataStore: {
+        users: IUser[]
+    };
+
+    lists: ReplaySubject<any> = new ReplaySubject(1);
     private list: List<any> = List();
 
     constructor(private userSocketService: UserSocketService) {
         console.log("UserService constructor here?");
+        this._users = <BehaviorSubject<IUser[]>>new BehaviorSubject([]);
+        this.dataStore = { users: [] };
+        this.users = this._users.asObservable();
+
         this.userSocketService
             .get("users")
             .subscribe(
                 (socketItem: ISocketItem) => {
-                    console.log("UserService constructor subscribe calling.....");
                     let user: IUser = socketItem.item;
                     let index: number = this.findIndex(user.nickname);
                     console.log("UserService constructor: socketItem.action:" + socketItem.action + ",index:" + index);
@@ -39,8 +49,7 @@ export class UserService {
                             this.list = this.list.set(index, user);
                         }
                     }
-                    this.users.next(this.list);
-                    console.log("UserService constructor: userSocketService subscribe");
+                    this.lists.next(this.list);
                 }, error => {console.log(error);},
                 () => {console.log("completed");}
             );
@@ -49,7 +58,9 @@ export class UserService {
     // Create user
     create(name: string, pass: string, type: string, datetime: Date) {
         console.log("UserService create :" + name + "," + pass + "," + type + "," + datetime);
-        this.userSocketService.usercreate(name, pass, type);
+        this.userSocketService.usercreate(name, type, pass);
+        // users data refresh
+        this.userlist();
     }
 
     // Remove user
@@ -57,16 +68,28 @@ export class UserService {
         console.log("UserService remove");
         // Send signal to remove the user
         this.userSocketService.remove(name);
+        // users data refresh
+        this.userlist();
     }
 
     // get user list
-    userlist(): IUser[] {
+    userlist(): void {
         console.log("UserService userlist");
         // Send signal to remove the user
-        return this.userSocketService.userlist();
+        // this.userSocketService.userlist();
+        this.userSocketService
+            .userlist()
+            .subscribe(
+                (data) => {
+                    console.log("UserService userlist: data:" + data);
+                    this.dataStore.users = data;
+                    this._users.next(Object.assign({}, this.dataStore).users);
+                }, error => {console.log(error);},
+                () => {console.log("completed");}
+            );
     }
 
-    login(nickname: string, usertype: string, created: Date): void {
+    login(nickname: string, usertype: string, password: string, created: Date): void {
         console.log("UserService login");
         let index: number = this.findIndex(nickname);
         let status: number = 0;
@@ -81,12 +104,18 @@ export class UserService {
                 console.log("UserService Not found User counselor");
             }
             else {
-                // Create
-                this.nickname = nickname;
-                this.usertype = usertype;
-                this.status = status;
+                // compare password
                 let user: IUser = this.list.get(index);
-                console.log("UserService exist user:pwd:" + user.password);
+                if( user.password === password) {
+                    // login success
+                    this.nickname = nickname;
+                    this.usertype = usertype;
+                    this.status = status;
+                } else {
+                    // login failure
+                    console.log("UserService login faileure!! password check");
+                    console.log("UserService exist user:pwd:" + user.password);
+                }
             }
         }
     }
