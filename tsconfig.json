@@ -28,6 +28,7 @@
       "source-map",
       "uglify-js",
       "webpack"
+      // "body-parser"
     ]
   },
   "exclude": [

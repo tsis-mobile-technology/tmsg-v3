@@ -7,6 +7,7 @@ export class MessageSocket {
     socket: any;
 
     constructor(io: any, private room: string) {
+        console.log("MessageSocket constructor");
         this.nsp = io.of("/messages/" + encodeURIComponent(this.room));
         this.nsp.on("connection", (socket: any) => {
             console.log("Client connected to room:", this.room);
