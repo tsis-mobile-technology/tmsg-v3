@@ -2,3 +2,4 @@
 <nickname *ngIf="!userService.nickname || userService.nickname === ''"></nickname>
 <control *ngIf="userService.nickname && userService.nickname !== ''"></control>
 <rooms *ngIf="userService.nickname && userService.nickname !== ''"></rooms>
+<app-error-message></app-error-message>

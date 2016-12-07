@@ -89,10 +89,11 @@ export class UserService {
             );
     }
 
-    login(nickname: string, usertype: string, password: string, created: Date): void {
+    login(nickname: string, usertype: string, password: string, created: Date): boolean {
         console.log("UserService login");
         let index: number = this.findIndex(nickname);
         let status: number = 0;
+        let rtn: boolean = false;
 
         if(usertype == "customer") {
             this.userSocketService.create(nickname);
@@ -111,13 +112,17 @@ export class UserService {
                     this.nickname = nickname;
                     this.usertype = usertype;
                     this.status = status;
+                    rtn = true;
                 } else {
                     // login failure
                     console.log("UserService login faileure!! password check");
                     console.log("UserService exist user:pwd:" + user.password);
+                    rtn = false;
                 }
             }
         }
+
+        return rtn;
     }
 
     logout(nickname: string): void {

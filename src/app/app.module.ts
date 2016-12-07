@@ -52,6 +52,7 @@ import { ErrorComponent } from "./common";
         UsersComponent,
         ErrorComponent
     ],
+    providers: [ ],
     bootstrap: [
         AppComponent
     ]
