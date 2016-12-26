@@ -15,6 +15,7 @@
       "es6"
     ],
     "types": [
+      // "body-parser",
       "express",
       "hammerjs",
       "jasmine",
@@ -28,7 +29,6 @@
       "source-map",
       "uglify-js",
       "webpack"
-      // "body-parser"
     ]
   },
   "exclude": [

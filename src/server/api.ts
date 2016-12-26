@@ -1,14 +1,16 @@
-import * as express from "express";
+import * as express from 'express'; 
+// import * as bodyParser from 'body-parser'; 
 import * as http from "http";
 import * as serveStatic from "serve-static";
 import * as path from "path";
 import * as socketIo from "socket.io";
 import * as mongoose from "mongoose";
-// import * as bodyParser from "body-parser";
 
 import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 
 declare var process, __dirname;
+
+var bodyParser = require('body-parser');
 
 class ApiServer {
     public kakao_app: any;
@@ -69,9 +71,9 @@ class ApiServer {
             next();
         });
 
-        // this.kakao_app.use(bodyParser.json());
-        // this.kakao_app.use(bodyParser.urlencoded({extended:true}));
-
+        this.kakao_app.use(bodyParser.json());
+        this.kakao_app.use(bodyParser.urlencoded({extended:true}));
+        
         this.kakao_app.get( '/', function(req, res) {
             res.send("{type: 'text'}");
         });
@@ -97,7 +99,8 @@ class ApiServer {
 
         // 응답
         this.kakao_app.post('/message', (request: express.Request, result: express.Response, next: express.NextFunction) => {
-            console.log("kakao message");
+            console.log("kakao message" + JSON.stringify(request.body));
+
             var user_key = request.body.user_key;
             var type = request.body.type;
             var content = request.body.content;
@@ -115,6 +118,10 @@ class ApiServer {
                     result.status(200).send(re);
                 } else if (content == 'testKey') {
                     re = {text:'응답 대기 10초 param : '+ user_key+"/"+type+"/"+content};
+                    re = {message:re};
+                    result.status(200).send(re);
+                } else{
+                    re = {text:'다른 질문을 하기거나 잠시만 기다려 주세요!.'+ user_key+"/"+type+"/"+content};
                     re = {message:re};
                     result.status(200).send(re);
                 } 

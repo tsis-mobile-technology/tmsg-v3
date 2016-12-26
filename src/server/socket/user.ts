@@ -24,6 +24,7 @@ export class UserSocket {
         console.log("UserSocket listen");
         this.socket.on("disconnect", () => this.disconnect());
         this.socket.on("usercreate", (name: string, type: string, pass: string) => this.usercreate(name, type, pass));
+        this.socket.on("login", (name: string, type: string, status: number) => this.login(name, type, status));
         this.socket.on("alllist", () => this.alllist());
         this.socket.on("remove", (name: string) => this.remove(name));
         this.socket.on("list", () => this.list());
@@ -43,6 +44,14 @@ export class UserSocket {
             this.users[user.nickname] = new MessageSocket(this.io, user.nickname);
         }
         this.nsp.emit("create", user);        
+    }
+
+    // Login user(counselor, customer)
+    private login(name: string, type: string, status: number): void {
+        console.log("UserSocket login");
+        console.log("UserSocket login:name" + name);
+        console.log("UserSocket login:type" + type);
+        console.log("UserSocket login:status" + status);
     }
 
     // Create a user
@@ -97,6 +106,7 @@ export class UserSocket {
                 console.log("UserSocket alllist:nickname:" + user.nickname);
                 console.log("UserSocket alllist:usertype:" + user.usertype);
                 console.log("UserSocket alllist:password:" + user.password);
+                console.log("UserSocket alllist:status:" + user.status);
             }
             this.socket.emit("alllist_success", users);
         });

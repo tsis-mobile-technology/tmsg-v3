@@ -113,6 +113,7 @@ export class UserService {
                     this.usertype = usertype;
                     this.status = status;
                     rtn = true;
+                    this.userSocketService.login(this.nickname, this.usertype, this.status);
                 } else {
                     // login failure
                     console.log("UserService login faileure!! password check");
