@@ -30,6 +30,8 @@ export class UserSocketService {
             this.socket.on("remove", (item: any) => observer.next({ action: "remove", item: item }) );
             this.socket.on("usercreate", (name: string, type: string, pass: string) => this.usercreate(name, type, pass));
             this.socket.on("login", (name: string, type: string, status: number) => this.login(name, type, status));
+            this.socket.on("logout", (name: string, type: string) => this.logout(name, type));
+            this.socket.on("changestatus", (name: string, type: string, status: number) => this.changestatus(name, type, status));
             this.socket.on("userlist", (item: any) => observer.next({ action: "userlist", item: item }) );
             return () => this.socket.close();
         });
@@ -49,8 +51,20 @@ export class UserSocketService {
 
     // Create signal
     login(name: string, type: string, status: number) {
-        console.log("UserSocketService login:" + name);
+        console.log("UserSocketService login:" + name + "," + type + "(" + status + ")");
         this.socket.emit("login", name, type, status);
+    }
+
+    // Create signal
+    logout(name: string, type: string) {
+        console.log("UserSocketService logout:" + name + "," + type );
+        this.socket.emit("logout", name, type);
+    }
+
+    // Create signal
+    changestatus(name: string, type: string, status: number) {
+        console.log("UserSocketService changestatus:" + name + "," + type + "(" + status + ")");
+        this.socket.emit("changestatus", name, type, status);
     }
 
     // Create signal

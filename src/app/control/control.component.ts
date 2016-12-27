@@ -82,7 +82,8 @@ export class ControlComponent {
     // status Change
     changeStatus(status: number): void {
         console.log("ControlComponent changeStatus:" + status);
-        this.userService.status = status;
+        this.userService.changeStatus(status);
+        // this.userService.status = status;
     }
 
     // status check

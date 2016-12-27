@@ -25,6 +25,8 @@ export class UserSocket {
         this.socket.on("disconnect", () => this.disconnect());
         this.socket.on("usercreate", (name: string, type: string, pass: string) => this.usercreate(name, type, pass));
         this.socket.on("login", (name: string, type: string, status: number) => this.login(name, type, status));
+        this.socket.on("logout", (name: string, type: string) => this.logout(name, type));
+        this.socket.on("changestatus", (name: string, type: string, status: number) => this.changestatus(name, type, status));
         this.socket.on("alllist", () => this.alllist());
         this.socket.on("remove", (name: string) => this.remove(name));
         this.socket.on("list", () => this.list());
@@ -49,9 +51,30 @@ export class UserSocket {
     // Login user(counselor, customer)
     private login(name: string, type: string, status: number): void {
         console.log("UserSocket login");
-        console.log("UserSocket login:name" + name);
-        console.log("UserSocket login:type" + type);
-        console.log("UserSocket login:status" + status);
+        console.log("UserSocket name:" + name);
+        console.log("UserSocket type:" + type);
+        console.log("UserSocket status:" + status);
+        this.changeStatus(name, status);
+    }
+
+    // Logout user(counselor, customer)
+    private logout(name: string, type: string): void {
+        var status: number;
+        status = -1;
+        console.log("UserSocket login");
+        console.log("UserSocket name:" + name);
+        console.log("UserSocket type:" + type);
+        console.log("UserSocket status:" + status);
+        this.changeStatus(name, status);
+    }
+
+    // Chage status user(counselor, customer)
+    private changestatus(name: string, type: string, status: number): void {
+        console.log("UserSocket login");
+        console.log("UserSocket name:" + name);
+        console.log("UserSocket type:" + type);
+        console.log("UserSocket status:" + status);
+        this.changeStatus(name, status);
     }
 
     // Create a user
@@ -109,6 +132,23 @@ export class UserSocket {
                 console.log("UserSocket alllist:status:" + user.status);
             }
             this.socket.emit("alllist_success", users);
+        });
+    }
+
+    // List all rooms
+    private changeStatus(name: string, status: number): void {
+        console.log("UserSocket alllist");
+        User.find({}).exec( (error: any, users: IUser[]) => {
+            for (let user of users) {
+                if( user.nickname === name ) {
+                    user.status = status;
+                }
+                console.log("UserSocket alllist:nickname:" + user.nickname);
+                console.log("UserSocket alllist:usertype:" + user.usertype);
+                console.log("UserSocket alllist:password:" + user.password);
+                console.log("UserSocket alllist:status:" + user.status);
+            }
+            // this.socket.emit("user_success", users);
         });
     }
 }

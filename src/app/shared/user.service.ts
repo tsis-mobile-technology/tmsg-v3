@@ -132,9 +132,21 @@ export class UserService {
             // Create
             console.log("UserService delete: not found");
         } else {
+            this.userSocketService.logout(nickname, this.usertype);
             // exist nickname
             this.list.delete(index);
             this.nickname = "";
+        }
+    }
+
+    changeStatus(status: number): void {
+        this.status = status;
+
+        if (this.nickname && this.nickname === null) {
+            // Create
+            console.log("UserService changeStatus: not found");
+        } else {
+            this.userSocketService.changestatus(this.nickname, this.usertype, status);
         }
     }
 
