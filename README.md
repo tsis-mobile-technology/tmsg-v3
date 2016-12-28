@@ -61,7 +61,7 @@ nvm install v6.3.1
 nvm use v6.3.1
 ```
 
-#### MongoDB
+#### MongoDB for Mac
 
 ```
 brew install mongodb
@@ -70,6 +70,20 @@ launchctl load ~/Library/LaunchAgents/homebrew.mxcl.mongodb.plist
 ```
 
 Note! You can also unload with `launchctl`, as well as add the load/unload commands to your `.bash_profile` or equivalent as aliases.
+
+#### MongoDB for Ubuntu
+
+```
+brew install mongodb
+mkdir /data;mkdir /data/db
+vi mongod.sh
+#!/bin/sh
+mongod --dbpath=/data/db --port 27017 &
+
+```
+
+Note! You can run script sh mongod.sh
+
 
 ### Installing prequisities on Windows
 
