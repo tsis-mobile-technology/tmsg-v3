@@ -44,6 +44,12 @@ export class ControlComponent {
         this.changeStatus(2);
     }
 
+    // counselor logout
+    logout(): void {
+        console.log("ControlComponent logout : " + this.userService.nickname );
+        this.userService.logout(this.userService.nickname);
+    }
+
     // Create room, when Create-button is pressed and empty newRoom text input
     create(): void {
         console.log("ControlComponent create : " + this.room );

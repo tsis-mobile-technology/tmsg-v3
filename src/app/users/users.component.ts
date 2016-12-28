@@ -54,6 +54,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
     userlist(): void {
        // userlist call?
        // this.users = this.userService.userlist();
+       this.userService.userlist();
        this.users = this.userService.users;
        console.log(this.users);
     }

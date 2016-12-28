@@ -50,6 +50,8 @@ export class UserSocket {
 
     // Login user(counselor, customer)
     private login(name: string, type: string, status: number): void {
+        var status: number;
+        status = 0;
         console.log("UserSocket login");
         console.log("UserSocket name:" + name);
         console.log("UserSocket type:" + type);
@@ -137,18 +139,21 @@ export class UserSocket {
 
     // List all rooms
     private changeStatus(name: string, status: number): void {
-        console.log("UserSocket alllist");
-        User.find({}).exec( (error: any, users: IUser[]) => {
-            for (let user of users) {
-                if( user.nickname === name ) {
-                    user.status = status;
-                }
-                console.log("UserSocket alllist:nickname:" + user.nickname);
-                console.log("UserSocket alllist:usertype:" + user.usertype);
-                console.log("UserSocket alllist:password:" + user.password);
-                console.log("UserSocket alllist:status:" + user.status);
-            }
-            // this.socket.emit("user_success", users);
+        console.log("UserSocket changeStatus");
+
+        // save the user
+        User.findOneAndUpdate({nickname: name}, {status: status}, function(err: any, user: IUser) {
+            if (err) throw err;
+            console.log('User successfully updated!(' + user.status + ")");
         });
+
+        // User.find({nickname: name}).exec( (error: any, users: IUser[]) => {
+        //     for (let user of users) {
+        //         if( user.nickname === name ) {
+        //             user.status = status;
+        //         }
+        //     }
+        //     // this.socket.emit("user_success", users);
+        // });
     }
 }
