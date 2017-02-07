@@ -81,17 +81,31 @@ export class UserSocket {
 
     // Create a user
     private usercreate(name: string, type: string, pass: string): void {
-        console.log("UserSocket usercreate");
 
-        User.create({
-            nickname: name, 
-            usertype: type, 
-            password: pass, 
-            created: new Date(), 
-            status: 0
-        }, (error: any, user: IUser) => {
-            if (!error && user) {
-                console.log("user save success");
+        let bCheck = false;
+
+        User.find({}).exec( (error: any, users: IUser[]) => {
+            for (let user of users) {
+                if(user.nickname == name) {
+                    bCheck = true;
+                }
+            }
+            if(bCheck == false) {
+                User.create({
+                    nickname: name, 
+                    usertype: type, 
+                    password: pass, 
+                    created: new Date(), 
+                    status: 0
+                }, (error: any, user: IUser) => {
+                    if (!error && user) {
+                        console.log("user save success");
+                        this.socket.emit("usercreate_result", "true");
+                    }
+                });
+            } else {
+                console.log("counselor is exist!");
+                this.socket.emit("usercreate_result", "false");
             }
         });
     }

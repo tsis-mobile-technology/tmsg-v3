@@ -28,7 +28,8 @@ export class UserSocketService {
             console.log("UserSocketService Observable.create");
             this.socket.on("create", (item: any) => observer.next({ action: "create", item: item }) );
             this.socket.on("remove", (item: any) => observer.next({ action: "remove", item: item }) );
-            this.socket.on("usercreate", (name: string, type: string, pass: string) => this.usercreate(name, type, pass));
+            //this.socket.on("usercreate", (name: string, type: string, pass: string) => this.usercreate(name, type, pass));
+            this.socket.on("usercreate", (item: any) => observer.next({ action: "usercreate", item: item }) );
             this.socket.on("login", (name: string, type: string, status: number) => this.login(name, type, status));
             this.socket.on("logout", (name: string, type: string) => this.logout(name, type));
             this.socket.on("changestatus", (name: string, type: string, status: number) => this.changestatus(name, type, status));
@@ -44,9 +45,13 @@ export class UserSocketService {
     }
 
     // Create signal
-    usercreate(name: string, type: string, pass: string) {
+    usercreate(name: string, type: string, pass: string): Observable<any> {
         console.log("UserSocketService usercreate:" + name);
         this.socket.emit("usercreate", name, type, pass);
+
+        return Observable.create((observer: any) => {
+            this.socket.on("usercreate_result", (data) => observer.next(data) );
+        });
     }
 
     // Create signal

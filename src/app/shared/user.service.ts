@@ -58,7 +58,14 @@ export class UserService {
     // Create user
     create(name: string, pass: string, type: string, datetime: Date) {
         console.log("UserService create :" + name + "," + pass + "," + type + "," + datetime);
-        this.userSocketService.usercreate(name, type, pass);
+        this.userSocketService
+            .usercreate(name, type, pass)
+            .subscribe(
+                (data) => {
+                    console.log("UserService create: data:" + data);
+                }, error => {console.log(error);},
+                () => {console.log("completed")}
+            );
         // users data refresh
         this.userlist();
     }
