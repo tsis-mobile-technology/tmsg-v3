@@ -85,10 +85,12 @@ class ApiServer {
 
         // 키보드
         this.kakao_app.get('/keyboard', (request: express.Request, result: express.Response, next: express.NextFunction) => {
-            console.log("keyboard");
+            console.log("get:keyboard");
+            console.log("get:keyboard" + JSON.stringify(request.body));
             var re;
             try {
-            re = {type:'text'};
+            	//re = {type:'text'};
+            	re = {type:"buttons", buttons: ["자동응답", "채팅상담"]};
             } catch (exception) {
             alert('키보드 에러');
             } finally {
@@ -120,8 +122,16 @@ class ApiServer {
                     re = {text:'응답 대기 10초 param : '+ user_key+"/"+type+"/"+content};
                     re = {message:re};
                     result.status(200).send(re);
+		} else if (content == '자동응답') {
+                    re = {text:'주소, 전화번호 중 한가지를 입력해주세요!'};
+                    re = {message:re};
+                    result.status(200).send(re);
+		} else if (content == '채팅상담') {
+                    re = {text:'http://test.proidea.kr:2581/cust?id='+ user_key};
+                    re = {message:re};
+                    result.status(200).send(re);
                 } else{
-                    re = {text:'다른 질문을 하기거나 잠시만 기다려 주세요!.'+ user_key+"/"+type+"/"+content};
+                    re = {text:'주소, 전화번호 중 한가지를 입력하거나 좀더 자세한 상담을 원하시면 링크를 선택하세요!(http://test.proidea.kr:2581/cust?id='+ user_key + ')'};
                     re = {message:re};
                     result.status(200).send(re);
                 } 
