@@ -54,7 +54,7 @@ class ApiServer {
     private kakaoConfig(): void {
         console.log("Server config");
         // By default the port should be 5000
-        this.kakao_port = process.env.PORT || 5000;
+        this.kakao_port = process.env.PORT || 2580;
 
         // root path is under ../../target
         this.kakao_root = path.join(path.resolve(__dirname, '../../target'));
