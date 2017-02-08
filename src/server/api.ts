@@ -122,11 +122,11 @@ class ApiServer {
                     re = {text:'응답 대기 10초 param : '+ user_key+"/"+type+"/"+content};
                     re = {message:re};
                     result.status(200).send(re);
-		} else if (content == '자동응답') {
+		        } else if (content == '자동응답') {
                     re = {text:'주소, 전화번호 중 한가지를 입력해주세요!'};
                     re = {message:re};
                     result.status(200).send(re);
-		} else if (content == '채팅상담') {
+		        } else if (content == '채팅상담') {
                     re = {text:'http://test.proidea.kr:2581/cust?id='+ user_key};
                     re = {message:re};
                     result.status(200).send(re);
