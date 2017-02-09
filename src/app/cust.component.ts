@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 
 import { UserService } from "./shared/user.service";
 
@@ -13,5 +14,20 @@ const template: string = require("./cust.component.html");
 })
 
 export class CustComponent {
-    constructor(public userService: UserService) {}
+
+	private sub: any;
+
+    constructor(public userService: UserService,
+    	        private route: ActivatedRoute) {}
+
+	private ngOnInit() {
+		this.sub = this.route.params.subscribe(params => {
+			this.userService.nickname = params['nickname']; // (+) converts string 'id' to a number
+			this.userService.status = 6; //6: 상담실 대기(customer)
+		});
+	}
+
+	private ngOnDestroy() {
+		this.sub.unsubscribe();
+	}
 }

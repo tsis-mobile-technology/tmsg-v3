@@ -127,11 +127,11 @@ class ApiServer {
                     re = {message:re};
                     result.status(200).send(re);
 		        } else if (content == '채팅상담') {
-                    re = {text:'http://test.proidea.kr:2581/cust?nickname='+ user_key};
+                    re = {text:'http://test.proidea.kr:2581/cust/'+ user_key};
                     re = {message:re};
                     result.status(200).send(re);
                 } else{
-                    re = {text:'주소, 전화번호 중 한가지를 입력하거나 좀더 자세한 상담을 원하시면 링크를 선택하세요!(http://test.proidea.kr:2581/cust?id='+ user_key + ')'};
+                    re = {text:'주소, 전화번호 중 한가지를 입력하거나 좀더 자세한 상담을 원하시면 링크를 선택하세요!(http://test.proidea.kr:2581/cust/'+ user_key + ')'};
                     re = {message:re};
                     result.status(200).send(re);
                 } 

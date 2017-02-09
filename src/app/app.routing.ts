@@ -10,7 +10,7 @@ import { UserComponent } from "./user.component";
 const appRoutes: Routes = [
   { path: '', redirectTo: '/call', pathMatch: 'full' },
   { path: 'call',	component: CallComponent },
-  { path: 'cust',	component: CustComponent },
+  { path: 'cust/:nickname',	component: CustComponent },
   { path: 'user',	component: UserComponent }
 ];
 

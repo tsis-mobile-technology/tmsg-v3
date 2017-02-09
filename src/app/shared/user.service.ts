@@ -11,7 +11,7 @@ export class UserService {
     nickname: string = "";
     usertype: string = "";
     password: string = "";
-    status: number;    // (0: 로그인, 1: 상담 중, 2: 대기, 3: 후처리, 4: 휴식, 5: 상담실 입장(customer))
+    status: number;    // (0: 로그인, 1: 상담 중, 2: 대기, 3: 후처리, 4: 휴식, 5: 상담실 입장(customer), 6: 상담실 대기(customer))
     rooms: IRoom[] = [];
     users: Observable<IUser[]>;
     private _users: BehaviorSubject<IUser[]>;
