@@ -75,7 +75,8 @@
     "webpack": "2.1.0-beta.22",
     "webpack-merge": "^0.14.1",
     "xmlhttprequest-ssl": "jussikinnula/node-XMLHttpRequest",
-    "zone.js": "~0.6.25"
+    "zone.js": "~0.6.25",
+    "mysql": "*"
   },
   "devDependencies": {
     "connect-history-api-fallback": "~1.3.0",
