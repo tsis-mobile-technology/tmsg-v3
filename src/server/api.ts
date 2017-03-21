@@ -115,19 +115,9 @@ class ApiServer {
             this.kakao_io.emit('chat message', content);
             console.log(">>>>>>>>>>>>>>>>>>>" + content);
             try {
-                // re = this.getMessageResponse(content, user_key, type);
-                // re = {message:re};
-                // result.status(200).send(re);
-        console.log("content : " + content);
-                if (content == "자주하는 질문") {
-                    re = depth_First_First;
-                    re = {message:re};
-        console.log("response:" + JSON.stringify(re));
-                    result.status(200).send(re);
-        console.log(">>>>>>>re : " + re);
-                } else{
-                    re = {text:'잠시후에 다시 불러주십시요!'};
-                } 
+                re = this.getMessageResponse(content, user_key, type);
+                console.log("response:" + JSON.stringify(re));
+                result.status(200).send(re);
             } catch (exception) {
                 console.log('응답 에러');
             }
