@@ -11,10 +11,10 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 declare var process, __dirname;
 
 var bodyParser = require('body-parser');
-var depth_First = {type:"buttons", buttons: ["자주하는 질문", "주문 조회/변경", "문의하기"]};
-var depth_First_First = { "message": {"text": "다른 고객님들이 궁금해 하시는 내용입니다.궁금하신 내용을 선택해주세요!"},"keyboard": {type:"buttons", buttons: ["콜센터 전화번호", "배송기간", "취소하기"]}};
-var dpeth_First_Second = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": {type:"buttons", buttons: ["주문 조회", "배송지 변경", "주문 취소", "반품 문의", "취소하기"]}};
-var depth_First_Third = { "message": {"text": "문의하실 내용을 선택해 주세요!"},"keyboard": {type:"buttons", buttons: ["사진 첨부 후 문의하기", "문의사항만 입력", "취소하기"]}};
+var depth_First = {"type": "buttons", "buttons": ["자주하는 질문", "주문 조회/변경", "문의하기"]};
+var depth_First_First = { "message": {"text": "다른 고객님들이 궁금해 하시는 내용입니다.궁금하신 내용을 선택해주세요!"},"keyboard": {"type":"buttons", "buttons": ["콜센터 전화번호", "배송기간", "취소하기"]}};
+var dpeth_First_Second = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": {"type":"buttons", "buttons": ["주문 조회", "배송지 변경", "주문 취소", "반품 문의", "취소하기"]}};
+var depth_First_Third = { "message": {"text": "문의하실 내용을 선택해 주세요!"},"keyboard": {"type":"buttons", "buttons": ["사진 첨부 후 문의하기", "문의사항만 입력", "취소하기"]}};
 
 class ApiServer {
     public kakao_app: any;
@@ -115,9 +115,19 @@ class ApiServer {
             this.kakao_io.emit('chat message', content);
             console.log(">>>>>>>>>>>>>>>>>>>" + content);
             try {
-                re = this.getMessageResponse(content, user_key, type);
-		        re = {message:re};
-		        result.status(200).send(re);
+                // re = this.getMessageResponse(content, user_key, type);
+                // re = {message:re};
+                // result.status(200).send(re);
+        console.log("content : " + content);
+                if (content == "자주하는 질문") {
+                    re = depth_First_First;
+                    re = {message:re};
+        console.log("response:" + JSON.stringify(re));
+                    result.status(200).send(re);
+        console.log(">>>>>>>re : " + re);
+                } else{
+                    re = {text:'잠시후에 다시 불러주십시요!'};
+                } 
             } catch (exception) {
                 console.log('응답 에러');
             }
