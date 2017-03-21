@@ -115,31 +115,7 @@ class ApiServer {
             console.log("req : " + content);
             this.kakao_io.emit('chat message', content);
             try {
-                if (content == '주소') {
-                    re = {text:'서울특별시 중구 칠패로 42 우리빌딩 5층'};
-                    re = {message:re};
-                    result.status(200).send(re);
-                } else if (content == '전화번호') {
-                    re = {text:'070-8188-0500'};
-                    re = {message:re};
-                    result.status(200).send(re);
-                } else if (content == 'testKey') {
-                    re = {text:'응답 대기 10초 param : '+ user_key+"/"+type+"/"+content};
-                    re = {message:re};
-                    result.status(200).send(re);
-		        } else if (content == '자동응답') {
-                    re = {text:'주소, 전화번호 중 한가지를 입력해주세요!'};
-                    re = {message:re};
-                    result.status(200).send(re);
-		        } else if (content == '채팅상담') {
-                    re = {text:'http://test.proidea.kr:2581/cust/'+ user_key};
-                    re = {message:re};
-                    result.status(200).send(re);
-                } else{
-                    re = {text:'주소, 전화번호 중 한가지를 입력하거나 좀더 자세한 상담을 원하시면 링크를 선택하세요!(http://test.proidea.kr:2581/cust/'+ user_key + ')'};
-                    re = {message:re};
-                    result.status(200).send(re);
-                } 
+                this.getMessageResponse(content, user_key, type);
             } catch (exception) {
                 console.log('응답 에러');
             }
@@ -189,6 +165,43 @@ class ApiServer {
                 result.status(200).send(re);
             }
         });
+    }
+
+    private getMessageResponse(content: string, user_key: string, type: string): string {
+        var re;
+
+        if (content == '자주하는 질문') {
+            re = depth_First_First;
+        } else{
+            re = {text:'잠시후에 다시 불러주십시요!'};
+        } 
+          //       if (content == '주소') {
+          //           re = {text:'서울특별시 중구 칠패로 42 우리빌딩 5층'};
+          //           re = {message:re};
+          //           result.status(200).send(re);
+          //       } else if (content == '전화번호') {
+          //           re = {text:'070-8188-0500'};
+          //           re = {message:re};
+          //           result.status(200).send(re);
+          //       } else if (content == 'testKey') {
+          //           re = {text:'응답 대기 10초 param : '+ user_key+"/"+type+"/"+content};
+          //           re = {message:re};
+          //           result.status(200).send(re);
+                // } else if (content == '자동응답') {
+          //           re = {text:'주소, 전화번호 중 한가지를 입력해주세요!'};
+          //           re = {message:re};
+          //           result.status(200).send(re);
+                // } else if (content == '채팅상담') {
+          //           re = {text:'http://test.proidea.kr:2581/cust/'+ user_key};
+          //           re = {message:re};
+          //           result.status(200).send(re);
+          //       } else{
+          //           re = {text:'주소, 전화번호 중 한가지를 입력하거나 좀더 자세한 상담을 원하시면 링크를 선택하세요!(http://test.proidea.kr:2581/cust/'+ user_key + ')'};
+          //           re = {message:re};
+          //           result.status(200).send(re);
+          //       } 
+
+        return re;
     }
 
     // Configure databases
