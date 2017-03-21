@@ -179,7 +179,7 @@ class ApiServer {
         } else if(content == '문의하기') {
             re = depth_First_Third;
         } else if(content == '취소하기') {
-            re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": {depth_First}};
+            re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
         } else {
             re = {'messge': {'text':'잠시후에 다시 불러주십시요!'}};
         } 
