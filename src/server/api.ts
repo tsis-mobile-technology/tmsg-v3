@@ -11,7 +11,7 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 declare var process, __dirname;
 
 var bodyParser = require('body-parser');
-var depth_First = {type:"text", content: "Test", type:"buttons", buttons: ["자주하는 질문", "주문 조회/변경", "문의하기"]};
+var depth_First = {type:"buttons", buttons: ["자주하는 질문", "주문 조회/변경", "문의하기"]};
 var depth_First_First = {type:"button", buttons: ["콜센터 전화번호", "배송기간", "이전 단계"]};
 var dpeth_First_Second = {type:"button", buttons: ["주문 조회", "배송지 변경", "주문 취소", "반품 문의", "이전 단계"]};
 var depth_First_Third = {type:"button", buttons: ["사진 첨부 후 문의하기", "문의사항만 입력", "이전 단계"]};
@@ -105,7 +105,7 @@ class ApiServer {
         });
 
         // 응답
-        dthis.kakao_app.post('/message', (request: express.Request, result: express.Response, next: express.NextFunction) => {
+        this.kakao_app.post('/message', (request: express.Request, result: express.Response, next: express.NextFunction) => {
             console.log("kakao message" + JSON.stringify(request.body));
 
             var user_key = request.body.user_key;
