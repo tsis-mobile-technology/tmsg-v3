@@ -113,11 +113,11 @@ class ApiServer {
             var content = request.body.content;
             var re;
             this.kakao_io.emit('chat message', content);
+            console.log(">>>>>>>>>>>>>>>>>>>" + content);
             try {
                 re = this.getMessageResponse(content, user_key, type);
-		re = {message:re};
-console.log("re : " + re);
-		result.status(200).send(re);
+		        re = {message:re};
+		        result.status(200).send(re);
             } catch (exception) {
                 console.log('응답 에러');
             }
@@ -173,7 +173,7 @@ console.log("re : " + re);
         var re;
 
 console.log("content : " + content);
-        if (content == '자주하는 질문') {
+        if (content == "자주하는 질문") {
             re = depth_First_First;
 console.log(">>>>>>>re : " + re);
         } else{
