@@ -173,6 +173,9 @@ class ApiServer {
 
         // Start listening
         this.kakaoListen();
+
+        // DB Connecton
+        this.dbConnection();
     }
 
     // Configuration
@@ -228,7 +231,6 @@ class ApiServer {
         // 응답
         this.kakao_app.post('/message', (request: express.Request, result: express.Response, next: express.NextFunction) => {
             console.log("kakao message" + JSON.stringify(request.body));
-
             var user_key = request.body.user_key;
             var type = request.body.type;
             var content = request.body.content;
@@ -291,9 +293,9 @@ class ApiServer {
 
     private getMessageResponse(content: string, user_key: string, type: string): string {
         var re;
-        
+console.log("getMessageResponse: 1");
         this.saveHistory(content, user_key, type);
-
+console.log("getMessageResponse: 2");
         if (content == '자주하는 질문') {re = depth_First_First;}
         else if (content == "콜센터 전화번호") {re = depth_First_First_First;}
         else if (content == "배송기간") {re = depth_First_First_Second;}
@@ -309,6 +311,8 @@ class ApiServer {
         else if (content == "문의사항만 입력") {re = depth_First_Third_Second;}
 
         if(content == '취소하기') {
+            re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
+        } else if(content == '#') {
             re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
         } else if(content == '이전단계1') {
             re = depth_First_First;
@@ -389,13 +393,18 @@ class ApiServer {
 
         var post = {UNIQUE_ID:user_key, MESSAGE:content};
         console.log("db values:" + JSON.stringify(post));
-        connection.connect();
 
         connection.query('INSERT INTO TB_CUSTOMER SET ?', post, function(err, rows, fields) {
         if (err)
             console.log('Error while performing Query.', err);
         });
+    }
 
+    private dbConnection(): void {
+        connection.connect();
+    }
+
+    private dbRelease(): void {
         connection.end();
     }
 }

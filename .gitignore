@@ -8,3 +8,4 @@ __MACOSX/
 .DS_Store
 Thumbs.db
 .env
+npm-debug.log
