@@ -37,7 +37,7 @@ var depth_First_First_First = {
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["자주하는 질문"]}
+                            {"type":"text"}
                         };
 var depth_First_First_Second = { 
                         "message": 
