@@ -1,0 +1,14 @@
+npm-debug.log
+**/node_modules/
+*node_modules/*
+node_modules/*
+node_modules/
+/typings/globals
+/typings/index.d.ts
+/typings/modules
+/target
+tmp/
+__MACOSX/
+.DS_Store
+Thumbs.db
+.env
