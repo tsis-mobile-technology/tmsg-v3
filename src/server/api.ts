@@ -10,11 +10,132 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 
 declare var process, __dirname;
 
+var mysql      = require('mysql');
+var connection = mysql.createConnection({
+  host     : '14.63.213.246',
+  user     : 'smarttest',
+  password : 'test1234',
+  port     : 10003,
+  database : 'smart_message_client'
+});
+
 var bodyParser = require('body-parser');
 var depth_First = {"type": "buttons", "buttons": ["자주하는 질문", "주문 조회/변경", "문의하기"]};
-var depth_First_First = { "message": {"text": "다른 고객님들이 궁금해 하시는 내용입니다.궁금하신 내용을 선택해주세요!"},"keyboard": {"type":"buttons", "buttons": ["콜센터 전화번호", "배송기간", "취소하기"]}};
-var depth_First_Second = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": {"type":"buttons", "buttons": ["주문 조회", "배송지 변경", "주문 취소", "반품 문의", "취소하기"]}};
-var depth_First_Third = { "message": {"text": "문의하실 내용을 선택해 주세요!"},"keyboard": {"type":"buttons", "buttons": ["사진 첨부 후 문의하기", "문의사항만 입력", "취소하기"]}};
+var depth_First_First = { 
+                        "message": 
+                            {"text": "다른 고객님들이 궁금해 하시는 내용입니다.궁금하신 내용을 선택해주세요!"},
+                        "keyboard": 
+                            {"type":"buttons", "buttons": ["콜센터 전화번호", "배송기간", "취소하기"]}
+                        };
+var depth_First_First_First = { 
+                        "message": 
+                            {
+                                "text": "콜센터 전화번호는 1234-1234입니다.",
+                                "message_button": {
+                                    "label": "홈페이지 방문",
+                                    "url": "https://www.shoppingntmall.com/index"
+                                }
+                            },
+                        "keyboard": 
+                            {"type":"buttons", "buttons": ["이전단계1"]}
+                        };
+var depth_First_First_Second = { 
+                        "message": 
+                            {
+                                "text": "상품에 따라 배송기간의 차이가 있습니다. 예상 배송일자가 궁금하시면 콜센터로 전화주세요!",
+                                "message_button": {
+                                    "label": "홈페이지 방문",
+                                    "url": "https://www.shoppingntmall.com/index"
+                                }
+                            },
+                        "keyboard": 
+                            {"type":"buttons", "buttons": ["이전단계1"]}
+                        };
+var depth_First_Second = { 
+                        "message": 
+                            {"text": "아래 내용 중 선택해 주세요!"},
+                        "keyboard": 
+                            {"type":"buttons", "buttons": ["주문 조회", "배송지 변경", "주문 취소", "반품 문의", "취소하기"]}
+                        };
+
+var depth_First_Second_First = { 
+                        "message": 
+                            {
+                                "text": "준비 중인 서비스 입니다.",
+                                "message_button": {
+                                    "label": "홈페이지 방문",
+                                    "url": "https://www.shoppingntmall.com/index"
+                                }
+                            },
+                        "keyboard": 
+                            {"type":"buttons", "buttons": ["이전단계2"]}
+                        };
+var depth_First_Second_Second = { 
+                        "message": 
+                            {
+                                "text": "준비 중인 서비스 입니다.",
+                                "message_button": {
+                                    "label": "홈페이지 방문",
+                                    "url": "https://www.shoppingntmall.com/index"
+                                }
+                            },
+                        "keyboard": 
+                            {"type":"buttons", "buttons": ["이전단계2"]}
+                        };
+var depth_First_Second_Third = { 
+                        "message": 
+                            {
+                                "text": "준비 중인 서비스 입니다.",
+                                "message_button": {
+                                    "label": "홈페이지 방문",
+                                    "url": "https://www.shoppingntmall.com/index"
+                                }
+                            },
+                        "keyboard": 
+                            {"type":"buttons", "buttons": ["이전단계2"]}
+                        };
+var depth_First_Second_Fifth = { 
+                        "message": 
+                            {
+                                "text": "주문 반품은 콜센터 1234-1234로 전화하셔서 신청가능합니다.",
+                                "message_button": {
+                                    "label": "홈페이지 방문",
+                                    "url": "https://www.shoppingntmall.com/index"
+                                }
+                            },
+                        "keyboard": 
+                            {"type":"buttons", "buttons": ["이전단계2"]}
+                        };
+var depth_First_Third = { 
+                        "message": 
+                            {"text": "문의하실 내용을 선택해 주세요!"},
+                        "keyboard": 
+                            {"type":"buttons", "buttons": ["사진 첨부 후 문의하기", "문의사항만 입력", "취소하기"]}
+                        };
+var depth_First_Third_First = { 
+                        "message": 
+                            {
+                                "text": "입력창 왼쪽에 잇는 +버튼을 눌러 사진을 선택하신 후 전송 버튼을 눌러주세요.",
+                                "message_button": {
+                                    "label": "홈페이지 방문",
+                                    "url": "https://www.shoppingntmall.com/index"
+                                }
+                            },
+                        "keyboard": 
+                            {"type":"buttons", "buttons": ["이전단계3"]}
+                        };
+var depth_First_Third_Second = { 
+                        "message": 
+                            {
+                                "text": "문의하실 내용을 모두 입력 후 전송 버튼을 눌러주세요.",
+                                "message_button": {
+                                    "label": "홈페이지 방문",
+                                    "url": "https://www.shoppingntmall.com/index"
+                                }
+                            },
+                        "keyboard": 
+                            {"type":"buttons", "buttons": ["이전단계3"]}
+                        };
 
 class ApiServer {
     public kakao_app: any;
@@ -113,7 +234,6 @@ class ApiServer {
             var content = request.body.content;
             var re;
             this.kakao_io.emit('chat message', content);
-            console.log(">>>>>>>>>>>>>>>>>>>" + content);
             try {
                 re = this.getMessageResponse(content, user_key, type);
                 console.log("response:" + JSON.stringify(re));
@@ -171,16 +291,33 @@ class ApiServer {
 
     private getMessageResponse(content: string, user_key: string, type: string): string {
         var re;
+        
+        this.saveHistory(content, user_key, type);
 
-        if (content == '자주하는 질문') {
-            re = depth_First_First;
-        } else if(content == '주문 조회/변경') {
-            re = depth_First_Second;
-        } else if(content == '문의하기') {
-            re = depth_First_Third;
-        } else if(content == '취소하기') {
+        if (content == '자주하는 질문') {re = depth_First_First;}
+        else if (content == "콜센터 전화번호") {re = depth_First_First_First;}
+        else if (content == "배송기간") {re = depth_First_First_Second;}
+
+        if (content == '주문 조회/변경') {re = depth_First_Second;}
+        else if (content == "주문 조회") {re = depth_First_Second_First;}
+        else if (content == "배송지 변경") {re = depth_First_Second_Second;}
+        else if (content == "주문 취소") {re = depth_First_Second_Third;}
+        else if (content == "반품 문의") {re = depth_First_Second_Fifth;}
+
+        if (content == '문의하기') {re = depth_First_Third;}
+        else if (content == "사진 첨부 후 문의하기") {re = depth_First_Third_First;}
+        else if (content == "문의사항만 입력") {re = depth_First_Third_Second;}
+
+        if(content == '취소하기') {
             re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
-        } else {
+        } else if(content == '이전단계1') {
+            re = depth_First_First;
+        } else if(content == '이전단계2') {
+            re = depth_First_Second;
+        } else if(content == '이전단계3') {
+            re = depth_First_Third;
+        } 
+        if (re == null) {
             re = {'messge': {'text':'잠시후에 다시 불러주십시요!'}};
         } 
           //       if (content == '주소') {
@@ -247,6 +384,20 @@ class ApiServer {
             console.log('==> Listening on port %s. Open up http://localhost:%s/ in your browser.', this.kakao_port, this.kakao_port);            
         });
 
+    }
+
+    private saveHistory(content: string, user_key: string, type: string): void {
+
+        var post = {UNIQUE_ID:user_key, MESSAGE:content};
+        console.log("db values:" + JSON.stringify(post));
+        connection.connect();
+
+        connection.query('INSERT INTO TB_CUSTOMER SET ?', post, function(err, rows, fields) {
+        if (err)
+            console.log('Error while performing Query.', err);
+        });
+
+        connection.end();
     }
 }
 
