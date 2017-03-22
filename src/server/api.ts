@@ -37,7 +37,7 @@ var depth_First_First_First = {
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["이전단계1"]}
+                            {"type":"buttons", "buttons": ["자주하는 질문"]}
                         };
 var depth_First_First_Second = { 
                         "message": 
@@ -49,7 +49,7 @@ var depth_First_First_Second = {
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["이전단계1"]}
+                            {"type":"buttons", "buttons": ["자주하는 질문"]}
                         };
 var depth_First_Second = { 
                         "message": 
@@ -68,7 +68,7 @@ var depth_First_Second_First = {
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["이전단계2"]}
+                            {"type":"buttons", "buttons": ["주문 조회/변경"]}
                         };
 var depth_First_Second_Second = { 
                         "message": 
@@ -80,7 +80,7 @@ var depth_First_Second_Second = {
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["이전단계2"]}
+                            {"type":"buttons", "buttons": ["주문 조회/변경"]}
                         };
 var depth_First_Second_Third = { 
                         "message": 
@@ -92,7 +92,7 @@ var depth_First_Second_Third = {
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["이전단계2"]}
+                            {"type":"buttons", "buttons": ["주문 조회/변경"]}
                         };
 var depth_First_Second_Fifth = { 
                         "message": 
@@ -104,7 +104,7 @@ var depth_First_Second_Fifth = {
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["이전단계2"]}
+                            {"type":"buttons", "buttons": ["주문 조회/변경"]}
                         };
 var depth_First_Third = { 
                         "message": 
@@ -122,7 +122,7 @@ var depth_First_Third_First = {
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["이전단계3"]}
+                            {"type":"buttons", "buttons": ["문의하기"]}
                         };
 var depth_First_Third_Second = { 
                         "message": 
@@ -134,7 +134,7 @@ var depth_First_Third_Second = {
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["이전단계3"]}
+                            {"type":"buttons", "buttons": ["문의하기"]}
                         };
 
 class ApiServer {
@@ -383,7 +383,6 @@ class ApiServer {
         this.kakao_server.on("listening", () => {
             console.log('==> Listening on port %s. Open up http://localhost:%s/ in your browser.', this.kakao_port, this.kakao_port);            
         });
-
     }
 
     private saveHistory(content: string, user_key: string, type: string): void {
