@@ -30,7 +30,7 @@ var depth_First_First = {
 var depth_First_First_First = { 
                         "message": 
                             {
-                                "text": "콜센터 전화번호는 1234-1234입니다.",
+                                "text": "콜센터 전화번호는 1234-1234입니다.\n 처음으로 돌아가시려면 '#'을 입력하세요.",
                                 "message_button": {
                                     "label": "홈페이지 방문",
                                     "url": "https://www.shoppingntmall.com/index"
@@ -42,14 +42,32 @@ var depth_First_First_First = {
 var depth_First_First_Second = { 
                         "message": 
                             {
-                                "text": "상품에 따라 배송기간의 차이가 있습니다. 예상 배송일자가 궁금하시면 콜센터로 전화주세요!",
+                                "text": "상품에 따라 배송기간의 차이가 있습니다. 예상 배송일자가 궁금하시면 콜센터(1234-1234)로 전화주세요!\n 처음으로 돌아가시려면 '#'을 입력하세요.",
                                 "message_button": {
                                     "label": "홈페이지 방문",
                                     "url": "https://www.shoppingntmall.com/index"
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["자주하는 질문"]}
+                            {"type":"text"}
+                        };
+var depth_First_Second_Name = { 
+                        "message": 
+                            {"text": "고객님의 성함을 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
+                        "keyboard": 
+                            {"type":"text"}
+                        };
+var depth_First_Second_Phone = { 
+                        "message": 
+                            {"text": "주문하신 고객님의 핸드폰번호를 '-'없이 숫자만 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
+                        "keyboard": 
+                            {"type":"text"}
+                        };
+var depth_First_Second_Auth = { 
+                        "message": 
+                            {"text": "입력하신 전화번호로 인증번호를 문자로 보냈습니다.인증번호 6자리를 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
+                        "keyboard": 
+                            {"type":"text"}
                         };
 var depth_First_Second = { 
                         "message": 
@@ -57,18 +75,11 @@ var depth_First_Second = {
                         "keyboard": 
                             {"type":"buttons", "buttons": ["주문 조회", "배송지 변경", "주문 취소", "반품 문의", "취소하기"]}
                         };
-
-var depth_First_Second_First = { 
+var depth_First_Second_First_Response = {
                         "message": 
-                            {
-                                "text": "준비 중인 서비스 입니다.",
-                                "message_button": {
-                                    "label": "홈페이지 방문",
-                                    "url": "https://www.shoppingntmall.com/index"
-                                }
-                            },
+                            {"text": "최근 3개월 내 고객님의 주문 내역이 없습니다.\n 취소하시려면 '#'을 입력해 주세요."},
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["주문 조회/변경"]}
+                            {"type":"text"}
                         };
 var depth_First_Second_Second = { 
                         "message": 
@@ -293,22 +304,42 @@ class ApiServer {
 
     private getMessageResponse(content: string, user_key: string, type: string): string {
         var re;
-console.log("getMessageResponse: 1");
-        this.saveHistory(content, user_key, type);
-console.log("getMessageResponse: 2");
-        if (content == '자주하는 질문') {re = depth_First_First;}
-        else if (content == "콜센터 전화번호") {re = depth_First_First_First;}
-        else if (content == "배송기간") {re = depth_First_First_Second;}
+        var beforeContent;
+        
+        if (content == '자주하는 질문') {re = depth_First_First; this.dbSaveHistory(content, user_key, type);}
+        else if (content == "콜센터 전화번호") {re = depth_First_First_First; this.dbSaveHistory(content, user_key, type);}
+        else if (content == "배송기간") {re = depth_First_First_Second; this.dbSaveHistory(content, user_key, type);}
 
-        if (content == '주문 조회/변경') {re = depth_First_Second;}
-        else if (content == "주문 조회") {re = depth_First_Second_First;}
-        else if (content == "배송지 변경") {re = depth_First_Second_Second;}
-        else if (content == "주문 취소") {re = depth_First_Second_Third;}
-        else if (content == "반품 문의") {re = depth_First_Second_Fifth;}
+/* 하위 메뉴에 대한 응답 처리 이전에 해당 아이디로 하여 성명, 전화번호, 인증 유무등을 체크하여 단계 진입을 선택해하여야 한다.*/
+        if (content == '주문 조회/변경') {re = depth_First_Second; this.dbSaveHistory(content, user_key, type);}
+        else if (content == "주문 조회") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
+        else if (content == "배송지 변경") {re = depth_First_Second_Second; this.dbSaveHistory(content, user_key, type);}
+        else if (content == "주문 취소") {re = depth_First_Second_Third; this.dbSaveHistory(content, user_key, type);}
+        else if (content == "반품 문의") {re = depth_First_Second_Fifth; this.dbSaveHistory(content, user_key, type);}
 
-        if (content == '문의하기') {re = depth_First_Third;}
-        else if (content == "사진 첨부 후 문의하기") {re = depth_First_Third_First;}
-        else if (content == "문의사항만 입력") {re = depth_First_Third_Second;}
+        if (content == '문의하기') {re = depth_First_Third; this.dbSaveHistory(content, user_key, type);}
+        else if (content == "사진 첨부 후 문의하기") {re = depth_First_Third_First; this.dbSaveHistory(content, user_key, type);}
+        else if (content == "문의사항만 입력") {re = depth_First_Third_Second; this.dbSaveHistory(content, user_key, type);}
+
+        if (re == null) {
+            beforeContent = this.dbCheckHistory(content, user_key);
+            var rtnStr = [];
+            rtnStr = this.dbLoadCustomer(user_key);
+console.log("getMessageResponse:" + beforeContent);
+            if (beforeContent == "주문 조회/변경") {
+                if (rtnStr == null) {
+                    this.dbSaveCustomerName(content, user_key);
+                    re = depth_First_Second_Phone;
+                } else if(rtnStr[0].PHONE == null) {
+                    this.dbSaveCustomerPhone(content, user_key);
+                    re = depth_First_Second_Auth;
+                    // 인증번호 보내기 기능 추가 
+                } else if(rtnStr[0].YN_AUTH == 'N') {
+                    this.dbSaveCustomerAuth(content, user_key);
+                    re = depth_First_Second_First_Response;
+                }
+            }
+        }
 
         if(content == '취소하기') {
             re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
@@ -322,7 +353,7 @@ console.log("getMessageResponse: 2");
             re = depth_First_Third;
         } 
         if (re == null) {
-            re = {'messge': {'text':'잠시후에 다시 불러주십시요!'}};
+            re = {"message": {"text":"제대로 인식하지 못했습니다. 취소하시려명 '#'을 입력하여주십시요!"}};
         } 
           //       if (content == '주소') {
           //           re = {text:'서울특별시 중구 칠패로 42 우리빌딩 5층'};
@@ -389,15 +420,76 @@ console.log("getMessageResponse: 2");
         });
     }
 
-    private saveHistory(content: string, user_key: string, type: string): void {
+    private dbSaveHistory(content: string, user_key: string, type: string): void {
 
         var post = {UNIQUE_ID:user_key, MESSAGE:content};
         console.log("db values:" + JSON.stringify(post));
 
-        connection.query('INSERT INTO TB_CUSTOMER SET ?', post, function(err, rows, fields) {
-        if (err)
-            console.log('Error while performing Query.', err);
+        connection.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
+            if (err)
+                console.log('Error while performing Query.', err);
         });
+    }
+
+    private dbSaveCustomerName(content: string, user_key: string): void {
+        var post = {UNIQUE_ID:user_key, NAME:content};
+        console.log("db values:" + JSON.stringify(post));
+
+        connection.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
+            if (err)
+                console.log('Error while performing Query.', err);
+        });
+    }
+
+    private dbLoadCustomer(user_key: string): string[] {
+        var rtnStr = [];
+
+        connection.query('SELECT UNIQUE_ID, NAME, PHONE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, function(err, rows, fields) {
+            if (!err) {
+                if(rows.length > 0) {
+                    rtnStr = rows;
+                }
+            } else { 
+                console.log('Error while performing Query.', err);
+            }
+        });
+        return rtnStr;
+    }
+
+    private dbSaveCustomerPhone(content: string, user_key: string): void {
+
+        connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+            if (err)
+                console.log('Error while performing Query.', err);
+        });
+    }
+
+    private dbSaveCustomerAuth(content: string, user_key: string): void {
+
+        connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+            if (err)
+                console.log('Error while performing Query.', err);
+        });
+    }
+
+    private dbCheckHistory(content: string, user_key: string): string {
+        var rtnStr = '';
+        var post = {UNIQUE_ID:user_key};
+        connection.query('select * from TB_AUTOCHAT_HISTORY where UNIQUE_ID =  ? order by wrtdate desc LIMIT 1', post, function(err, rows, fields) {
+            if (!err) {
+                 if(rows.length > 0) {
+                     rtnStr = rows[0].MESSAGE;
+                 }
+                 else {
+                     rtnStr = 'NFD'
+                 }
+            } else {
+                console.log('Error while performing Query.', err);
+                rtnStr = 'NFD'; //Not Found Data
+            }
+        });
+
+        return rtnStr;
     }
 
     private dbConnection(): void {
