@@ -82,6 +82,18 @@ var depth_First_Second_First_Response = {
                         "keyboard": 
                             {"type":"text"}
                         };
+var depth_First_Second_Second_Response = {
+                        "message": 
+                            {"text": "배송지 변경 가능한 주문내역이 없습니다.\n 취소하시려면 '#'을 입력해 주세요."},
+                        "keyboard": 
+                            {"type":"text"}
+                        };
+var depth_First_Second_Third_Response = {
+                        "message": 
+                            {"text": "주문 취소 가능한 내역이 없습니.\n 취소하시려면 '#'을 입력해 주세요."},
+                        "keyboard": 
+                            {"type":"text"}
+                        };
 var depth_First_Second_Second = { 
                         "message": 
                             {
@@ -332,13 +344,11 @@ class ApiServer {
 
         if (re == null) {
             Q.all([this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key)]).then(function(results){
-                //res.send(JSON.stringify(results[0][0][0].solution+results[1][0][0].solution));
-                console.log("result[0]:" + JSON.stringify(results[0][0][0])); 
-                console.log("result[1]:" + JSON.stringify(results[1][0][0]));
+                // console.log("result[0]:" + JSON.stringify(results[0][0][0])); 
+                // console.log("result[1]:" + JSON.stringify(results[1][0][0]));
                 // Hint : your third query would go here
                 beforeContent = results[0][0][0].MESSAGE;
                 rtnStr = results[1][0][0];
-console.log("rtnStr:" + JSON.stringify(rtnStr));
             }).then(function() {
                 if (beforeContent == "주문 조회") {
                     if (rtnStr == null) {
@@ -351,8 +361,39 @@ console.log("rtnStr:" + JSON.stringify(rtnStr));
                     } else if(rtnStr.YN_AUTH == 'N') {
                         updateType = "Auth";
                         re = depth_First_Second_First_Response;
+                    } else if(rtnStr.YN_AUTH == 'Y') {
+                        re = depth_First_Second_First_Response;
                     }
-                }
+                } else if (beforeContent == "배송지 변경") {
+                    if (rtnStr == null) {
+                        updateType = "Name";
+                        re = depth_First_Second_Phone;
+                    } else if(rtnStr.PHONE == null) {
+                        updateType = "Phone";
+                        re = depth_First_Second_Auth;
+                        // 인증번호 보내기 기능 추가 
+                    } else if(rtnStr.YN_AUTH == 'N') {
+                        updateType = "Auth";
+                        re = depth_First_Second_Second_Response;
+                    } else if(rtnStr.YN_AUTH == 'Y') {
+                        re = depth_First_Second_Second_Response;
+                    }
+                } else if (beforeContent == "주문 최소") {
+                    if (rtnStr == null) {
+                        updateType = "Name";
+                        re = depth_First_Second_Phone;
+                    } else if(rtnStr.PHONE == null) {
+                        updateType = "Phone";
+                        re = depth_First_Second_Auth;
+                        // 인증번호 보내기 기능 추가 
+                    } else if(rtnStr.YN_AUTH == 'N') {
+                        updateType = "Auth";
+                        re = depth_First_Second_Third_Response;
+                    } else if(rtnStr.YN_AUTH == 'Y') {
+                        re = depth_First_Second_Third_Response;
+                    }
+                } 
+
                 if(content == '취소하기') {
                     re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
                 } else if(content == '#') {
@@ -369,15 +410,8 @@ console.log("rtnStr:" + JSON.stringify(rtnStr));
                 }
             })
             .then(function() {
-console.log("dbSaveCustomer Call," + updateType + "," + content + "," + user_key);
-                //return this.dbSaveCustomer(updateType, content, user_key);
-        console.log("1");
                 var post = {UNIQUE_ID:user_key, NAME:content};
-        console.log("2");
-                console.log("db values:" + JSON.stringify(post));
-        console.log("3");
                 if( updateType == "Name" ) {
-        console.log("4");
                     connection.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
                     });
@@ -390,7 +424,6 @@ console.log("dbSaveCustomer Call," + updateType + "," + content + "," + user_key
                         if(err) console.log("Query Error:", err);
                     });
                 }
-        console.log("5");
             })
             .then(function() {
                 console.log("re:" + JSON.stringify(re)); 
