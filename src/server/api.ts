@@ -94,30 +94,30 @@ var depth_First_Second_Third_Response = {
                         "keyboard": 
                             {"type":"text"}
                         };
-var depth_First_Second_Second = { 
-                        "message": 
-                            {
-                                "text": "준비 중인 서비스 입니다.",
-                                "message_button": {
-                                    "label": "홈페이지 방문",
-                                    "url": "https://www.shoppingntmall.com/index"
-                                }
-                            },
-                        "keyboard": 
-                            {"type":"buttons", "buttons": ["주문 조회/변경"]}
-                        };
-var depth_First_Second_Third = { 
-                        "message": 
-                            {
-                                "text": "준비 중인 서비스 입니다.",
-                                "message_button": {
-                                    "label": "홈페이지 방문",
-                                    "url": "https://www.shoppingntmall.com/index"
-                                }
-                            },
-                        "keyboard": 
-                            {"type":"buttons", "buttons": ["주문 조회/변경"]}
-                        };
+// var depth_First_Second_Second = { 
+//                         "message": 
+//                             {
+//                                 "text": "준비 중인 서비스 입니다.",
+//                                 "message_button": {
+//                                     "label": "홈페이지 방문",
+//                                     "url": "https://www.shoppingntmall.com/index"
+//                                 }
+//                             },
+//                         "keyboard": 
+//                             {"type":"buttons", "buttons": ["주문 조회/변경"]}
+//                         };
+// var depth_First_Second_Third = { 
+//                         "message": 
+//                             {
+//                                 "text": "준비 중인 서비스 입니다.",
+//                                 "message_button": {
+//                                     "label": "홈페이지 방문",
+//                                     "url": "https://www.shoppingntmall.com/index"
+//                                 }
+//                             },
+//                         "keyboard": 
+//                             {"type":"buttons", "buttons": ["주문 조회/변경"]}
+//                         };
 var depth_First_Second_Fifth = { 
                         "message": 
                             {
@@ -146,7 +146,7 @@ var depth_First_Third_First = {
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["문의하기"]}
+                            {"type":"text"}
                         };
 var depth_First_Third_Second = { 
                         "message": 
@@ -158,7 +158,13 @@ var depth_First_Third_Second = {
                                 }
                             },
                         "keyboard": 
-                            {"type":"buttons", "buttons": ["문의하기"]}
+                            {"type":"text"}
+                        };
+var depth_First_Third_Last_Response = {
+                        "message": 
+                            {"text": "문의가 정상적으로 접수되었습니다. 평일 9시~18시, 빠른 시간 안에 답변 드리겠습니다.\n 취소하시려면 '#'을 입력해 주세요."},
+                        "keyboard": 
+                            {"type":"text"}
                         };
 
 class ApiServer {
@@ -331,11 +337,11 @@ class ApiServer {
         else if (content == "콜센터 전화번호") {re = depth_First_First_First; this.dbSaveHistory(content, user_key, type);}
         else if (content == "배송기간") {re = depth_First_First_Second; this.dbSaveHistory(content, user_key, type);}
 
-/* 하위 메뉴에 대한 응답 처리 이전에 해당 아이디로 하여 성명, 전화번호, 인증 유무등을 체크하여 단계 진입을 선택해하여야 한다.*/
+        /* 하위 메뉴에 대한 응답 처리 이전에 해당 아이디로 하여 성명, 전화번호, 인증 유무등을 체크하여 단계 진입을 선택해하여야 한다.*/
         if (content == '주문 조회/변경') {re = depth_First_Second; this.dbSaveHistory(content, user_key, type);}
         else if (content == "주문 조회") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
-        else if (content == "배송지 변경") {re = depth_First_Second_Second; this.dbSaveHistory(content, user_key, type);}
-        else if (content == "주문 취소") {re = depth_First_Second_Third; this.dbSaveHistory(content, user_key, type);}
+        else if (content == "배송지 변경") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
+        else if (content == "주문 취소") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
         else if (content == "반품 문의") {re = depth_First_Second_Fifth; this.dbSaveHistory(content, user_key, type);}
 
         if (content == '문의하기') {re = depth_First_Third; this.dbSaveHistory(content, user_key, type);}
@@ -392,7 +398,17 @@ class ApiServer {
                     } else if(rtnStr.YN_AUTH == 'Y') {
                         re = depth_First_Second_Third_Response;
                     }
-                } 
+                } else if (beforeContent == "사진 첨부 후 문의하기") {
+                    /*
+                        등록한 사진을 어디론가 옮기고 이력저장하고 
+                    */
+                    re = depth_First_Third_Last_Response;
+                } else if (beforeContent == "문의사항만 입력") {
+                    /*
+                        등록한 사진을 어디론가 옮기고 이력저장하고 
+                    */
+                    re = depth_First_Third_Last_Response;
+                }  
 
                 if(content == '취소하기') {
                     re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
