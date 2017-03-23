@@ -311,6 +311,8 @@ class ApiServer {
 
     private getMessageResponse(content: string, user_key: string, type: string, callback: any): void {
         var re;
+        var rtnStr;
+        var updateType;
         var beforeContent;
         
         if (content == '자주하는 질문') {re = depth_First_First; this.dbSaveHistory(content, user_key, type);}
@@ -329,46 +331,72 @@ class ApiServer {
         else if (content == "문의사항만 입력") {re = depth_First_Third_Second; this.dbSaveHistory(content, user_key, type);}
 
         if (re == null) {
-
-            var rtnStr = [];
-            
             Q.all([this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key)]).then(function(results){
                 //res.send(JSON.stringify(results[0][0][0].solution+results[1][0][0].solution));
                 console.log("result[0]:" + JSON.stringify(results[0][0][0])); 
                 console.log("result[1]:" + JSON.stringify(results[1][0][0]));
                 // Hint : your third query would go here
-                beforeContent = results[0][0][0];
+                beforeContent = results[0][0][0].MESSAGE;
                 rtnStr = results[1][0][0];
-            });
-
-            if (beforeContent == "주문 조회") {
-                if (rtnStr == null) {
-                    this.dbSaveCustomerName(content, user_key);
-                    re = depth_First_Second_Phone;
-                } else if(rtnStr[0].PHONE == null) {
-                    this.dbSaveCustomerPhone(content, user_key);
-                    re = depth_First_Second_Auth;
-                    // 인증번호 보내기 기능 추가 
-                } else if(rtnStr[0].YN_AUTH == 'N') {
-                    this.dbSaveCustomerAuth(content, user_key);
-                    re = depth_First_Second_First_Response;
+console.log("rtnStr:" + JSON.stringify(rtnStr));
+            }).then(function() {
+                if (beforeContent == "주문 조회") {
+                    if (rtnStr == null) {
+                        updateType = "Name";
+                        re = depth_First_Second_Phone;
+                    } else if(rtnStr.PHONE == null) {
+                        updateType = "Phone";
+                        re = depth_First_Second_Auth;
+                        // 인증번호 보내기 기능 추가 
+                    } else if(rtnStr.YN_AUTH == 'N') {
+                        updateType = "Auth";
+                        re = depth_First_Second_First_Response;
+                    }
                 }
-            }
-            if(content == '취소하기') {
-                re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
-            } else if(content == '#') {
-                re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
-            } else if(content == '이전단계1') {
-                re = depth_First_First;
-            } else if(content == '이전단계2') {
-                re = depth_First_Second;
-            } else if(content == '이전단계3') {
-                re = depth_First_Third;
-            } 
-            if (re == null) {
-                re = {"message": {"text":"제대로 인식하지 못했습니다. 취소하시려명 '#'을 입력하여주십시요!"}};
-            } 
-            callback(null, re);
+                if(content == '취소하기') {
+                    re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
+                } else if(content == '#') {
+                    re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
+                } else if(content == '이전단계1') {
+                    re = depth_First_First;
+                } else if(content == '이전단계2') {
+                    re = depth_First_Second;
+                } else if(content == '이전단계3') {
+                    re = depth_First_Third;
+                } 
+                if (re == null) {
+                    re = {"message": {"text":"제대로 인식하지 못했습니다. 취소하시려명 '#'을 입력하여주십시요!"}};
+                }
+            })
+            .then(function() {
+console.log("dbSaveCustomer Call," + updateType + "," + content + "," + user_key);
+                //return this.dbSaveCustomer(updateType, content, user_key);
+        console.log("1");
+                var post = {UNIQUE_ID:user_key, NAME:content};
+        console.log("2");
+                console.log("db values:" + JSON.stringify(post));
+        console.log("3");
+                if( updateType == "Name" ) {
+        console.log("4");
+                    connection.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
+                        if(err) console.log("Query Error:", err);
+                    });
+                } else if( updateType == "Phone" ) {
+                    connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+                        if(err) console.log("Query Error:", err);
+                    });
+                } else if( updateType == "Auth") {
+                    connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+                        if(err) console.log("Query Error:", err);
+                    });
+                }
+        console.log("5");
+            })
+            .then(function() {
+                console.log("re:" + JSON.stringify(re)); 
+                callback(null, re);
+            })
+            .done();
         }
 
           //       if (content == '주소') {
@@ -445,37 +473,74 @@ class ApiServer {
         });
     }
 
-    private dbSaveCustomerName(content: string, user_key: string): void {
+//     private dbSaveCustomer(updateType: string, content: string, user_key: string): void {
+//         var defered = Q.defer();
+// console.log("1");
+//         var post = {UNIQUE_ID:user_key, NAME:content};
+// console.log("2");
+//         console.log("db values:" + JSON.stringify(post));
+// console.log("3");
+//         if( updateType == "Name" ) {
+// console.log("4");
+//             connection.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, defered.makeNodeResolver());
+//         } else if( updateType == "Phone" ) {
+//             connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], defered.makeNodeResolver());
+//         } else if( updateType == "Auth") {
+//             connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], defered.makeNodeResolver());
+//         }
+// console.log("5");
+//         return defered.promise;
+//     }
+
+    private dbSaveCustomer(updateType: string, content: string, user_key: string): void {
+
         var post = {UNIQUE_ID:user_key, NAME:content};
         console.log("db values:" + JSON.stringify(post));
-
-        connection.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
-            if (err)
-                console.log('Error while performing Query.', err);
-        });
+        if( updateType == "Name" ) {
+            connection.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
+                if(err) console.log("Query Error:", err);
+            });
+        } else if( updateType == "Phone" ) {
+            connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+                if(err) console.log("Query Error:", err);
+            });
+        } else if( updateType == "Auth") {
+            connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+                if(err) console.log("Query Error:", err);
+            });
+        }
     }
+
+    // private dbSaveCustomerName(content: string, user_key: string): void {
+    //     var defered = Q.defer();
+    //     var post = {UNIQUE_ID:user_key, NAME:content};
+    //     console.log("db values:" + JSON.stringify(post));
+    //     connection.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, defered.makeNodeResolver());
+    //     return defered.promise;
+    // }
+
+    // private dbSaveCustomerPhone(content: string, user_key: string): void {
+
+    //     connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+    //         if (err)
+    //             console.log('Error while performing Query.', err);
+    //     });
+    // }
+
+    // private dbSaveCustomerAuth(content: string, user_key: string): void {
+
+    //     connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+    //         if (err)
+    //             console.log('Error while performing Query.', err);
+    //     });
+    // }
 
     private dbLoadCustomer(user_key: string): void {
         var defered = Q.defer();
-        connection.query('SELECT UNIQUE_ID, NAME, PHONE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
+        connection.query('SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
         return defered.promise;
     }
 
-    private dbSaveCustomerPhone(content: string, user_key: string): void {
-
-        connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
-            if (err)
-                console.log('Error while performing Query.', err);
-        });
-    }
-
-    private dbSaveCustomerAuth(content: string, user_key: string): void {
-
-        connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
-            if (err)
-                console.log('Error while performing Query.', err);
-        });
-    }
 
     private dbCheckHistory(content: string, user_key: string): void {
         var defered = Q.defer();
