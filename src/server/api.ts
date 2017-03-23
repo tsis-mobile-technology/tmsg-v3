@@ -10,6 +10,7 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 
 declare var process, __dirname;
 
+var Q          = require("q");
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
   host     : '14.63.213.246',
@@ -248,9 +249,15 @@ class ApiServer {
             var re;
             this.kakao_io.emit('chat message', content);
             try {
-                re = this.getMessageResponse(content, user_key, type);
-                console.log("response:" + JSON.stringify(re));
-                result.status(200).send(re);
+                this.getMessageResponse(content, user_key, type, function(err, data) {
+                    if(err) {
+                        console.log('응답 에러');
+                    } else {
+                        re = data;
+                        console.log("response:" + JSON.stringify(re));
+                        result.status(200).send(re);
+                    }
+                });
             } catch (exception) {
                 console.log('응답 에러');
             }
@@ -302,7 +309,7 @@ class ApiServer {
         });
     }
 
-    private getMessageResponse(content: string, user_key: string, type: string): string {
+    private getMessageResponse(content: string, user_key: string, type: string, callback: any): void {
         var re;
         var beforeContent;
         
@@ -322,11 +329,19 @@ class ApiServer {
         else if (content == "문의사항만 입력") {re = depth_First_Third_Second; this.dbSaveHistory(content, user_key, type);}
 
         if (re == null) {
-            beforeContent = this.dbCheckHistory(content, user_key);
+
             var rtnStr = [];
-            rtnStr = this.dbLoadCustomer(user_key);
-console.log("getMessageResponse:" + beforeContent);
-            if (beforeContent == "주문 조회/변경") {
+            
+            Q.all([this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key)]).then(function(results){
+                //res.send(JSON.stringify(results[0][0][0].solution+results[1][0][0].solution));
+                console.log("result[0]:" + JSON.stringify(results[0][0][0])); 
+                console.log("result[1]:" + JSON.stringify(results[1][0][0]));
+                // Hint : your third query would go here
+                beforeContent = results[0][0][0];
+                rtnStr = results[1][0][0];
+            });
+
+            if (beforeContent == "주문 조회") {
                 if (rtnStr == null) {
                     this.dbSaveCustomerName(content, user_key);
                     re = depth_First_Second_Phone;
@@ -339,22 +354,23 @@ console.log("getMessageResponse:" + beforeContent);
                     re = depth_First_Second_First_Response;
                 }
             }
+            if(content == '취소하기') {
+                re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
+            } else if(content == '#') {
+                re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
+            } else if(content == '이전단계1') {
+                re = depth_First_First;
+            } else if(content == '이전단계2') {
+                re = depth_First_Second;
+            } else if(content == '이전단계3') {
+                re = depth_First_Third;
+            } 
+            if (re == null) {
+                re = {"message": {"text":"제대로 인식하지 못했습니다. 취소하시려명 '#'을 입력하여주십시요!"}};
+            } 
+            callback(null, re);
         }
 
-        if(content == '취소하기') {
-            re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
-        } else if(content == '#') {
-            re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
-        } else if(content == '이전단계1') {
-            re = depth_First_First;
-        } else if(content == '이전단계2') {
-            re = depth_First_Second;
-        } else if(content == '이전단계3') {
-            re = depth_First_Third;
-        } 
-        if (re == null) {
-            re = {"message": {"text":"제대로 인식하지 못했습니다. 취소하시려명 '#'을 입력하여주십시요!"}};
-        } 
           //       if (content == '주소') {
           //           re = {text:'서울특별시 중구 칠패로 42 우리빌딩 5층'};
           //           re = {message:re};
@@ -380,8 +396,6 @@ console.log("getMessageResponse:" + beforeContent);
           //           re = {message:re};
           //           result.status(200).send(re);
           //       } 
-
-        return re;
     }
 
     // Configure databases
@@ -441,19 +455,10 @@ console.log("getMessageResponse:" + beforeContent);
         });
     }
 
-    private dbLoadCustomer(user_key: string): string[] {
-        var rtnStr = [];
-
-        connection.query('SELECT UNIQUE_ID, NAME, PHONE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, function(err, rows, fields) {
-            if (!err) {
-                if(rows.length > 0) {
-                    rtnStr = rows;
-                }
-            } else { 
-                console.log('Error while performing Query.', err);
-            }
-        });
-        return rtnStr;
+    private dbLoadCustomer(user_key: string): void {
+        var defered = Q.defer();
+        connection.query('SELECT UNIQUE_ID, NAME, PHONE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
+        return defered.promise;
     }
 
     private dbSaveCustomerPhone(content: string, user_key: string): void {
@@ -472,24 +477,10 @@ console.log("getMessageResponse:" + beforeContent);
         });
     }
 
-    private dbCheckHistory(content: string, user_key: string): string {
-        var rtnStr = '';
-        var post = {UNIQUE_ID:user_key};
-        connection.query('select * from TB_AUTOCHAT_HISTORY where UNIQUE_ID =  ? order by wrtdate desc LIMIT 1', post, function(err, rows, fields) {
-            if (!err) {
-                 if(rows.length > 0) {
-                     rtnStr = rows[0].MESSAGE;
-                 }
-                 else {
-                     rtnStr = 'NFD'
-                 }
-            } else {
-                console.log('Error while performing Query.', err);
-                rtnStr = 'NFD'; //Not Found Data
-            }
-        });
-
-        return rtnStr;
+    private dbCheckHistory(content: string, user_key: string): void {
+        var defered = Q.defer();
+        connection.query('select * from TB_AUTOCHAT_HISTORY where UNIQUE_ID = ? order by wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
+        return defered.promise;
     }
 
     private dbConnection(): void {
