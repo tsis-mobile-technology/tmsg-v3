@@ -20,6 +20,16 @@ var connection = mysql.createConnection({
   database : 'smart_message_client'
 });
 
+var pool = mysql.createPool({
+    connectionLimit: 100, //important
+    host     : '14.63.213.246',
+    user     : 'smarttest',
+    password : 'test1234',
+    port     : 10003,
+    database : 'smart_message_client',
+    debug: false
+});
+
 var bodyParser = require('body-parser');
 var depth_First = {"type": "buttons", "buttons": ["자주하는 질문", "주문 조회/변경", "문의하기"]};
  var depth_First_First = { 
@@ -203,9 +213,6 @@ class ApiServer {
 
         // Start listening
         this.kakaoListen();
-
-        // DB Connecton
-        this.dbConnection();
     }
 
     // Configuration
@@ -243,8 +250,6 @@ class ApiServer {
 
         // 키보드
         this.kakao_app.get('/keyboard', (request: express.Request, result: express.Response, next: express.NextFunction) => {
-            console.log("get:keyboard");
-            console.log("get:keyboard" + JSON.stringify(request.body));
             var re;
             try {
             	//re = {type:'text'};
@@ -428,15 +433,15 @@ class ApiServer {
             .then(function() {
                 var post = {UNIQUE_ID:user_key, NAME:content};
                 if( updateType == "Name" ) {
-                    connection.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
+                    pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
                     });
                 } else if( updateType == "Phone" ) {
-                    connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
                     });
                 } else if( updateType == "Auth") {
-                    connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
                     });
                 }
@@ -514,11 +519,10 @@ class ApiServer {
     }
 
     private dbSaveHistory(content: string, user_key: string, type: string): void {
-
         var post = {UNIQUE_ID:user_key, MESSAGE:content};
         console.log("db values:" + JSON.stringify(post));
 
-        connection.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
+        pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
             if (err)
                 console.log('Error while performing Query.', err);
         });
@@ -548,15 +552,15 @@ class ApiServer {
         var post = {UNIQUE_ID:user_key, NAME:content};
         console.log("db values:" + JSON.stringify(post));
         if( updateType == "Name" ) {
-            connection.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
+            pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
                 if(err) console.log("Query Error:", err);
             });
         } else if( updateType == "Phone" ) {
-            connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+            pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
                 if(err) console.log("Query Error:", err);
             });
         } else if( updateType == "Auth") {
-            connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+            pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
                 if(err) console.log("Query Error:", err);
             });
         }
@@ -588,22 +592,23 @@ class ApiServer {
 
     private dbLoadCustomer(user_key: string): void {
         var defered = Q.defer();
-        connection.query('SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
+
+        pool.query('SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
         return defered.promise;
     }
 
 
     private dbCheckHistory(content: string, user_key: string): void {
         var defered = Q.defer();
-        connection.query('select * from TB_AUTOCHAT_HISTORY where UNIQUE_ID = ? order by wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
+        pool.query('select * from TB_AUTOCHAT_HISTORY where UNIQUE_ID = ? order by wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
         return defered.promise;
     }
 
-    private dbConnection(): void {
+    public dbConnection(): void {
         connection.connect();
     }
 
-    private dbRelease(): void {
+    public dbRelease(): void {
         connection.end();
     }
 }
