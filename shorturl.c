@@ -65,7 +65,7 @@ long getTime()
     return (long)current_time;
 }
 
-int shorturl (int argc, const char * argv[])
+int shorturl_plus_localtime (int argc, const char * argv[])
 {
     char szBase62[16] = {0x00,};
     long dec = 0;
@@ -79,6 +79,19 @@ int shorturl (int argc, const char * argv[])
     return 0;
 }
 
+int shorturl (int argc, const char * argv[])
+{
+    char szBase62[16] = {0x00,};
+    long dec = 0;
+    long timeInput = 0;
+   
+    timeInput = getTime();
+    toBase62((long)atol(argv[1]), szBase62);
+    dec = fromBase62(szBase62);
+   
+    fprintf(stdout, "%s", szBase62);
+    return 0;
+}
 
 int fulltest (int argc, const char * argv[])
 {
@@ -103,7 +116,8 @@ int fulltest (int argc, const char * argv[])
 int main (int argc, const char * argv[])
 {
     if( argc > 1 ) {
-        shorturl(argc, argv);
+        shorturl_plus_localtime(argc, argv);
+        /*shorturl(argc, argv); */
     }
     else {
         fulltest(argc, argv);
