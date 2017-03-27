@@ -110,12 +110,27 @@ class ShorturlServer {
             }
         });
 
-        this.shorturl_app.get('*', function(req, res) {
-            console.log(req);
-            console.log("req.url:" + req.url);
-            console.log("req.query.long_url:" + req.query.long_url);
-            // res.send("{type: 'text'}");
-            res.send("{type: 'text'}");
+        this.shorturl_app.get('*', (request: express.Request, result: express.Response, next: express.NextFunction) =>  {
+
+            var short_url = request.url.substring(1);
+            var long_url = '';
+
+            if (short_url != null) {
+console.log("short_url:" + short_url);
+                Q.all([this.dbGetLongUrl(short_url)]).then(function(results) {
+                    long_url = results[0][0][0].LONG_URL;
+console.log("long_url:" + long_url);
+                }).then(function() {
+                    console.log("Redirect URL:" + long_url);
+                    result.redirect(long_url);
+                    result.end();
+                    // res.send("{type: '" + long_url + "'}");
+                })
+                .done();
+            } else {
+                result.send("{type: 'Not Found Url'}");
+            }
+
         });
     }
 
@@ -193,6 +208,12 @@ class ShorturlServer {
     private dbGetSeq(long_url: string): void {
         var defered = Q.defer();
         pool.query('SELECT sp_insert_shorturl( ? ) AS SEQ ', [long_url], defered.makeNodeResolver());
+        return defered.promise;
+    }
+
+    private dbGetLongUrl(short_url: string): void {
+        var defered = Q.defer();
+        pool.query('SELECT sp_select_longurl( ? ) AS LONG_URL ', [short_url], defered.makeNodeResolver());
         return defered.promise;
     }
 }
