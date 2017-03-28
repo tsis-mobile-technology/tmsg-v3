@@ -8,6 +8,7 @@ import { AppComponent } from "./app.component";
 import { CallComponent } from "./call.component";
 import { CustComponent } from "./cust.component";
 import { UserComponent } from "./user.component";
+import { ShortUrlComponent } from "./shorturl.component";
 
 // Routing Module
 import { AppRoutingModule } from "./app.routing";

@@ -116,10 +116,8 @@ class ShorturlServer {
             var long_url = '';
 
             if (short_url != null) {
-console.log("short_url:" + short_url);
                 Q.all([this.dbGetLongUrl(short_url)]).then(function(results) {
                     long_url = results[0][0][0].LONG_URL;
-console.log("long_url:" + long_url);
                 }).then(function() {
                     console.log("Redirect URL:" + long_url);
                     result.redirect(long_url);
