@@ -2,12 +2,14 @@ import { BrowserModule  } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
+import { HttpModule, JsonpModule }          from '@angular/http';
 
 // App component
 import { AppComponent } from "./app.component";
 import { CallComponent } from "./call.component";
 import { CustComponent } from "./cust.component";
 import { UserComponent } from "./user.component";
+import { ShortUrlComponent } from "./shorturl.component";
 
 // Routing Module
 import { AppRoutingModule } from "./app.routing";
@@ -34,7 +36,9 @@ import { ErrorComponent } from "./common";
         CommonModule,
         FormsModule,
         SharedModule,
-        AppRoutingModule
+        AppRoutingModule,
+        HttpModule,
+        JsonpModule
     ],
     declarations: [
         AppComponent,
@@ -50,7 +54,8 @@ import { ErrorComponent } from "./common";
         CustroomComponent,
         CustroomsComponent,
         UsersComponent,
-        ErrorComponent
+        ErrorComponent,
+        ShortUrlComponent
     ],
     providers: [ ],
     bootstrap: [

@@ -1,0 +1,24 @@
+<div id="wrap_login">
+    <div class="loginbox">
+        <h2>ShortUrl</h2>
+        <ul class="form-group">
+            <li>
+                <label>
+                    <input #focus [(ngModel)]="long_url" class="input_txt_long_url" placeholder="Long Url" required/>
+                </label>
+= <button (click)="changeUrl()" class="btn btn_login">변환</button> =>
+                <label>
+                    <input [(ngModel)]="short_url" class="input_txt_short_url" placeholder="Short Url" required readonly />
+                    <a href="{{full_url}}" target="_NEW"> URL Test </a>
+                </label>
+            </li>
+        </ul>
+    </div>
+    <div class="urllist">
+        <li *ngFor="let url of urls | async">
+            <label>
+                {{url.long_url}}=>{{url.short_url}}
+            </label>
+        </li>
+    </div>
+</div>
