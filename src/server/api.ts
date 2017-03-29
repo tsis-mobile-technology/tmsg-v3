@@ -21,7 +21,7 @@ var connection = mysql.createConnection({
 });
 
 var pool = mysql.createPool({
-    connectionLimit: 100, //important
+    connectionLimit: 10, //important
     host     : '14.63.213.246',
     user     : 'smarttest',
     password : 'test1234',
