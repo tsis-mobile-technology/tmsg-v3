@@ -100,7 +100,8 @@ class ShorturlServer {
                     if(err) {
                         console.log('응답 에러');
                     } else {
-                        re = "{'data':" + data.shorturl + "}";
+                        // re = "{data:" + data.shorturl + "}";
+                        re = data.shorturl;
                         console.log("response:" + JSON.stringify(re));
                         result.status(200).send(re);
                     }

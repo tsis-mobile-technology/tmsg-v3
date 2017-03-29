@@ -2,3 +2,4 @@
 npm install
 sh stop.sh
 sh start.sh
+tail -f ../npm.stderr

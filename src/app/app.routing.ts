@@ -13,7 +13,7 @@ const appRoutes: Routes = [
   { path: 'call',	component: CallComponent },
   { path: 'cust/:nickname',	component: CustComponent },
   { path: 'user',	component: UserComponent },
-  { path: 'shorturl',	component: ShortUrlComponent },
+  { path: 'shorturl',	component: ShortUrlComponent }
 ];
 
 @NgModule({
