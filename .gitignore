@@ -12,8 +12,5 @@ __MACOSX/
 .DS_Store
 Thumbs.db
 .env
-<<<<<<< HEAD
-=======
 npm-debug.log
 shorturl
->>>>>>> c78ec6e525792ca0d6d75def5b9ff4c3ba06dd6a
