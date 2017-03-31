@@ -95,19 +95,24 @@ class ShorturlServer {
         this.shorturl_app.get('/create', (request: express.Request, result: express.Response, next: express.NextFunction) => {
             var long_url = request.query.long_url;
             var re;
-            try {
-                this.getShortURL(long_url,  function(err, data) {
-                    if(err) {
-                        console.log('응답 에러');
-                    } else {
-                        // re = "{data:" + data.shorturl + "}";
-                        re = data.shorturl;
-                        console.log("response:" + JSON.stringify(re));
-                        result.status(200).send(re);
-                    }
-                });
-            } catch (exception) {
-                console.log('응답 에러');
+
+            if ( long_url != null && long_url == '') {
+                try {
+                    this.getShortURL(long_url,  function(err, data) {
+                        if(err) {
+                            console.log('응답 에러');
+                        } else {
+                            // re = "{data:" + data.shorturl + "}";
+                            re = data.shorturl;
+                            console.log("response:" + JSON.stringify(re));
+                            result.status(200).send(re);
+                        }
+                    });
+                } catch (exception) {
+                    console.log('응답 에러');
+                }
+            } else {
+                result.status(200).send("{data:'long_url is null'}");
             }
         });
 
