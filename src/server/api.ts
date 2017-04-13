@@ -251,15 +251,25 @@ class ApiServer {
         // 키보드
         this.kakao_app.get('/keyboard', (request: express.Request, result: express.Response, next: express.NextFunction) => {
             var re;
+            var content = "keyboard";
             try {
             	//re = {type:'text'};
             	//re = {type:"buttons", buttons: ["자동응답", "채팅상담"]};
-                re = depth_First;
+                // re = depth_First;
+                this.getKeyboardResponse(content, function(err, data) {
+                    if(err) {
+                        console.log('응답 에러');
+                    } else {
+                        re = data;
+                        console.log("response:" + JSON.stringify(re));
+                    }
+                });
+
             } catch (exception) {
-            alert('키보드 에러');
+                console.log('키보드 에러');
             } finally {
-            //re.data = result;
-            result.status(200).send(re);
+                //re.data = result;
+                result.status(200).send(re);
             }
         });
 
@@ -330,6 +340,17 @@ class ApiServer {
                 result.status(200).send(re);
             }
         });
+    }
+
+    private getKeyboardResponse(content: string, callback: any): void {
+        var re;
+        Q.all([this.dbSelectScenario(content)]).then(function(results){
+            re = results[0][0][0].RES_MESSAGE;
+        }).then(function() {
+            console.log("re:" + JSON.stringify(re)); 
+            callback(null, re);
+        })
+        .done();
     }
 
     private getMessageResponse(content: string, user_key: string, type: string, callback: any): void {
@@ -407,11 +428,25 @@ class ApiServer {
                     /*
                         등록한 사진을 어디론가 옮기고 이력저장하고 
                     */
+                    var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
+                    console.log("db values:" + JSON.stringify(post));
+
+                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                        if (err)
+                            console.log('Error while performing Query.', err);
+                    });
                     re = depth_First_Third_Last_Response;
                 } else if (beforeContent == "문의사항만 입력") {
                     /*
                         등록한 사진을 어디론가 옮기고 이력저장하고 
                     */
+                    var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
+                    console.log("db values:" + JSON.stringify(post));
+
+                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                        if (err)
+                            console.log('Error while performing Query.', err);
+                    });
                     re = depth_First_Third_Last_Response;
                 }  
 
@@ -597,6 +632,12 @@ class ApiServer {
         return defered.promise;
     }
 
+    private dbSelectScenario(content: string): void {
+        var defered = Q.defer();
+
+        pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
+        return defered.promise;
+    }
 
     private dbCheckHistory(content: string, user_key: string): void {
         var defered = Q.defer();
