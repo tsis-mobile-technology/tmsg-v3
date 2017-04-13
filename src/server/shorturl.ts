@@ -8,6 +8,11 @@ declare var process, __dirname;
 
 var Q          = require("q");
 var mysql      = require('mysql');
+var useragent  = require('useragent');
+//[useragent] If you want to use automatic updating, please add:
+//[useragent]   - request (npm install request --save)
+//[useragent]   - yamlparser (npm install yamlparser --save)
+//[useragent] To your own package.json
 
 var pool = mysql.createPool({
     connectionLimit: 10, //important
@@ -31,6 +36,7 @@ class ShorturlServer {
     // Bootstrap the application.
     public static bootstrap(): ShorturlServer {
         console.log("ApiServer bootstrap");
+        useragent(true);
         return new ShorturlServer();
     }
 
@@ -83,7 +89,15 @@ class ShorturlServer {
         this.shorturl_app.use(bodyParser.urlencoded({extended:true}));
         
         this.shorturl_app.get( '/', function(req, res) {
-            res.send("{type: 'text'}");
+            var agent = useragent.parse(req.headers['user-agent'])
+            , another = useragent.fromJSON(JSON.stringify(agent));
+ 
+            console.log("init:" + agent.toString());
+            console.log("os:" + agent.os.toString());
+            console.log("device:" + agent.device.toString());
+
+            res.status(200).send(agent + "/" + another);
+            //res.send("{type: 'text'}");
         });
 
         this.shorturl_app.all('*', function(req, res, next) {
@@ -120,8 +134,8 @@ class ShorturlServer {
 
             var short_url = request.url.substring(1);
             var long_url = '';
-
-            if (short_url != null) {
+            console.log(">" + short_url + "<");
+            if ( short_url != null && short_url.length > 0 && short_url != "favicon.ico" ) {
                 Q.all([this.dbGetLongUrl(short_url)]).then(function(results) {
                     long_url = results[0][0][0].LONG_URL;
                 }).then(function() {

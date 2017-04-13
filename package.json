@@ -77,6 +77,9 @@
     "xmlhttprequest-ssl": "jussikinnula/node-XMLHttpRequest",
     "zone.js": "~0.6.25",
     "mysql": "*",
+    "useragent": "*",
+    "request": "*",
+    "yamlparser": "*",
     "q": "1.5.0"
   },
   "devDependencies": {
