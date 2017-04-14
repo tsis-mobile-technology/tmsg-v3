@@ -109,10 +109,13 @@ class ShorturlServer {
         this.shorturl_app.get('/create', (request: express.Request, result: express.Response, next: express.NextFunction) => {
             var long_url = request.query.long_url;
             var re;
+            var agent = useragent.parse(request.headers['user-agent']);
+            var agent_os = agent.os.toString();
+            var agent_device = agent.device.toString();
 
             if ( long_url != null && long_url == '') {
                 try {
-                    this.getShortURL(long_url,  function(err, data) {
+                    this.getShortURL(long_url, agent_os, agent_device, function(err, data) {
                         if(err) {
                             console.log('응답 에러');
                         } else {
@@ -152,13 +155,13 @@ class ShorturlServer {
         });
     }
 
-    private getShortURL(long_url: string, callback: any): void {
+    private getShortURL(long_url: string, agent_os: string, agent_device: string, callback: any): void {
         var re;
         var rtnStr;
         var systemCallRtn;
         var beforeContent;
         if (re == null) {
-            Q.all([this.dbGetSeq(long_url)]).then(function(results){
+            Q.all([this.dbGetSeq(long_url, agent_os, agent_device)]).then(function(results){
                 // console.log("result[0]:" + JSON.stringify(results[0][0][0])); 
                 // console.log("result[1]:" + JSON.stringify(results[1][0][0]));
                 // Hint : your third query would go here
@@ -223,13 +226,13 @@ class ShorturlServer {
         });
     }
 
-    private dbGetSeq(long_url: string): void {
+    private dbGetSeq(long_url: string, agent_os: string, agent_device: string): void {
         var defered = Q.defer();
-        pool.query('SELECT sp_insert_shorturl( ? ) AS SEQ ', [long_url], defered.makeNodeResolver());
+        pool.query('SELECT sp_insert_shorturl( ?, ?, ? ) AS SEQ ', [long_url, agent_os, agent_device], defered.makeNodeResolver());
         return defered.promise;
     }
 
-    private dbGetLongUrl(short_url: string): void {
+    private dbGetLongUrl(short_url: string): void { // 추후에 수정 필요 
         var defered = Q.defer();
         pool.query('SELECT sp_select_longurl( ? ) AS LONG_URL ', [short_url], defered.makeNodeResolver());
         return defered.promise;
