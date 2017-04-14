@@ -347,10 +347,13 @@ class ApiServer {
     private getKeyboardResponse(content: string, callback: any): void {
         var re;
         Q.all([this.dbSelectScenario(content)]).then(function(results){
-            console.log("results:" + JSON.stringify(results));
+            // console.log("results:" + JSON.stringify(results));
             re = results[0][0][0];
+            // console.log("re:" + JSON.stringify(re));
+            // console.log("re.RES_MESSAGE:" + JSON.stringify(re.RES_MESSAGE));
+            // console.log("re.RES_MESSAGE.keyboard):" + JSON.stringify(JSON.parse(re.RES_MESSAGE).keyboard));
         }).then(function() {
-            callback(null, re.RES_MESSAGE);
+            callback(null, JSON.parse(re.RES_MESSAGE).keyboard);
         })
         .done();
     }
@@ -360,6 +363,8 @@ class ApiServer {
         var rtnStr;
         var updateType;
         var beforeContent;
+
+        if (content == "#") content = "keyboard";
 
         Q.all([this.dbSelectScenario(content)]).then(function(results){
             console.log("results:" + JSON.stringify(results));
@@ -454,7 +459,7 @@ class ApiServer {
                                 console.log('Error while performing Query.', err);
                         });
                         re = depth_First_Third_Last_Response;
-                    }  
+                    }
 
                     if(content == '취소하기') {
                         re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
@@ -466,7 +471,8 @@ class ApiServer {
                         re = depth_First_Second;
                     } else if(content == '이전단계3') {
                         re = depth_First_Third;
-                    } 
+                    }
+ 
                     if (re == null) {
                         re = {"message": {"text":"제대로 인식하지 못했습니다. 취소하시려명 '#'을 입력하여주십시요!"}};
                     }
@@ -642,7 +648,7 @@ class ApiServer {
 
     private dbSelectScenario(content: string): void {
         var defered = Q.defer();
-        console.log("content:" + content);
+        // console.log("content:" + content);
         pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
         return defered.promise;
     }
