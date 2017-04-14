@@ -17,7 +17,7 @@ var connection = mysql.createConnection({
   user     : 'smarttest',
   password : 'test1234',
   port     : 10003,
-  database : 'smart_message_client'
+  database : 'SMART_MESSAGE_VERTWO'
 });
 
 var pool = mysql.createPool({
@@ -26,7 +26,7 @@ var pool = mysql.createPool({
     user     : 'smarttest',
     password : 'test1234',
     port     : 10003,
-    database : 'smart_message_client',
+    database : 'SMART_MESSAGE_VERTWO',
     debug: false
 });
 
@@ -252,25 +252,27 @@ class ApiServer {
         this.kakao_app.get('/keyboard', (request: express.Request, result: express.Response, next: express.NextFunction) => {
             var re;
             var content = "keyboard";
+            // try {
+            //     re = depth_First;
+            // } catch (exception) {
+            //     console.log('키보드 에러');
+            // } finally {
+            //     //re.data = result;
+            //     result.status(200).send(re);
+            // }
             try {
-            	//re = {type:'text'};
-            	//re = {type:"buttons", buttons: ["자동응답", "채팅상담"]};
-                // re = depth_First;
                 this.getKeyboardResponse(content, function(err, data) {
                     if(err) {
                         console.log('응답 에러');
                     } else {
                         re = data;
-                        console.log("response:" + JSON.stringify(re));
+                        result.status(200).send(re);
                     }
                 });
-
             } catch (exception) {
-                console.log('키보드 에러');
-            } finally {
-                //re.data = result;
-                result.status(200).send(re);
+                console.log('응답 에러');
             }
+
         });
 
         // 응답
@@ -345,10 +347,10 @@ class ApiServer {
     private getKeyboardResponse(content: string, callback: any): void {
         var re;
         Q.all([this.dbSelectScenario(content)]).then(function(results){
-            re = results[0][0][0].RES_MESSAGE;
+            console.log("results:" + JSON.stringify(results));
+            re = results[0][0][0];
         }).then(function() {
-            console.log("re:" + JSON.stringify(re)); 
-            callback(null, re);
+            callback(null, re.RES_MESSAGE);
         })
         .done();
     }
@@ -358,137 +360,143 @@ class ApiServer {
         var rtnStr;
         var updateType;
         var beforeContent;
-        
-        if (content == '자주하는 질문') {re = depth_First_First; this.dbSaveHistory(content, user_key, type);}
-        else if (content == "콜센터 전화번호") {re = depth_First_First_First; this.dbSaveHistory(content, user_key, type);}
-        else if (content == "배송기간") {re = depth_First_First_Second; this.dbSaveHistory(content, user_key, type);}
 
-        /* 하위 메뉴에 대한 응답 처리 이전에 해당 아이디로 하여 성명, 전화번호, 인증 유무등을 체크하여 단계 진입을 선택해하여야 한다.*/
-        if (content == '주문 조회/변경') {re = depth_First_Second; this.dbSaveHistory(content, user_key, type);}
-        else if (content == "주문 조회") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
-        else if (content == "배송지 변경") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
-        else if (content == "주문 취소") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
-        else if (content == "반품 문의") {re = depth_First_Second_Fifth; this.dbSaveHistory(content, user_key, type);}
+        Q.all([this.dbSelectScenario(content)]).then(function(results){
+            console.log("results:" + JSON.stringify(results));
+            re = results[0][0][0].RES_MESSAGE;
+        }).then(function() {
+            if (re == null) {
+                if (content == '자주하는 질문') {re = depth_First_First; this.dbSaveHistory(content, user_key, type);}
+                else if (content == "콜센터 전화번호") {re = depth_First_First_First; this.dbSaveHistory(content, user_key, type);}
+                else if (content == "배송기간") {re = depth_First_First_Second; this.dbSaveHistory(content, user_key, type);}
 
-        if (content == '문의하기') {re = depth_First_Third; this.dbSaveHistory(content, user_key, type);}
-        else if (content == "사진 첨부 후 문의하기") {re = depth_First_Third_First; this.dbSaveHistory(content, user_key, type);}
-        else if (content == "문의사항만 입력") {re = depth_First_Third_Second; this.dbSaveHistory(content, user_key, type);}
+                /* 하위 메뉴에 대한 응답 처리 이전에 해당 아이디로 하여 성명, 전화번호, 인증 유무등을 체크하여 단계 진입을 선택해하여야 한다.*/
+                if (content == '주문 조회/변경') {re = depth_First_Second; this.dbSaveHistory(content, user_key, type);}
+                else if (content == "주문 조회") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
+                else if (content == "배송지 변경") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
+                else if (content == "주문 취소") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
+                else if (content == "반품 문의") {re = depth_First_Second_Fifth; this.dbSaveHistory(content, user_key, type);}
 
-        if (re == null) {
-            Q.all([this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key)]).then(function(results){
-                // console.log("result[0]:" + JSON.stringify(results[0][0][0])); 
-                // console.log("result[1]:" + JSON.stringify(results[1][0][0]));
-                // Hint : your third query would go here
-                beforeContent = results[0][0][0].MESSAGE;
-                rtnStr = results[1][0][0];
-            }).then(function() {
-                if (beforeContent == "주문 조회") {
-                    if (rtnStr == null) {
-                        updateType = "Name";
-                        re = depth_First_Second_Phone;
-                    } else if(rtnStr.PHONE == null) {
-                        updateType = "Phone";
-                        re = depth_First_Second_Auth;
-                        // 인증번호 보내기 기능 추가 
-                    } else if(rtnStr.YN_AUTH == 'N') {
-                        updateType = "Auth";
-                        re = depth_First_Second_First_Response;
-                    } else if(rtnStr.YN_AUTH == 'Y') {
-                        re = depth_First_Second_First_Response;
+                if (content == '문의하기') {re = depth_First_Third; this.dbSaveHistory(content, user_key, type);}
+                else if (content == "사진 첨부 후 문의하기") {re = depth_First_Third_First; this.dbSaveHistory(content, user_key, type);}
+                else if (content == "문의사항만 입력") {re = depth_First_Third_Second; this.dbSaveHistory(content, user_key, type);}
+
+                Q.all([this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key)]).then(function(results){
+                    // console.log("result[0]:" + JSON.stringify(results[0][0][0])); 
+                    // console.log("result[1]:" + JSON.stringify(results[1][0][0]));
+                    // Hint : your third query would go here
+                    beforeContent = results[0][0][0].MESSAGE;
+                    rtnStr = results[1][0][0];
+                }).then(function() {
+                    if (beforeContent == "주문 조회") {
+                        if (rtnStr == null) {
+                            updateType = "Name";
+                            re = depth_First_Second_Phone;
+                        } else if(rtnStr.PHONE == null) {
+                            updateType = "Phone";
+                            re = depth_First_Second_Auth;
+                            // 인증번호 보내기 기능 추가 
+                        } else if(rtnStr.YN_AUTH == 'N') {
+                            updateType = "Auth";
+                            re = depth_First_Second_First_Response;
+                        } else if(rtnStr.YN_AUTH == 'Y') {
+                            re = depth_First_Second_First_Response;
+                        }
+                    } else if (beforeContent == "배송지 변경") {
+                        if (rtnStr == null) {
+                            updateType = "Name";
+                            re = depth_First_Second_Phone;
+                        } else if(rtnStr.PHONE == null) {
+                            updateType = "Phone";
+                            re = depth_First_Second_Auth;
+                            // 인증번호 보내기 기능 추가 
+                        } else if(rtnStr.YN_AUTH == 'N') {
+                            updateType = "Auth";
+                            re = depth_First_Second_Second_Response;
+                        } else if(rtnStr.YN_AUTH == 'Y') {
+                            re = depth_First_Second_Second_Response;
+                        }
+                    } else if (beforeContent == "주문 최소") {
+                        if (rtnStr == null) {
+                            updateType = "Name";
+                            re = depth_First_Second_Phone;
+                        } else if(rtnStr.PHONE == null) {
+                            updateType = "Phone";
+                            re = depth_First_Second_Auth;
+                            // 인증번호 보내기 기능 추가 
+                        } else if(rtnStr.YN_AUTH == 'N') {
+                            updateType = "Auth";
+                            re = depth_First_Second_Third_Response;
+                        } else if(rtnStr.YN_AUTH == 'Y') {
+                            re = depth_First_Second_Third_Response;
+                        }
+                    } else if (beforeContent == "사진 첨부 후 문의하기") {
+                        /*
+                            등록한 사진을 어디론가 옮기고 이력저장하고 
+                        */
+                        var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
+                        console.log("db values:" + JSON.stringify(post));
+
+                        pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                            if (err)
+                                console.log('Error while performing Query.', err);
+                        });
+                        re = depth_First_Third_Last_Response;
+                    } else if (beforeContent == "문의사항만 입력") {
+                        /*
+                            등록한 사진을 어디론가 옮기고 이력저장하고 
+                        */
+                        var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
+                        console.log("db values:" + JSON.stringify(post));
+
+                        pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                            if (err)
+                                console.log('Error while performing Query.', err);
+                        });
+                        re = depth_First_Third_Last_Response;
+                    }  
+
+                    if(content == '취소하기') {
+                        re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
+                    } else if(content == '#') {
+                        re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
+                    } else if(content == '이전단계1') {
+                        re = depth_First_First;
+                    } else if(content == '이전단계2') {
+                        re = depth_First_Second;
+                    } else if(content == '이전단계3') {
+                        re = depth_First_Third;
+                    } 
+                    if (re == null) {
+                        re = {"message": {"text":"제대로 인식하지 못했습니다. 취소하시려명 '#'을 입력하여주십시요!"}};
                     }
-                } else if (beforeContent == "배송지 변경") {
-                    if (rtnStr == null) {
-                        updateType = "Name";
-                        re = depth_First_Second_Phone;
-                    } else if(rtnStr.PHONE == null) {
-                        updateType = "Phone";
-                        re = depth_First_Second_Auth;
-                        // 인증번호 보내기 기능 추가 
-                    } else if(rtnStr.YN_AUTH == 'N') {
-                        updateType = "Auth";
-                        re = depth_First_Second_Second_Response;
-                    } else if(rtnStr.YN_AUTH == 'Y') {
-                        re = depth_First_Second_Second_Response;
+                })
+                .then(function() {
+                    var post = {UNIQUE_ID:user_key, NAME:content};
+                    if( updateType == "Name" ) {
+                        pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
+                            if(err) console.log("Query Error:", err);
+                        });
+                    } else if( updateType == "Phone" ) {
+                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+                            if(err) console.log("Query Error:", err);
+                        });
+                    } else if( updateType == "Auth") {
+                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+                            if(err) console.log("Query Error:", err);
+                        });
                     }
-                } else if (beforeContent == "주문 최소") {
-                    if (rtnStr == null) {
-                        updateType = "Name";
-                        re = depth_First_Second_Phone;
-                    } else if(rtnStr.PHONE == null) {
-                        updateType = "Phone";
-                        re = depth_First_Second_Auth;
-                        // 인증번호 보내기 기능 추가 
-                    } else if(rtnStr.YN_AUTH == 'N') {
-                        updateType = "Auth";
-                        re = depth_First_Second_Third_Response;
-                    } else if(rtnStr.YN_AUTH == 'Y') {
-                        re = depth_First_Second_Third_Response;
-                    }
-                } else if (beforeContent == "사진 첨부 후 문의하기") {
-                    /*
-                        등록한 사진을 어디론가 옮기고 이력저장하고 
-                    */
-                    var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
-                    console.log("db values:" + JSON.stringify(post));
-
-                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
-                        if (err)
-                            console.log('Error while performing Query.', err);
-                    });
-                    re = depth_First_Third_Last_Response;
-                } else if (beforeContent == "문의사항만 입력") {
-                    /*
-                        등록한 사진을 어디론가 옮기고 이력저장하고 
-                    */
-                    var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
-                    console.log("db values:" + JSON.stringify(post));
-
-                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
-                        if (err)
-                            console.log('Error while performing Query.', err);
-                    });
-                    re = depth_First_Third_Last_Response;
-                }  
-
-                if(content == '취소하기') {
-                    re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
-                } else if(content == '#') {
-                    re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
-                } else if(content == '이전단계1') {
-                    re = depth_First_First;
-                } else if(content == '이전단계2') {
-                    re = depth_First_Second;
-                } else if(content == '이전단계3') {
-                    re = depth_First_Third;
-                } 
-                if (re == null) {
-                    re = {"message": {"text":"제대로 인식하지 못했습니다. 취소하시려명 '#'을 입력하여주십시요!"}};
-                }
-            })
-            .then(function() {
-                var post = {UNIQUE_ID:user_key, NAME:content};
-                if( updateType == "Name" ) {
-                    pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
-                        if(err) console.log("Query Error:", err);
-                    });
-                } else if( updateType == "Phone" ) {
-                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
-                        if(err) console.log("Query Error:", err);
-                    });
-                } else if( updateType == "Auth") {
-                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
-                        if(err) console.log("Query Error:", err);
-                    });
-                }
-            })
-            .then(function() {
-                console.log("re:" + JSON.stringify(re)); 
+                })
+                .then(function() {
+                    console.log("re:" + JSON.stringify(re)); 
+                    callback(null, re);
+                })
+                .done();
+            } else {
                 callback(null, re);
-            })
-            .done();
-        } else {
-            callback(null, re);
-        }
+            }
+        })
+        .done();
 
           //       if (content == '주소') {
           //           re = {text:'서울특별시 중구 칠패로 42 우리빌딩 5층'};
@@ -634,7 +642,7 @@ class ApiServer {
 
     private dbSelectScenario(content: string): void {
         var defered = Q.defer();
-
+        console.log("content:" + content);
         pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
         return defered.promise;
     }
