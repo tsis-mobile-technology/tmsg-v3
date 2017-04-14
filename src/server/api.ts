@@ -32,36 +32,36 @@ var pool = mysql.createPool({
 
 var bodyParser = require('body-parser');
 var depth_First = {"type": "buttons", "buttons": ["자주하는 질문", "주문 조회/변경", "문의하기"]};
-var depth_First_First = { 
-                        "message": 
-                            {"text": "다른 고객님들이 궁금해 하시는 내용입니다.궁금하신 내용을 선택해주세요!"},
-                        "keyboard": 
-                            {"type":"buttons", "buttons": ["콜센터 전화번호", "배송기간", "취소하기"]}
-                        };
-var depth_First_First_First = { 
-                        "message": 
-                            {
-                                "text": "콜센터 전화번호는 1234-1234입니다.\n 처음으로 돌아가시려면 '#'을 입력하세요.",
-                                "message_button": {
-                                    "label": "홈페이지 방문",
-                                    "url": "https://www.shoppingntmall.com/index"
-                                }
-                            },
-                        "keyboard": 
-                            {"type":"text"}
-                        };
-var depth_First_First_Second = { 
-                        "message": 
-                            {
-                                "text": "상품에 따라 배송기간의 차이가 있습니다. 예상 배송일자가 궁금하시면 콜센터(1234-1234)로 전화주세요!\n 처음으로 돌아가시려면 '#'을 입력하세요.",
-                                "message_button": {
-                                    "label": "홈페이지 방문",
-                                    "url": "https://www.shoppingntmall.com/index"
-                                }
-                            },
-                        "keyboard": 
-                            {"type":"text"}
-                        };
+// var depth_First_First = { 
+//                         "message": 
+//                             {"text": "다른 고객님들이 궁금해 하시는 내용입니다.궁금하신 내용을 선택해주세요!"},
+//                         "keyboard": 
+//                             {"type":"buttons", "buttons": ["콜센터 전화번호", "배송기간", "취소하기"]}
+//                         };
+// var depth_First_First_First = { 
+//                         "message": 
+//                             {
+//                                 "text": "콜센터 전화번호는 1234-1234입니다.\n 처음으로 돌아가시려면 '#'을 입력하세요.",
+//                                 "message_button": {
+//                                     "label": "홈페이지 방문",
+//                                     "url": "https://www.shoppingntmall.com/index"
+//                                 }
+//                             },
+//                         "keyboard": 
+//                             {"type":"text"}
+//                         };
+// var depth_First_First_Second = { 
+//                         "message": 
+//                             {
+//                                 "text": "상품에 따라 배송기간의 차이가 있습니다. 예상 배송일자가 궁금하시면 콜센터(1234-1234)로 전화주세요!\n 처음으로 돌아가시려면 '#'을 입력하세요.",
+//                                 "message_button": {
+//                                     "label": "홈페이지 방문",
+//                                     "url": "https://www.shoppingntmall.com/index"
+//                                 }
+//                             },
+//                         "keyboard": 
+//                             {"type":"text"}
+//                         };
 var depth_First_Second_Name = { 
                         "message": 
                             {"text": "고객님의 성함을 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
@@ -80,12 +80,12 @@ var depth_First_Second_Auth = {
                         "keyboard": 
                             {"type":"text"}
                         };
-var depth_First_Second = { 
-                        "message": 
-                            {"text": "아래 내용 중 선택해 주세요!"},
-                        "keyboard": 
-                            {"type":"buttons", "buttons": ["주문 조회", "배송지 변경", "주문 취소", "반품 문의", "취소하기"]}
-                        };
+// var depth_First_Second = { 
+//                         "message": 
+//                             {"text": "아래 내용 중 선택해 주세요!"},
+//                         "keyboard": 
+//                             {"type":"buttons", "buttons": ["주문 조회", "배송지 변경", "주문 취소", "반품 문의", "취소하기"]}
+//                         };
 var depth_First_Second_First_Response = {
                         "message": 
                             {"text": "최근 3개월 내 고객님의 주문 내역이 없습니다.\n 취소하시려면 '#'을 입력해 주세요."},
@@ -128,48 +128,48 @@ var depth_First_Second_Third_Response = {
 //                         "keyboard": 
 //                             {"type":"buttons", "buttons": ["주문 조회/변경"]}
 //                         };
-var depth_First_Second_Fifth = { 
-                        "message": 
-                            {
-                                "text": "주문 반품은 콜센터 1234-1234로 전화하셔서 신청가능합니다.",
-                                "message_button": {
-                                    "label": "홈페이지 방문",
-                                    "url": "https://www.shoppingntmall.com/index"
-                                }
-                            },
-                        "keyboard": 
-                            {"type":"buttons", "buttons": ["주문 조회/변경"]}
-                        };
-var depth_First_Third = { 
-                        "message": 
-                            {"text": "문의하실 내용을 선택해 주세요!"},
-                        "keyboard": 
-                            {"type":"buttons", "buttons": ["사진 첨부 후 문의하기", "문의사항만 입력", "취소하기"]}
-                        };
-var depth_First_Third_First = { 
-                        "message": 
-                            {
-                                "text": "입력창 왼쪽에 잇는 +버튼을 눌러 사진을 선택하신 후 전송 버튼을 눌러주세요.",
-                                "message_button": {
-                                    "label": "홈페이지 방문",
-                                    "url": "https://www.shoppingntmall.com/index"
-                                }
-                            },
-                        "keyboard": 
-                            {"type":"text"}
-                        };
-var depth_First_Third_Second = { 
-                        "message": 
-                            {
-                                "text": "문의하실 내용을 모두 입력 후 전송 버튼을 눌러주세요.",
-                                "message_button": {
-                                    "label": "홈페이지 방문",
-                                    "url": "https://www.shoppingntmall.com/index"
-                                }
-                            },
-                        "keyboard": 
-                            {"type":"text"}
-                        };
+// var depth_First_Second_Fifth = { 
+//                         "message": 
+//                             {
+//                                 "text": "주문 반품은 콜센터 1234-1234로 전화하셔서 신청가능합니다.",
+//                                 "message_button": {
+//                                     "label": "홈페이지 방문",
+//                                     "url": "https://www.shoppingntmall.com/index"
+//                                 }
+//                             },
+//                         "keyboard": 
+//                             {"type":"buttons", "buttons": ["주문 조회/변경"]}
+//                         };
+// var depth_First_Third = { 
+//                         "message": 
+//                             {"text": "문의하실 내용을 선택해 주세요!"},
+//                         "keyboard": 
+//                             {"type":"buttons", "buttons": ["사진 첨부 후 문의하기", "문의사항만 입력", "취소하기"]}
+//                         };
+// var depth_First_Third_First = { 
+//                         "message": 
+//                             {
+//                                 "text": "입력창 왼쪽에 잇는 +버튼을 눌러 사진을 선택하신 후 전송 버튼을 눌러주세요.",
+//                                 "message_button": {
+//                                     "label": "홈페이지 방문",
+//                                     "url": "https://www.shoppingntmall.com/index"
+//                                 }
+//                             },
+//                         "keyboard": 
+//                             {"type":"text"}
+//                         };
+// var depth_First_Third_Second = { 
+//                         "message": 
+//                             {
+//                                 "text": "문의하실 내용을 모두 입력 후 전송 버튼을 눌러주세요.",
+//                                 "message_button": {
+//                                     "label": "홈페이지 방문",
+//                                     "url": "https://www.shoppingntmall.com/index"
+//                                 }
+//                             },
+//                         "keyboard": 
+//                             {"type":"text"}
+//                         };
 var depth_First_Third_Last_Response = {
                         "message": 
                             {"text": "문의가 정상적으로 접수되었습니다. 평일 9시~18시, 빠른 시간 안에 답변 드리겠습니다.\n 취소하시려면 '#'을 입력해 주세요."},
@@ -366,33 +366,44 @@ class ApiServer {
 
         if (content == "#") content = "keyboard";
 
-        Q.all([this.dbSelectScenario(content)]).then(function(results){
+        Q.all([this.dbSelectScenario(content),this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key)]).then(function(results){
             console.log("results:" + JSON.stringify(results));
-            re = results[0][0][0].RES_MESSAGE;
+            if( results[0][0][0] != null )
+                re = results[0][0][0].RES_MESSAGE;
+            else re = null;
+            
+            if( results[1][0][0] != null )
+                beforeContent = results[1][0][0].MESSAGE;
+            else beforeContent = null;
+
+            if( results[2][0][0] != null )
+                rtnStr = results[2][0][0];
+            else rtnStr = null;
         }).then(function() {
             if (re == null) {
-                if (content == '자주하는 질문') {re = depth_First_First; this.dbSaveHistory(content, user_key, type);}
-                else if (content == "콜센터 전화번호") {re = depth_First_First_First; this.dbSaveHistory(content, user_key, type);}
-                else if (content == "배송기간") {re = depth_First_First_Second; this.dbSaveHistory(content, user_key, type);}
+                // if (content == '자주하는 질문') {re = depth_First_First; this.dbSaveHistory(content, user_key, type);}
+                // else if (content == "콜센터 전화번호") {re = depth_First_First_First; this.dbSaveHistory(content, user_key, type);}
+                // else if (content == "배송기간") {re = depth_First_First_Second; this.dbSaveHistory(content, user_key, type);}
 
-                /* 하위 메뉴에 대한 응답 처리 이전에 해당 아이디로 하여 성명, 전화번호, 인증 유무등을 체크하여 단계 진입을 선택해하여야 한다.*/
-                if (content == '주문 조회/변경') {re = depth_First_Second; this.dbSaveHistory(content, user_key, type);}
-                else if (content == "주문 조회") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
-                else if (content == "배송지 변경") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
-                else if (content == "주문 취소") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
-                else if (content == "반품 문의") {re = depth_First_Second_Fifth; this.dbSaveHistory(content, user_key, type);}
+                // /* 하위 메뉴에 대한 응답 처리 이전에 해당 아이디로 하여 성명, 전화번호, 인증 유무등을 체크하여 단계 진입을 선택해하여야 한다.*/
+                // if (content == '주문 조회/변경') {re = depth_First_Second; this.dbSaveHistory(content, user_key, type);}
+                // else if (content == "주문 조회") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
+                // else if (content == "배송지 변경") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
+                // else if (content == "주문 취소") {re = depth_First_Second_Name; this.dbSaveHistory(content, user_key, type);}
+                // else if (content == "반품 문의") {re = depth_First_Second_Fifth; this.dbSaveHistory(content, user_key, type);}
 
-                if (content == '문의하기') {re = depth_First_Third; this.dbSaveHistory(content, user_key, type);}
-                else if (content == "사진 첨부 후 문의하기") {re = depth_First_Third_First; this.dbSaveHistory(content, user_key, type);}
-                else if (content == "문의사항만 입력") {re = depth_First_Third_Second; this.dbSaveHistory(content, user_key, type);}
-
-                Q.all([this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key)]).then(function(results){
-                    // console.log("result[0]:" + JSON.stringify(results[0][0][0])); 
-                    // console.log("result[1]:" + JSON.stringify(results[1][0][0]));
-                    // Hint : your third query would go here
-                    beforeContent = results[0][0][0].MESSAGE;
-                    rtnStr = results[1][0][0];
-                }).then(function() {
+                // if (content == '문의하기') {re = depth_First_Third; this.dbSaveHistory(content, user_key, type);}
+                // else if (content == "사진 첨부 후 문의하기") {re = depth_First_Third_First; this.dbSaveHistory(content, user_key, type);}
+                // else if (content == "문의사항만 입력") {re = depth_First_Third_Second; this.dbSaveHistory(content, user_key, type);}
+console.log("beforeContent:" + beforeContent);
+console.log("rtnStr:" + rtnStr);
+                // Q.all([this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key)]).then(function(results){
+                //     // console.log("result[0]:" + JSON.stringify(results[0][0][0])); 
+                //     // console.log("result[1]:" + JSON.stringify(results[1][0][0]));
+                //     // Hint : your third query would go here
+                //     beforeContent = results[0][0][0].MESSAGE;
+                //     rtnStr = results[1][0][0];
+                // }).then(function() {
                     if (beforeContent == "주문 조회") {
                         if (rtnStr == null) {
                             updateType = "Name";
@@ -465,22 +476,23 @@ class ApiServer {
                         re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
                     } else if(content == '#') {
                         re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
-                    } else if(content == '이전단계1') {
-                        re = depth_First_First;
-                    } else if(content == '이전단계2') {
-                        re = depth_First_Second;
-                    } else if(content == '이전단계3') {
-                        re = depth_First_Third;
-                    }
+                    } 
+                    // else if(content == '이전단계1') {
+                    //     re = depth_First_First;
+                    // } else if(content == '이전단계2') {
+                    //     re = depth_First_Second;
+                    // } else if(content == '이전단계3') {
+                    //     re = depth_First_Third;
+                    // }
  
                     if (re == null) {
                         re = {"message": {"text":"제대로 인식하지 못했습니다. 취소하시려명 '#'을 입력하여주십시요!"}};
                     }
-                })
-                .then(function() {
-                    var post = {UNIQUE_ID:user_key, NAME:content};
+                // })
+                // .then(function() {
+                    var cust_post = {UNIQUE_ID:user_key, NAME:content};
                     if( updateType == "Name" ) {
-                        pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
+                        pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
                             if(err) console.log("Query Error:", err);
                         });
                     } else if( updateType == "Phone" ) {
@@ -492,15 +504,30 @@ class ApiServer {
                             if(err) console.log("Query Error:", err);
                         });
                     }
-                })
-                .then(function() {
-                    console.log("re:" + JSON.stringify(re)); 
-                    callback(null, re);
-                })
-                .done();
-            } else {
-                callback(null, re);
-            }
+                // })
+                // .then(function() {
+                //     console.log("in_re:" + JSON.stringify(re)); 
+                //     callback(null, re);
+                // })
+                // .done();
+            } 
+            // else {
+            //     callback(null, re);
+            // }
+        })
+        .then(function() {
+            // this.dbSaveHistory(content, user_key, type);
+            var post = {UNIQUE_ID:user_key, MESSAGE:content};
+            console.log("db values:" + JSON.stringify(post));
+
+            pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
+            if (err)
+                console.log('Error while performing Query.', err);
+            });
+        })
+        .then(function() {
+            console.log("out re:" + JSON.stringify(re)); 
+            callback(null, re);
         })
         .done();
 
@@ -639,7 +666,7 @@ class ApiServer {
     //     });
     // }
 
-    private dbLoadCustomer(user_key: string): void {
+    public dbLoadCustomer(user_key: string): void {
         var defered = Q.defer();
 
         pool.query('SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
@@ -653,7 +680,7 @@ class ApiServer {
         return defered.promise;
     }
 
-    private dbCheckHistory(content: string, user_key: string): void {
+    public dbCheckHistory(content: string, user_key: string): void {
         var defered = Q.defer();
         pool.query('select * from TB_AUTOCHAT_HISTORY where UNIQUE_ID = ? order by wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
         return defered.promise;
