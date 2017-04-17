@@ -409,34 +409,35 @@ class ApiServer {
                 });
             }
         }).then(function() {
-
-            if( rtnStr == null) {
-                updateType = "Init";
-                re = customer_Info_Name;
-            } else if (rtnStr.NAME == null) {
-                updateType = "Name";
-                re = customer_Info_Phone;
-            } else if(rtnStr.PHONE == null) {
-                updateType = "Phone";
-            }
-            
-            if( updateType == "Init" ) {
-                var cust_post = {UNIQUE_ID:user_key};
-                pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
-                    if(err) console.log("Query Error:", err);
-                });
-            } else if( updateType == "Name" ) {
-                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
-                    if(err) console.log("Query Error:", err);
-                });
-            } else if( updateType == "Phone" ) {
-                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "Y", user_key], function(err, rows, fields) {
-                    if(err) console.log("Query Error:", err);
-                });
-            } else if( updateType == "Auth") {
-                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
-                    if(err) console.log("Query Error:", err);
-                });
+            if( content != "keyboard") {
+                if( rtnStr == null) {
+                    updateType = "Init";
+                    re = customer_Info_Name;
+                } else if (rtnStr.NAME == null) {
+                    updateType = "Name";
+                    re = customer_Info_Phone;
+                } else if(rtnStr.PHONE == null) {
+                    updateType = "Phone";
+                }
+                
+                if( updateType == "Init" ) {
+                    var cust_post = {UNIQUE_ID:user_key};
+                    pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
+                        if(err) console.log("Query Error:", err);
+                    });
+                } else if( updateType == "Name" ) {
+                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+                        if(err) console.log("Query Error:", err);
+                    });
+                } else if( updateType == "Phone" ) {
+                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "Y", user_key], function(err, rows, fields) {
+                        if(err) console.log("Query Error:", err);
+                    });
+                } else if( updateType == "Auth") {
+                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+                        if(err) console.log("Query Error:", err);
+                    });
+                }
             }
         }).then(function() {
 
