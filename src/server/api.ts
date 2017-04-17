@@ -377,6 +377,7 @@ class ApiServer {
         var rtnStr;
         var updateType;
         var beforeContent;
+        var beforeStep;
 
         if (content == "#") content = "keyboard";
 
@@ -386,8 +387,10 @@ class ApiServer {
                 re = results[0][0][0].RES_MESSAGE;
             else re = null;
             
-            if( results[1][0][0] != null )
+            if( results[1][0][0] != null ) {
                 beforeContent = results[1][0][0].MESSAGE;
+                beforeStep = results[1][0][0].STEP;
+            }
             else beforeContent = null;
 
             if( results[2][0][0] != null )
@@ -443,15 +446,17 @@ class ApiServer {
 
             if (re == null) {
 console.log("beforeContent:" + beforeContent);
+console.log("beforeStep:" + beforeStep);
 console.log("rtnStr:" + rtnStr);
 /* 답변 처리에 대한 로직이 추가 되어야 한다. */
-                if (beforeContent == "주문 조회") {
-                    re = depth_First_Second_First_Response;
-                } else if (beforeContent == "배송지 변경") {
-                    re = depth_First_Second_Second_Response;
-                } else if (beforeContent == "주문 최소") {
-                    re = depth_First_Second_Third_Response;
-                } else if (beforeContent == "사진 첨부 후 문의하기") {
+                // if (beforeContent == "주문 조회") {
+                //     re = depth_First_Second_First_Response;
+                // } else if (beforeContent == "배송지 변경") {
+                //     re = depth_First_Second_Second_Response;
+                // } else if (beforeContent == "주문 최소") {
+                //     re = depth_First_Second_Third_Response;
+                // } else 
+                if (beforeContent == "사진 첨부 후 문의하기") {
                     /*
                     등록한 사진을 어디론가 옮기고 이력저장하고 
                     */
@@ -475,7 +480,15 @@ console.log("rtnStr:" + rtnStr);
                     console.log('Error while performing Query.', err);
                     });
                     re = depth_First_Third_Last_Response;
-                }
+                } else if ( beforeContent != "keyboard" && beforeStep == '3' ) {
+                    re = {
+                        "message": 
+                            {"text": "1:1 자동응답 기능 테스트 용입니다. 좀더 다양한 기능은 추후 제공 하도록 하겠습니다.\n 처음으로 돌아가시려면 '#'을 입력하세요!"},
+                        "keyboard": 
+                            {"type":"text"}
+                        };;
+                } 
+
 
                 if(content == '취소하기') {
                     re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
@@ -652,7 +665,7 @@ console.log("rtnStr:" + rtnStr);
 
     public dbCheckHistory(content: string, user_key: string): void {
         var defered = Q.defer();
-        pool.query('select * from TB_AUTOCHAT_HISTORY where UNIQUE_ID = ? order by wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
+        pool.query('select a.*, b.step, b.trun from TB_AUTOCHAT_HISTORY as a, TB_AUTOCHAT_SCENARIO as b where a.UNIQUE_ID = ? and b.REQ_MESSAGE = a.MESSAGE order by a.wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
         return defered.promise;
     }
 
