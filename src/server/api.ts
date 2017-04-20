@@ -378,13 +378,24 @@ class ApiServer {
         var updateType;
         var beforeContent;
         var beforeStep;
+        var nowStep;
 
         if (content == "#") content = "keyboard";
 
         Q.all([this.dbSelectScenario(content),this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key),this.dbBeforeSelectScenario(content, user_key)]).then(function(results){
             //console.log("results:" + JSON.stringify(results));
-            if( results[0][0][0] != null )
+            if( results[0][0][0] != null ) {
                 re = results[0][0][0].RES_MESSAGE;
+                nowStep = results[0][0][0].STEP;
+                if( nowStep != '1' ) {
+                    var msg = JSON.parse(re);
+                    if( msg.keyboard.buttons.length > 0 ) {
+                        msg.keyboard.buttons.push("처음으로");
+                        console.log(msg.keyboard.buttons);
+                        re = JSON.stringify(msg);
+                    }
+                }
+            }
             else re = null;
             
             if( results[1][0][0] != null ) {
@@ -445,9 +456,9 @@ class ApiServer {
         }).then(function() {
 
             if (re == null) {
-console.log("beforeContent:" + beforeContent);
-console.log("beforeStep:" + beforeStep);
-console.log("rtnStr:" + rtnStr);
+// console.log("beforeContent:" + beforeContent);
+// console.log("beforeStep:" + beforeStep);
+// console.log("rtnStr:" + rtnStr);
 /* 답변 처리에 대한 로직이 추가 되어야 한다. */
                 // if (beforeContent == "주문 조회") {
                 //     re = depth_First_Second_First_Response;
@@ -494,7 +505,9 @@ console.log("rtnStr:" + rtnStr);
                     re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
                 } else if(content == '#') {
                     re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
-                } 
+                } else if(content == '처음으로') {
+                    re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": depth_First};
+                }
                     
                 if(re == null ) {
                     re = beforeRe;
@@ -502,7 +515,7 @@ console.log("rtnStr:" + rtnStr);
             }
         })
         .then(function() {
-            console.log("out re:" + JSON.stringify(re)); 
+            //console.log("out re:" + JSON.stringify(re)); 
             callback(null, re);
         })
         .done();
