@@ -6,6 +6,7 @@ import * as socketIo from "socket.io";
 import * as mongoose from "mongoose";
 
 import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
+import { DatabaseService } from "../app/shared";
 
 declare var process, __dirname;
 
@@ -16,6 +17,7 @@ class Server {
     private mongo: any;
     private root: string;
     private port: number;
+    public databaseService: DatabaseService;
 
     // Bootstrap the application.
     public static bootstrap(): Server {
