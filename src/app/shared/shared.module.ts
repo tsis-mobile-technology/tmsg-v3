@@ -6,6 +6,7 @@ import { SocketService } from "./socket.service";
 import { UserService } from "./user.service";
 import { UserSocketService } from "./user-socket.service";
 import { MyHttpService } from "./myhttp.service";
+import { DatabaseService } from "./database.service";
 
 @NgModule({
     declarations: [
@@ -16,7 +17,8 @@ import { MyHttpService } from "./myhttp.service";
         UserService,
         SocketService,
         UserSocketService,
-        MyHttpService
+        MyHttpService,
+        DatabaseService
     ],
     exports: [
         OrderByPipe
