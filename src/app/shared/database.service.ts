@@ -1,5 +1,7 @@
 import { Injectable } from "@angular/core";
 
+import { ICR_Counselor } from "../../models";
+
 @Injectable()
 export class DatabaseService {
 

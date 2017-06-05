@@ -1,0 +1,137 @@
+
+export interface ICR_Counselor {
+	SEQ: number;
+	UNIQUE_ID: string;
+	NAME: string;
+	PHONE: string;
+	TYPE: string;
+	PASSWORD: string;
+	WRTDATE: Date;
+	MODDATE: Date;
+	ETC1: string;
+	ETC2: string;
+	ETC3: string;
+}
+
+export interface ICR_CounselorList {
+	SEQ: number;
+	COUNSELOR_ID: string;
+	STATUS: string;
+	WRTDATE: Date;
+	MODDATE: Date;
+	ETC1: string;
+	ETC2: string;
+	ETC3: string;
+}
+
+export interface ICR_UserList {
+	SEQ: number;
+	USER_ID: string;
+	STATUS: string;
+	WRTDATE: Date;
+	MODDATE: Date;
+	ETC1: string;
+	ETC2: string;
+	ETC3: string;	
+}
+
+export interface ICR_RoomList {
+	SEQ: number;
+	USER_ID: string;
+	COUNSELOR_ID: string;
+	STATUS: string;
+	WRTDATE: Date;
+	MODDATE: Date;
+	ETC1: string;
+	ETC2: string;
+	ETC3: string;		
+}
+
+export interface ICR_ChatHistory {
+	SEQ: number;
+	ROOM_SEQ: number;
+	CHAT_SEQ: number;
+	USER_ID: string;
+	COUNSELOR_ID: string;
+	TYPE: string;
+	CONTENTS: string;
+	WRTDATE: Date;
+	ETC1: string;
+	ETC2: string;
+	ETC3: string;	
+}
+
+/*
+CREATE TABLE TB_ICR_COUNSELOR (
+  SEQ int(11) NOT NULL AUTO_INCREMENT,
+  UNIQUE_ID varchar(64) NOT NULL,
+  NAME varchar(128) DEFAULT NULL,
+  PHONE varchar(16) DEFAULT NULL,
+  TYPE varchar(10)  DEFAULT NULL,
+  PASSWORD varchar(128) DEFAULT NULL,
+  WRTDATE timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  MODDATE timestamp NULL,  
+  ETC1 varchar(64) DEFAULT NULL,
+  ETC2 varchar(64) DEFAULT NULL,
+  ETC3 varchar(64) DEFAULT NULL,
+  PRIMARY KEY (SEQ),
+  KEY TB_ICR_COUNSELOR_IDX1 (UNIQUE_ID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE TB_ICR_COUNSELOR_LIST (
+  SEQ int(11) NOT NULL AUTO_INCREMENT,
+  COUNSELOR_ID varchar(64) NOT NULL,
+  STATUS varchar(10) DEFAULT NULL,
+  WRTDATE timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  MODDATE timestamp NULL,  
+  ETC1 varchar(64) DEFAULT NULL,
+  ETC2 varchar(64) DEFAULT NULL,
+  ETC3 varchar(64) DEFAULT NULL,
+  PRIMARY KEY (SEQ),
+  KEY TB_ICR_COUNSELOR_LIST_IDX1 (COUNSELOR_ID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE TB_ICR_USER_LIST (
+  SEQ int(11) NOT NULL AUTO_INCREMENT,
+  USER_ID varchar(64) NOT NULL,
+  STATUS varchar(10) DEFAULT NULL,
+  WRTDATE timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  MODDATE timestamp NULL,  
+  ETC1 varchar(64) DEFAULT NULL,
+  ETC2 varchar(64) DEFAULT NULL,
+  ETC3 varchar(64) DEFAULT NULL,
+  PRIMARY KEY (SEQ),
+  KEY TB_ICR_USER_LIST_IDX1 (USER_ID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE TB_ICR_ROOM_LIST (
+  SEQ int(11) NOT NULL AUTO_INCREMENT,
+  USER_ID varchar(64) NOT NULL,
+  COUNSELOR_ID varchar(64) NOT NULL,
+  STATUS varchar(10) DEFAULT NULL,
+  WRTDATE timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  MODDATE timestamp NULL,  
+  ETC1 varchar(64) DEFAULT NULL,
+  ETC2 varchar(64) DEFAULT NULL,
+  ETC3 varchar(64) DEFAULT NULL,
+  PRIMARY KEY (SEQ),
+  KEY TB_ICR_ROOM_LIST_IDX1 (COUNSELOR_ID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE TB_ICR_CHAT_HISTORY (
+  SEQ int(11) NOT NULL AUTO_INCREMENT,
+  ROOM_SEQ int(11) NOT NULL,
+  CHAT_SEQ int(11) NOT NULL,
+  USER_ID varchar(64) NOT NULL,
+  COUNSELOR_ID varchar(64) NOT NULL,
+  TYPE varchar(10) DEFAULT NULL,  
+  CONTENTS varchar(2000) DEFAULT NULL,
+  WRTDATE timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ETC1 varchar(64) DEFAULT NULL,
+  ETC2 varchar(64) DEFAULT NULL,
+  ETC3 varchar(64) DEFAULT NULL,
+  PRIMARY KEY (SEQ),
+  KEY TB_ICR_CHAT_HISTORY_IDX1 (ROOM_SEQ)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+*/
