@@ -31,7 +31,7 @@ You might wish to install the prequisities with Homebrew, so here're quick guide
 You can install [Homebrew](http://brew.sh/) with this command:
 
 ```
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
 ```
 
 #### NodeJS
