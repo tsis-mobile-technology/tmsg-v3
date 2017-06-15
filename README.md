@@ -31,7 +31,10 @@ You might wish to install the prequisities with Homebrew, so here're quick guide
 You can install [Homebrew](http://brew.sh/) with this command:
 
 ```
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
+add package ubuntu> sudo apt-get install build-essential curl file git python-setuptools ruby
+add package redhat> sudo yum groupinstall 'Development Tools' && sudo yum install curl file git irb python-setuptools ruby
+
 ```
 
 #### NodeJS
