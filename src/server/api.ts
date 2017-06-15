@@ -298,7 +298,9 @@ class ApiServer {
                 });
             }
         }).then(function() {
-            if( content != "keyboard" && content != "처음으로" && content != "취소하기") {
+console.log("re:" + re);
+console.log("nowStemp:" + nowStep);   
+            if( re == null && content != "keyboard" && content != "처음으로" && content != "취소하기") {
                 if( rtnStr == null) {
                     updateType = "INS_PHONE";
                     re = customer_Info_Name;
@@ -312,6 +314,7 @@ class ApiServer {
                     updateType = "AUTH";
                     re = beforeContent; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
                 } 
+             
 console.log("beforeContent:" + beforeContent);
 console.log("beforeStep:" + beforeStep);
 console.log("rtnStr:" + JSON.stringify(rtnStr));
