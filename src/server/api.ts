@@ -58,6 +58,13 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
                             {"type":"text"}
                         };
 
+ var customer_Info_Auth_Response = {
+                        "message": 
+                            {"text": "요금조회 결과 문제가 없습니다. 다른 문의 사항이 있으시면 '#'을 입력하여주십시요."},
+                        "keyboard": 
+                            {"type":"text"}
+                        };                        
+
 declare var process, __dirname;
 
 class ApiServer {
@@ -250,6 +257,7 @@ class ApiServer {
         var beforeStep;
         var nowStep;
         var keyboardContent;
+        var nOTP;
 
         if (content == "#") content = "keyboard";
 
@@ -312,7 +320,7 @@ console.log("nowStemp:" + nowStep);
                     re = customer_Info_Auth;
                 } else if (rtnStr.PHONE != null && rtnStr.NAME != null) {
                     updateType = "AUTH";
-                    re = beforeContent; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
+                    re = customer_Info_Auth_Response; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
                 } 
              
 console.log("beforeContent:" + beforeContent);
@@ -337,9 +345,29 @@ console.log("updateType:" + updateType);
                         if(err) console.log("Query Error:", err);
                     });
                 } else if( updateType == "NAME" ) {
-                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
-                        if(err) console.log("Query Error:", err);
-                    });
+                        const spawn = require('child_process').spawn;
+                        const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+
+                        ls.stdout.on('data', (data) => {
+                            console.log(`stdout: ${data}`);
+                            nOTP = data;
+                            if( nOTP != null ) {
+                                // 1. send SMS customer phone
+                                // 2. DB Update
+                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function(err, rows, fields) {
+                                    if(err) console.log("Query Error:", err);
+                                });
+                            }
+                        });
+
+                        ls.stderr.on('data', (data) => {
+                          console.log(`stderr: ${data}`);
+                          // retry ? 
+                        });
+
+                        ls.on('close', (code) => {
+                          console.log(`child process exited with code ${code}`);
+                        });
                 } else if( updateType == "AUTH") {
                     pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
