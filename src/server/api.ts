@@ -44,6 +44,13 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
                             {"type":"text"}
                         };
 
+ var customer_Info_Auth = { 
+                        "message": 
+                            {"text": "고객님의 핸드폰번호으로 인증번호를 전달해 드렸습니다. 확인 후 입력을 부탁 드립니다. 숫자만 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
+                        "keyboard": 
+                            {"type":"text"}
+                        };
+
  var depth_First_Third_Last_Response = {
                         "message": 
                             {"text": "문의가 정상적으로 접수되었습니다. 평일 9시~18시, 빠른 시간 안에 답변 드리겠습니다.\n 취소하시려면 '#'을 입력해 주세요."},
@@ -225,9 +232,9 @@ class ApiServer {
         Q.all([this.dbSelectScenario(content)]).then(function(results){
             // console.log("results:" + JSON.stringify(results));
             re = results[0][0][0];
-            console.log("re:" + JSON.stringify(re));
-            console.log("re.RES_MESSAGE:" + JSON.stringify(re.RES_MESSAGE));
-            console.log("re.RES_MESSAGE.keyboard):" + JSON.stringify(JSON.parse(re.RES_MESSAGE).keyboard));
+            // console.log("re:" + JSON.stringify(re));
+            // console.log("re.RES_MESSAGE:" + JSON.stringify(re.RES_MESSAGE));
+            // console.log("re.RES_MESSAGE.keyboard):" + JSON.stringify(JSON.parse(re.RES_MESSAGE).keyboard));
         }).then(function() {
             callback(null, JSON.parse(re.RES_MESSAGE).keyboard);
         })
@@ -291,31 +298,46 @@ class ApiServer {
                 });
             }
         }).then(function() {
-            if( content != "keyboard") {
+            if( content != "keyboard" && content != "처음으로" && content != "취소하기") {
                 if( rtnStr == null) {
-                    updateType = "Init";
+                    updateType = "INS_PHONE";
                     re = customer_Info_Name;
-                } else if (rtnStr.NAME == null) {
-                    updateType = "Name";
-                    re = customer_Info_Phone;
-                } else if(rtnStr.PHONE == null) {
-                    updateType = "Phone";
-                }
-                
-                if( updateType == "Init" ) {
-                    var cust_post = {UNIQUE_ID:user_key};
+                } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
+                    updateType = "UPD_PHONE";
+                    re = customer_Info_Name;
+                } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
+                    updateType = "NAME";
+                    re = customer_Info_Auth;
+                } else if (rtnStr.PHONE != null && rtnStr.NAME != null) {
+                    updateType = "AUTH";
+                    re = beforeContent; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
+                } 
+console.log("beforeContent:" + beforeContent);
+console.log("beforeStep:" + beforeStep);
+console.log("rtnStr:" + JSON.stringify(rtnStr));
+console.log("content:" + content);
+console.log("updateType:" + updateType);
+
+                // if( updateType == "Init" ) {
+                //     var cust_post = {UNIQUE_ID:user_key};
+                //     pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
+                //         if(err) console.log("Query Error:", err);
+                //     });
+                // } else 
+                if( updateType == "INS_PHONE" ) {
+                    var cust_post = {UNIQUE_ID:user_key, PHONE:content};
                     pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
                     });
-                } else if( updateType == "Name" ) {
-                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+                } else if( updateType == "UPD_PHONE" ) {
+                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
                     });
-                } else if( updateType == "Phone" ) {
-                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "Y", user_key], function(err, rows, fields) {
+                } else if( updateType == "NAME" ) {
+                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
                     });
-                } else if( updateType == "Auth") {
+                } else if( updateType == "AUTH") {
                     pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
                     });
@@ -324,9 +346,9 @@ class ApiServer {
         }).then(function() {
 
             if (re == null) {
-console.log("beforeContent:" + beforeContent);
-console.log("beforeStep:" + beforeStep);
-console.log("rtnStr:" + rtnStr);
+// console.log("beforeContent:" + beforeContent);
+// console.log("beforeStep:" + beforeStep);
+// console.log("rtnStr:" + rtnStr);
 /* 답변 처리에 대한 로직이 추가 되어야 한다. */
                 // if (beforeContent == "주문 조회") {
                 //     re = depth_First_Second_First_Response;

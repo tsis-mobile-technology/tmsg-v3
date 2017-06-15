@@ -4,6 +4,9 @@
 #include <time.h>
 const char table[] = {"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"};
 #define BASE    62
+const char table_number[] = {"0123456789"};
+#define BASE_NUM    10
+#define MAX_NUM 6
 
 int strpos(const char *s, int c)
 {
@@ -25,6 +28,17 @@ void toBase62(long id, char *pBase62)
     } while ((id = id / BASE));
 }
 
+void toBaseNum10(long id, char *pBaseNum10)
+{
+    int i = 0;
+
+    do {
+        int mod = id % BASE_NUM;
+        pBaseNum10[i] = table_number[mod];
+        i++;
+    } while ((id = id / BASE_NUM));
+}
+
 long fromBase62(char *pBase62)
 {
     long dec = 0;
@@ -36,6 +50,22 @@ long fromBase62(char *pBase62)
         pos = strpos(table, pBase62[i]);
         dec += pos * mul;
         mul *= BASE;
+    }
+
+    return dec;
+}
+
+long fromBaseNum10(char *pBaseNum10)
+{
+    long dec = 0;
+    long mul = 1;
+    int pos = 0;
+
+    for(int i = 0; i < strlen(pBaseNum10); i++)
+    {
+        pos = strpos(table_number, pBaseNum10[i]);
+        dec += pos * mul;
+        mul *= BASE_NUM;
     }
 
     return dec;
@@ -79,6 +109,23 @@ int shorturl_plus_localtime (int argc, const char * argv[])
     return 0;
 }
 
+int shorturl_number_plus_localtime (int argc, const char * argv[])
+{
+    char szBase10[7] = {0x00,};
+    long dec = 0;
+    long timeInput = 0;
+    char state1[32];
+
+    initstate( time(NULL), state1, sizeof(state1));
+    setstate(state1);
+    timeInput = getTime();
+    toBaseNum10(random()%99999, szBase10);
+    dec = fromBaseNum10(szBase10);
+   
+    fprintf(stdout, "%s", szBase10);
+    return 0;
+}
+
 int shorturl (int argc, const char * argv[])
 {
     char szBase62[16] = {0x00,};
@@ -115,8 +162,12 @@ int fulltest (int argc, const char * argv[])
 
 int main (int argc, const char * argv[])
 {
-    if( argc > 1 ) {
+    if( argc == 2 ) {
         shorturl_plus_localtime(argc, argv);
+        /*shorturl(argc, argv); */
+    }
+    else if( argc == 1 ) {
+        shorturl_number_plus_localtime(argc, argv);
         /*shorturl(argc, argv); */
     }
     else {
