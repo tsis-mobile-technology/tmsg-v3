@@ -354,6 +354,18 @@ class ApiServer {
                     console.log('Error while performing Query.', err);
                     });
                     re = depth_First_Third_Last_Response;
+                } else if (beforeContent == "문의하기") {
+                    /*
+                    등록한 사진을 어디론가 옮기고 이력저장하고 
+                    */
+                    var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
+                    console.log("db values:" + JSON.stringify(post));
+
+                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                    if (err)
+                    console.log('Error while performing Query.', err);
+                    });
+                    re = depth_First_Third_Last_Response;
                 } else if ( beforeContent != "keyboard" && beforeStep == '3' ) {
                     re = {
                         "message": 
