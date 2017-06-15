@@ -225,9 +225,9 @@ class ApiServer {
         Q.all([this.dbSelectScenario(content)]).then(function(results){
             // console.log("results:" + JSON.stringify(results));
             re = results[0][0][0];
-            // console.log("re:" + JSON.stringify(re));
-            // console.log("re.RES_MESSAGE:" + JSON.stringify(re.RES_MESSAGE));
-            // console.log("re.RES_MESSAGE.keyboard):" + JSON.stringify(JSON.parse(re.RES_MESSAGE).keyboard));
+            console.log("re:" + JSON.stringify(re));
+            console.log("re.RES_MESSAGE:" + JSON.stringify(re.RES_MESSAGE));
+            console.log("re.RES_MESSAGE.keyboard):" + JSON.stringify(JSON.parse(re.RES_MESSAGE).keyboard));
         }).then(function() {
             callback(null, JSON.parse(re.RES_MESSAGE).keyboard);
         })
@@ -242,10 +242,11 @@ class ApiServer {
         var beforeContent;
         var beforeStep;
         var nowStep;
+        var keyboardContent;
 
         if (content == "#") content = "keyboard";
 
-        Q.all([this.dbSelectScenario(content),this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key),this.dbBeforeSelectScenario(content, user_key)]).then(function(results){
+        Q.all([this.dbSelectScenario(content),this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key),this.dbBeforeSelectScenario(content, user_key),this.dbSelectScenario("keyboard")]).then(function(results){
             //console.log("results:" + JSON.stringify(results));
             if( results[0][0][0] != null ) {
                 re = results[0][0][0].RES_MESSAGE;
@@ -274,6 +275,10 @@ class ApiServer {
             if( results[3][0][0] != null )
                 beforeRe = results[3][0][0].RES_MESSAGE;
             else beforeRe = null;
+
+            if( results[4][0][0] != null )
+                keyboardContent = JSON.parse(results[4][0][0].RES_MESSAGE).keyboard;
+            else keyboardContent = null;
         }).then(function() {
             // this.dbSaveHistory(content, user_key, type);
             if( re != null ) {
@@ -319,9 +324,9 @@ class ApiServer {
         }).then(function() {
 
             if (re == null) {
-// console.log("beforeContent:" + beforeContent);
-// console.log("beforeStep:" + beforeStep);
-// console.log("rtnStr:" + rtnStr);
+console.log("beforeContent:" + beforeContent);
+console.log("beforeStep:" + beforeStep);
+console.log("rtnStr:" + rtnStr);
 /* 답변 처리에 대한 로직이 추가 되어야 한다. */
                 // if (beforeContent == "주문 조회") {
                 //     re = depth_First_Second_First_Response;
@@ -376,34 +381,9 @@ class ApiServer {
                 } 
                 var depth_First;
 
-                if(content == '취소하기') {
-                    re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": this.getKeyboardResponse("keyboard", function(err, data) {
-                                                                                        if(err) {
-                                                                                            console.log('응답 에러');
-                                                                                        } else {
-                                                                                            depth_First = data;
-                                                                                        }
-                                                                                    })
-                    };
-                } else if(content == '#') {
-                    re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": this.getKeyboardResponse("keyboard", function(err, data) {
-                                                                                        if(err) {
-                                                                                            console.log('응답 에러');
-                                                                                        } else {
-                                                                                            depth_First = data;
-                                                                                        }
-                                                                                    })
-                    };
-                } else if(content == '처음으로') {
-                    re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": this.getKeyboardResponse("keyboard", function(err, data) {
-                                                                                        if(err) {
-                                                                                            console.log('응답 에러');
-                                                                                        } else {
-                                                                                            depth_First = data;
-                                                                                        }
-                                                                                    })
-                    };
-                }
+                if(content == '취소하기' || content == '#' || content == '처음으로') {
+                    re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": keyboardContent};
+                } 
                     
                 if(re == null ) {
                     re = beforeRe;
