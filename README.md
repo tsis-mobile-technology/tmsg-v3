@@ -32,8 +32,9 @@ You can install [Homebrew](http://brew.sh/) with this command:
 
 ```
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
-add package ubuntu> sudo apt-get install build-essential curl file git python-setuptools ruby
-add package redhat> sudo yum groupinstall 'Development Tools' && sudo yum install curl file git irb python-setuptools ruby
+
+add package ubuntu> sudo apt-get install ruby
+add package redhat> sudo yum nstall ruby
 
 ```
 
