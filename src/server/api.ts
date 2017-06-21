@@ -10,14 +10,8 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 
  var Q          = require("q");
  var mysql      = require('mysql');
- var connection = mysql.createConnection({
-  host     : '14.63.213.246',
-  user     : 'smarttest',
-  password : 'test1234',
-  port     : 10003,
-  database : 'SMART_MESSAGE_VERTWO'
-});
 
+// open test
  var pool = mysql.createPool({
     connectionLimit: 10, //important
     host     : '14.63.213.246',
@@ -27,6 +21,14 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
     database : 'SMART_MESSAGE_VERTWO',
     debug: false
 });
+
+// var connection = mysql.createConnection({
+//   host     : '14.63.213.246',
+//   user     : 'smarttest',
+//   password : 'test1234',
+//   port     : 10003,
+//   database : 'SMART_MESSAGE_VERTWO'
+// });
 
  var bodyParser = require('body-parser');
 
@@ -142,25 +144,18 @@ class ApiServer {
         this.kakao_app.get('/keyboard', (request: express.Request, result: express.Response, next: express.NextFunction) => {
             var re;
             var content = "keyboard";
-            // try {
-            //     re = depth_First;
-            // } catch (exception) {
-            //     console.log('키보드 에러');
-            // } finally {
-            //     //re.data = result;
-            //     result.status(200).send(re);
-            // }
             try {
                 this.getKeyboardResponse(content, function(err, data) {
                     if(err) {
-                        console.log('응답 에러');
+                        console.log('keyboard:응답 에러');
                     } else {
                         re = data;
                         result.status(200).send(re);
+                        console.log('keyboard:응답 성공');
                     }
                 });
             } catch (exception) {
-                console.log('응답 에러');
+                console.log('keyboard:응답 에러');
             }
 
         });
@@ -176,15 +171,16 @@ class ApiServer {
             try {
                 this.getMessageResponse(content, user_key, type, function(err, data) {
                     if(err) {
-                        console.log('응답 에러');
+                        console.log('message:응답 에러');
                     } else {
                         re = data;
-                        console.log("response:" + JSON.stringify(re));
+                        // console.log("response:" + JSON.stringify(re));
                         result.status(200).send(re);
+                        console.log('message:응답 성공');
                     }
                 });
             } catch (exception) {
-                console.log('응답 에러');
+                console.log('message:응답 에러');
             }
         });
 
@@ -197,9 +193,10 @@ class ApiServer {
             try {
                 re = {text:'param : ' + user_key};
             } catch (exception) {
-                console.log('키보드 에러');
+                console.log('friend:응답 에러');
             } finally {
                 result.status(200).send(re);
+                console.log('friend:응답 성공');
             }
         });
 
@@ -212,9 +209,10 @@ class ApiServer {
             try {
                 re = {text:'param : ' + user_key};
             } catch (exception) {
-                console.log('키보드 에러');
+                console.log('friend del:응답 에러');
             } finally {
                 result.status(200).send(re);
+                console.log('friend del:응답 성공');
             }
         });
 
@@ -227,9 +225,10 @@ class ApiServer {
             try {
                 re = {text:'param : ' + user_key};
             } catch (exception) {
-                console.log('키보드 에러');
+                console.log('chat_room del:응답 에러');
             } finally {
                 result.status(200).send(re);
+                console.log('chat_room del:응답 성공');
             }
         });
     }
@@ -585,13 +584,13 @@ console.log("updateType:" + updateType);
         return defered.promise;
     }
 
-    public dbConnection(): void {
-        connection.connect();
-    }
+    // public dbConnection(): void {
+    //     connection.connect();
+    // }
 
-    public dbRelease(): void {
-        connection.end();
-    }
+    // public dbRelease(): void {
+    //     connection.end();
+    // }
 }
 
 // Bootstrap the server
