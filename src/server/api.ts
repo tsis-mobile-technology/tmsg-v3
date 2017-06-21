@@ -32,7 +32,7 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 // });
 
 const mtURL = "http://125.132.2.120:30063";
-const mtMessage = '<?xml version="1.0" encoding="EUC-KR"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>TESTMSG</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>01089704538</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1005</IDSO></REQUEST>';
+const mtMessage: string = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>TESTMSG</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>01089704538</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1005</IDSO></REQUEST>";
 
 // const mtOptions: SocketIOClient.ConnectOpts = {
 //     forceNew: true,
@@ -276,7 +276,7 @@ class ApiServer {
                 nowStep = results[0][0][0].STEP;
                 if( nowStep != '1' ) {
                     var msg = JSON.parse(re);
-                    if( msg.keyboard.buttons.length > 0 ) {
+                    if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
                         msg.keyboard.buttons.push("처음으로");
                         console.log(msg.keyboard.buttons);
                         re = JSON.stringify(msg);
@@ -363,9 +363,10 @@ class ApiServer {
                                 // 1. send SMS customer phone
                                 // 2. DB Update
                                 // const client = socketIoClient.connect(mtURL, options);
+                                var sendData = this.zeroLeftPad(mtMessage.length, 5) + mtMessage;
                                 var socketClient = socketIoClient(mtURL);
                                 socketClient.on('connect', function() {});
-                                socketClient.on('connect', function() {this.zeroLeftPad(mtMessage.length, 5) + mtMessage});
+                                socketClient.on('event', function(sendData) {});
                                 socketClient.on('disconnect', function() {});
 
                                 pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function(err, rows, fields) {
