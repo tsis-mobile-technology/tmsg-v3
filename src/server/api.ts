@@ -4,6 +4,7 @@ import * as http from "http";
 import * as serveStatic from "serve-static";
 import * as path from "path";
 import * as socketIo from "socket.io";
+import * as socketIoClient from "socket.io-client";
 // import * as mongoose from "mongoose";
 
 import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
@@ -29,6 +30,14 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 //   port     : 10003,
 //   database : 'SMART_MESSAGE_VERTWO'
 // });
+
+const mtURL = "http://125.132.2.120:30063";
+const mtMessage = '<?xml version="1.0" encoding="EUC-KR"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>TESTMSG</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>01089704538</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1005</IDSO></REQUEST>';
+
+// const mtOptions: SocketIOClient.ConnectOpts = {
+//     forceNew: true,
+//     transports: ["websocket"]
+// };
 
  var bodyParser = require('body-parser');
 
@@ -305,8 +314,8 @@ class ApiServer {
                 });
             }
         }).then(function() {
-console.log("re:" + re);
-console.log("nowStemp:" + nowStep);   
+// console.log("re:" + re);
+// console.log("nowStemp:" + nowStep);   
             if( re == null && content != "keyboard" && content != "처음으로" && content != "취소하기") {
                 if( rtnStr == null) {
                     updateType = "INS_PHONE";
@@ -322,11 +331,11 @@ console.log("nowStemp:" + nowStep);
                     re = customer_Info_Auth_Response; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
                 } 
              
-console.log("beforeContent:" + beforeContent);
-console.log("beforeStep:" + beforeStep);
-console.log("rtnStr:" + JSON.stringify(rtnStr));
-console.log("content:" + content);
-console.log("updateType:" + updateType);
+// console.log("beforeContent:" + beforeContent);
+// console.log("beforeStep:" + beforeStep);
+// console.log("rtnStr:" + JSON.stringify(rtnStr));
+// console.log("content:" + content);
+// console.log("updateType:" + updateType);
 
                 // if( updateType == "Init" ) {
                 //     var cust_post = {UNIQUE_ID:user_key};
@@ -353,6 +362,12 @@ console.log("updateType:" + updateType);
                             if( nOTP != null ) {
                                 // 1. send SMS customer phone
                                 // 2. DB Update
+                                // const client = socketIoClient.connect(mtURL, options);
+                                var socketClient = socketIoClient(mtURL);
+                                socketClient.on('connect', function() {});
+                                socketClient.on('connect', function() {this.zeroLeftPad(mtMessage.length, 5) + mtMessage});
+                                socketClient.on('disconnect', function() {});
+
                                 pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function(err, rows, fields) {
                                     if(err) console.log("Query Error:", err);
                                 });
@@ -467,6 +482,12 @@ console.log("updateType:" + updateType);
 
         let kakaoSocket = new KakaoSocket(this.kakao_io);
    }
+
+    private zeroLeftPad(num:number, size:number): string {
+        var s = num+"";
+        while (s.length < size) s = "0" + s;
+        return s;
+    }
 
     // Start HTTP server listening
     private kakaoListen(): void {
