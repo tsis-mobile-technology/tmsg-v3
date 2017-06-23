@@ -4,21 +4,20 @@ import * as http from "http";
 import * as serveStatic from "serve-static";
 import * as path from "path";
 import * as socketIo from "socket.io";
-import * as socketIoClient from "socket.io-client";
 // import * as mongoose from "mongoose";
 
 import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 
- var Q          = require("q");
- var mysql      = require('mysql');
+ var Q      = require("q");
+ var mysql  = require('mysql');
 
 // open test
  var pool = mysql.createPool({
     connectionLimit: 10, //important
-    host     : '14.63.213.246',
-    user     : 'smarttest',
-    password : 'test1234',
-    port     : 10003,
+    host     : 'localhost',
+    user     : 'icr',
+    password : '1q2w3e4r',
+    port     : 3306,
     database : 'SMART_MESSAGE_VERTWO',
     debug: false
 });
@@ -31,9 +30,10 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 //   database : 'SMART_MESSAGE_VERTWO'
 // });
 
-const mtURL = "http://125.132.2.120:30063";
-const mtMessage: string = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>TESTMSG</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>01089704538</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1005</IDSO></REQUEST>";
-
+// const mtURL = "http://125.132.2.120:30063";
+const mtURL = "http://localhost:2581";
+const mtIP = "localhost";
+const mtPort = 22;
 // const mtOptions: SocketIOClient.ConnectOpts = {
 //     forceNew: true,
 //     transports: ["websocket"]
@@ -333,7 +333,7 @@ class ApiServer {
              
 // console.log("beforeContent:" + beforeContent);
 // console.log("beforeStep:" + beforeStep);
-// console.log("rtnStr:" + JSON.stringify(rtnStr));
+console.log("rtnStr:" + JSON.stringify(rtnStr));
 // console.log("content:" + content);
 // console.log("updateType:" + updateType);
 
@@ -354,8 +354,8 @@ class ApiServer {
                     });
                 } else if( updateType == "NAME" ) {
                         const spawn = require('child_process').spawn;
-                        //const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
-                        const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+                        const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+                        //const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
 
                         ls.stdout.on('data', (data) => {
                             console.log(`stdout: ${data}`);
@@ -365,17 +365,39 @@ class ApiServer {
                                 // 2. DB Update
                                 // const client = socketIoClient.connect(mtURL, options);
 
-                                var messageSize = mtMessage.length+"";
+                                // var messageSize = mtMessage.length+"";
+                                var sendMessage = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>" + nOTP + "</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>" + rtnStr.PHONE + "</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1000</IDSO></REQUEST>";
+                                var messageSize = sendMessage.length + "";
                                 while (messageSize.length < 5) messageSize = "0" + messageSize;
 
-                                var sendData = messageSize + mtMessage;
-                                var socketClient = socketIoClient(mtURL);
-                                socketClient.connect();
-                                socketClient.send(sendData);
-                                socketClient.disconnect();
+                                var sendData = messageSize + sendMessage;
+var net = require('net');
 
+var client = new net.Socket();
+client.connect(mtPort, mtIP, function() {
+    console.log('CONNECTED TO: ' + mtIP + ':' + mtPort);
+    // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
+    client.write(sendData);
+});
+
+// Add a 'data' event handler for the client socket
+// data is what the server sent to this socket
+client.on('data', function(data) {
+    
+    console.log('DATA: ' + data);
+    // Close the client socket completely
+    client.destroy();
+    
+});
+
+// Add a 'close' event handler for the client socket
+client.on('close', function() {
+    console.log('Connection closed');
+});
+                                
+                                // var socketClient = ws.client;
                                 // socketClient.on('connect', function() {});
-                                // socketClient.on('event', function(sendData) {});
+                                // socketClient.on('event', function(sendData) {socketClient.send(sendData)});
                                 // socketClient.on('disconnect', function() {});
 
                                 pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function(err, rows, fields) {
