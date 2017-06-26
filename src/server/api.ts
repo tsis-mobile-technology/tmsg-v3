@@ -6,7 +6,7 @@ import * as path from "path";
 import * as socketIo from "socket.io";
 // import * as mongoose from "mongoose";
 
-import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
+import { KakaoSocket } from "./socket";
 
 var Q      = require("q");
 var mysql  = require('mysql');
@@ -330,7 +330,7 @@ class ApiServer {
 
             if (results[5][0][0] != null) {
                 console.log(">>>" + JSON.stringify(results[5][0]));
-                systemContent = JSON.stringify(results[5][0]);
+                systemContent = results[5][0];
             }
             else
                 systemContent = null;
@@ -355,16 +355,25 @@ class ApiServer {
                 } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
                     updateType = "UPD_PHONE";
                     re = customer_Info_Name;
+                    let kakaoSocket = new KakaoSocket(systemContent);
+                    kakaoSocket.findXml("PHONE");
                     console.log(">>>>>>>>>>>:" + JSON.stringify(systemContent.filter(function (item) { return item.REQ_MESSAGE === "PHONE"; })));
                 } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
                     updateType = "NAME";
                     re = customer_Info_Auth;
+                    let kakaoSocket = new KakaoSocket(systemContent);
+                    kakaoSocket.findXml("NAME");
                     console.log(">>>>>>>>>>>:" + JSON.stringify(systemContent.filter(function (item) { return item.REQ_MESSAGE === "NAME"; })));
                 } else if (rtnStr.PHONE != null && rtnStr.NAME != null) {
                     updateType = "AUTH";
-                    console.log(">>>>>>>>>>>:" + JSON.stringify(systemContent.filter(function (item) { return item.REQ_MESSAGE === "AUTH"; })));
                     re = customer_Info_Auth_Response; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
-                } 
+                    let kakaoSocket = new KakaoSocket(systemContent);
+                    kakaoSocket.findXml("AUTH");
+                    console.log(">>>>>>>>>>>:" + JSON.stringify(systemContent.filter(function (item) { return item.REQ_MESSAGE === "AUTH"; })));
+                } else {
+                    let kakaoSocket = new KakaoSocket(systemContent);
+                    kakaoSocket.findXml("AUTH");
+                }
              
 // console.log("beforeContent:" + beforeContent);
 // console.log("beforeStep:" + beforeStep);
@@ -389,8 +398,8 @@ console.log("rtnStr:" + JSON.stringify(rtnStr));
                     });
                 } else if( updateType == "NAME" ) {
                         const spawn = require('child_process').spawn;
-                        // const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
-                        const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+                        const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+                        // const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
 
                         ls.stdout.on('data', (data) => {
                             console.log(`stdout: ${data}`);

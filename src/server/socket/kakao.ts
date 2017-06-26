@@ -1,53 +1,28 @@
-import { IUser, User } from "../../models";
+
+export class TB_AUTOCHAT_SCENARIO {
+    SEQ: number;
+    STEP: number;
+    TRUN: number;
+    REQ_MESSAGE: string;
+    RES_MESSAGE: string;
+    WRTDATa: Date;
+    ETC1: string;
+    ETC2: string;
+    ETC3: string;
+};
 
 export class KakaoSocket {
-    nsp: any;
-    name: string;
-    data: any;
-    socket: any;
-    users: any = {};
+    public inputData: TB_AUTOCHAT_SCENARIO[];
 
     constructor(private io: any) {
-        console.log("KakaoSocket constructor");
-        // this.nsp = this.io.of("/");
-        // this.nsp.on("connection", (socket: any) => {
-        //     console.log("Client connected");
-        //     this.socket = socket;
-        //     this.listen();
-        // });
-        this.nsp = this.io.of("/keyboard");
-        this.nsp.on("connection", (socket: any) => {
-            console.log("Client keyboard connected");
-            this.socket = socket;
-            this.listen();
-        });
+        console.log("KakaoSocket constructor: " + io);
+        this.inputData = io;
     }
 
     // Add signal
-    private listen(): void {
-        console.log("KakaoSocket listen");
-        this.socket.on("disconnect", () => this.disconnect());
-        this.socket.on("chat message", (content: string) => this.chat(content))
-        // this.socket.on("keyboard", () => this.keyboard());
-    }
-
-    // Handel keyboard
-    private keyboard(): void {
-        console.log("KakaoSocket listen");
-        let result: any = {type:'text1'};
-
-        this.socket.emit("keyboard", result);
-    }
-
-    //chat ....
-    private chat(content: string): void {
-        console.log("KakaoSocket chat:" + content);
-        this.socket.emit("chat message", "text:" + content);
-    }
-
-    // Handle disconnect
-    private disconnect(): void {
-        console.log("RoomSocket disconnect");
-        console.log("Client disconnected");
+    public findXml(tagName: string): void {
+        console.log("findXml call:" + tagName);
+        
+        this.inputData.filter(function (item) { return item.REQ_MESSAGE === tagName; });
     }
 }
