@@ -8,17 +8,39 @@ import * as socketIo from "socket.io";
 
 import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 
- var Q      = require("q");
- var mysql  = require('mysql');
+var Q      = require("q");
+var mysql  = require('mysql');
+var net = require('net');
+var fastXmlParser = require('fast-xml-parser');
+var options = {
+    attrPrefix: "@_",
+    textNodeName: "#text",
+    ignoreNonTextNodeAttr: true,
+    ignoreTextNodeAttr: true,
+    ignoreNameSpace: true,
+    textNodeConversion: true
+};
 
 // open test
- var pool = mysql.createPool({
-    connectionLimit: 10, //important
-    host     : 'localhost',
-    user     : 'icr',
-    password : '1q2w3e4r',
-    port     : 3306,
-    database : 'SMART_MESSAGE_VERTWO',
+//  var pool = mysql.createPool({
+//     connectionLimit: 10, //important
+//     host     : 'localhost',
+//     user     : 'icr',
+//     password : '1q2w3e4r',
+//     port     : 3306,
+//     database : 'SMART_MESSAGE_VERTWO',
+//     debug: false
+// });
+// const mtURL = "http://localhost:2581";
+// const mtIP = "localhost";
+// const mtPort = 22;
+var pool = mysql.createPool({
+    connectionLimit: 2,
+    host: '14.63.213.246',
+    user: 'smarttest',
+    password: 'test1234',
+    port: 10003,
+    database: 'SMART_MESSAGE_VERTWO',
     debug: false
 });
 
@@ -30,10 +52,12 @@ import { RoomSocket, UserSocket, KakaoSocket } from "./socket";
 //   database : 'SMART_MESSAGE_VERTWO'
 // });
 
-// const mtURL = "http://125.132.2.120:30063";
-const mtURL = "http://localhost:2581";
-const mtIP = "localhost";
-const mtPort = 22;
+// const mtURL = "http://localhost:2581";
+// const mtIP = "localhost";
+// const mtPort = 22;
+var mtURL = "http://125.132.2.120:30063";
+var mtIP = "125.132.2.120";
+var mtPort = 30063;
 // const mtOptions: SocketIOClient.ConnectOpts = {
 //     forceNew: true,
 //     transports: ["websocket"]
@@ -265,11 +289,12 @@ class ApiServer {
         var beforeStep;
         var nowStep;
         var keyboardContent;
+        var systemContent;
         var nOTP;
 
         if (content == "#") content = "keyboard";
 
-        Q.all([this.dbSelectScenario(content),this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key),this.dbBeforeSelectScenario(content, user_key),this.dbSelectScenario("keyboard")]).then(function(results){
+        Q.all([this.dbSelectScenario(content),this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key),this.dbBeforeSelectScenario(content, user_key),this.dbSelectScenario("keyboard"),this.dbSelectScenarioSystem("system")]).then(function(results){
             //console.log("results:" + JSON.stringify(results));
             if( results[0][0][0] != null ) {
                 re = results[0][0][0].RES_MESSAGE;
@@ -302,6 +327,13 @@ class ApiServer {
             if( results[4][0][0] != null )
                 keyboardContent = JSON.parse(results[4][0][0].RES_MESSAGE).keyboard;
             else keyboardContent = null;
+
+            if (results[5][0][0] != null) {
+                console.log(">>>" + JSON.stringify(results[5][0]));
+                systemContent = JSON.stringify(results[5][0]);
+            }
+            else
+                systemContent = null;
         }).then(function() {
             // this.dbSaveHistory(content, user_key, type);
             if( re != null ) {
@@ -323,11 +355,14 @@ class ApiServer {
                 } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
                     updateType = "UPD_PHONE";
                     re = customer_Info_Name;
+                    console.log(">>>>>>>>>>>:" + JSON.stringify(systemContent.filter(function (item) { return item.REQ_MESSAGE === "PHONE"; })));
                 } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
                     updateType = "NAME";
                     re = customer_Info_Auth;
+                    console.log(">>>>>>>>>>>:" + JSON.stringify(systemContent.filter(function (item) { return item.REQ_MESSAGE === "NAME"; })));
                 } else if (rtnStr.PHONE != null && rtnStr.NAME != null) {
                     updateType = "AUTH";
+                    console.log(">>>>>>>>>>>:" + JSON.stringify(systemContent.filter(function (item) { return item.REQ_MESSAGE === "AUTH"; })));
                     re = customer_Info_Auth_Response; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
                 } 
              
@@ -354,8 +389,8 @@ console.log("rtnStr:" + JSON.stringify(rtnStr));
                     });
                 } else if( updateType == "NAME" ) {
                         const spawn = require('child_process').spawn;
-                        const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
-                        //const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+                        // const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+                        const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
 
                         ls.stdout.on('data', (data) => {
                             console.log(`stdout: ${data}`);
@@ -371,37 +406,39 @@ console.log("rtnStr:" + JSON.stringify(rtnStr));
                                 while (messageSize.length < 5) messageSize = "0" + messageSize;
 
                                 var sendData = messageSize + sendMessage;
-var net = require('net');
-
-var client = new net.Socket();
-client.connect(mtPort, mtIP, function() {
-    console.log('CONNECTED TO: ' + mtIP + ':' + mtPort);
-    // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
-    client.write(sendData);
-});
-
-// Add a 'data' event handler for the client socket
-// data is what the server sent to this socket
-client.on('data', function(data) {
-    
-    console.log('DATA: ' + data);
-    // Close the client socket completely
-    client.destroy();
-    
-});
-
-// Add a 'close' event handler for the client socket
-client.on('close', function() {
-    console.log('Connection closed');
-});
                                 
-                                // var socketClient = ws.client;
-                                // socketClient.on('connect', function() {});
-                                // socketClient.on('event', function(sendData) {socketClient.send(sendData)});
-                                // socketClient.on('disconnect', function() {});
-
-                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function(err, rows, fields) {
-                                    if(err) console.log("Query Error:", err);
+                                var client = new net.Socket();
+                                client.connect(mtPort, mtIP, function () {
+                                    console.log('CONNECTED TO: ' + mtIP + ':' + mtPort);
+                                    // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
+                                    client.write(sendData);
+                                });
+                                // Add a 'data' event handler for the client socket
+                                // data is what the server sent to this socket
+                                client.on('data', function (data) {
+                                    console.log("data:" + data);
+                                    var str = data;
+                                    // Close the client socket completely
+                                    var res = new String(str.slice(5));
+                                    // res = res.replace(/\\r\\n/g, "");
+                                    if (fastXmlParser.validate(res) === true) {
+                                        var jsonObj = fastXmlParser.parse(res, options);
+                                        var resultObj = JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG;
+                                        // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
+                                        // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
+                                        // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
+                                        if (resultObj == "SUCCESS") {
+                                            pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function (err, rows, fields) {
+                                                if (err)
+                                                    console.log("Query Error:", err);
+                                            });
+                                        }
+                                    }
+                                    client.destroy();
+                                });
+                                // Add a 'close' event handler for the client socket
+                                client.on('close', function () {
+                                    console.log('Connection closed');
                                 });
                             }
                         });
@@ -615,6 +652,13 @@ client.on('close', function() {
         var defered = Q.defer();
         // console.log("content:" + content);
         pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
+        return defered.promise;
+    }
+
+    private dbSelectScenarioSystem(content: string): void {
+        var defered = Q.defer();
+        // console.log("content:" + content);
+        pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE ETC2 = ?', content, defered.makeNodeResolver());
         return defered.promise;
     }
 
