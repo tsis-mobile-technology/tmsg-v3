@@ -329,7 +329,6 @@ class ApiServer {
             else keyboardContent = null;
 
             if (results[5][0][0] != null) {
-                console.log(">>>" + JSON.stringify(results[5][0]));
                 systemContent = results[5][0];
             }
             else
@@ -346,35 +345,44 @@ class ApiServer {
                 });
             }
         }).then(function() {
-// console.log("re:" + re);
-// console.log("nowStemp:" + nowStep);   
+  
             if( re == null && content != "keyboard" && content != "처음으로" && content != "취소하기") {
                 if( rtnStr == null) {
                     updateType = "INS_PHONE";
-                    re = customer_Info_Name;
+                    // re = customer_Info_Name;
+                    let kakaoSocket = new KakaoSocket(systemContent);
+                    re = kakaoSocket.findXml("PHONE");
                 } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
                     updateType = "UPD_PHONE";
-                    re = customer_Info_Name;
+                    // re = customer_Info_Name;
                     let kakaoSocket = new KakaoSocket(systemContent);
-                    kakaoSocket.findXml("PHONE");
-                    console.log(">>>>>>>>>>>:" + JSON.stringify(systemContent.filter(function (item) { return item.REQ_MESSAGE === "PHONE"; })));
+                    re = kakaoSocket.findXml("NAME");
                 } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
                     updateType = "NAME";
-                    re = customer_Info_Auth;
+                    // re = customer_Info_Auth;
                     let kakaoSocket = new KakaoSocket(systemContent);
-                    kakaoSocket.findXml("NAME");
-                    console.log(">>>>>>>>>>>:" + JSON.stringify(systemContent.filter(function (item) { return item.REQ_MESSAGE === "NAME"; })));
-                } else if (rtnStr.PHONE != null && rtnStr.NAME != null) {
+                    re = kakaoSocket.findXml("AUTH");
+                } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 == null) {
+                    updateType = "NAME";
+                    // re = customer_Info_Auth_Response; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
+                    let kakaoSocket = new KakaoSocket(systemContent);
+                    re = kakaoSocket.findXml("AUTH");
+                } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 != null) {
                     updateType = "AUTH";
-                    re = customer_Info_Auth_Response; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
+                    // re = customer_Info_Auth_Response; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
                     let kakaoSocket = new KakaoSocket(systemContent);
-                    kakaoSocket.findXml("AUTH");
-                    console.log(">>>>>>>>>>>:" + JSON.stringify(systemContent.filter(function (item) { return item.REQ_MESSAGE === "AUTH"; })));
+                    if( content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
+                        re = kakaoSocket.findXml("AUTH_OK");
+                        updateType = "AUTH_OK";
+                    } else {
+                        re = kakaoSocket.findXml("AUTH_NOK");
+                        updateType = "AUTH_NOK";
+                    }
                 } else {
                     let kakaoSocket = new KakaoSocket(systemContent);
-                    kakaoSocket.findXml("AUTH");
+                    re = kakaoSocket.findXml("AUTH");
                 }
-             
+console.log("re:" + JSON.stringify(re));
 // console.log("beforeContent:" + beforeContent);
 // console.log("beforeStep:" + beforeStep);
 console.log("rtnStr:" + JSON.stringify(rtnStr));
@@ -398,8 +406,8 @@ console.log("rtnStr:" + JSON.stringify(rtnStr));
                     });
                 } else if( updateType == "NAME" ) {
                         const spawn = require('child_process').spawn;
-                        const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
-                        // const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+                        // const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+                        const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
 
                         ls.stdout.on('data', (data) => {
                             console.log(`stdout: ${data}`);
@@ -460,8 +468,12 @@ console.log("rtnStr:" + JSON.stringify(rtnStr));
                         ls.on('close', (code) => {
                           console.log(`child process exited with code ${code}`);
                         });
-                } else if( updateType == "AUTH") {
+                } else if( updateType == "AUTH_OK") {
                     pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+                        if(err) console.log("Query Error:", err);
+                    });
+                } else if( updateType == "AUTH_NOK") {
+                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["N", user_key], function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
                     });
                 }
