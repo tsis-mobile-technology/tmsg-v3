@@ -67,6 +67,11 @@ var pool = mysql.createPool({
 var mtURL = "http://125.132.2.120:30063";
 var mtIP = "125.132.2.120";
 var mtPort = 30063;
+
+var hpURL = "http://migtest.tbroad.com";
+var IN0002_URL = "/interface/tbroad/xml_module/CustInvoiceDtlXml";
+var IN0002_PARAM = "?KEY_NUM=1234561234567&MONTH_CNT=2&NM_CUST=홍길동&CORP=3200&ID_INSERT=U000000000";
+
 // const mtOptions: SocketIOClient.ConnectOpts = {
 //     forceNew: true,
 //     transports: ["websocket"]
@@ -74,40 +79,36 @@ var mtPort = 30063;
 
  var bodyParser = require('body-parser');
 
-
- var customer_Info_Name = { 
-                        "message": 
-                            {"text": "문의 사항에 대해서 알림톡으로 회신 예정이며 이를 위해 고객님의 성함을 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
-                        "keyboard": 
-                            {"type":"text"}
-                        };
- var customer_Info_Phone = { 
-                        "message": 
-                            {"text": "문의 사항에 대해서 알림톡으로 회신 예정이며 이를 위해 고객님의 핸드폰번호를 '-'없이 숫자만 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
-                        "keyboard": 
-                            {"type":"text"}
-                        };
-
- var customer_Info_Auth = { 
-                        "message": 
-                            {"text": "고객님의 핸드폰번호으로 인증번호를 전달해 드렸습니다. 확인 후 입력을 부탁 드립니다. 숫자만 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
-                        "keyboard": 
-                            {"type":"text"}
-                        };
-
- var depth_First_Third_Last_Response = {
-                        "message": 
-                            {"text": "문의가 정상적으로 접수되었습니다. 평일 9시~18시, 빠른 시간 안에 답변 드리겠습니다.\n 취소하시려면 '#'을 입력해 주세요."},
-                        "keyboard": 
-                            {"type":"text"}
-                        };
-
- var customer_Info_Auth_Response = {
-                        "message": 
-                            {"text": "요금조회 결과 문제가 없습니다. 다른 문의 사항이 있으시면 '#'을 입력하여주십시요."},
-                        "keyboard": 
-                            {"type":"text"}
-                        };                        
+ // var customer_Info_Name = { 
+ //                        "message": 
+ //                            {"text": "문의 사항에 대해서 알림톡으로 회신 예정이며 이를 위해 고객님의 성함을 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
+ //                        "keyboard": 
+ //                            {"type":"text"}
+ //                        };
+ // var customer_Info_Phone = { 
+ //                        "message": 
+ //                            {"text": "문의 사항에 대해서 알림톡으로 회신 예정이며 이를 위해 고객님의 핸드폰번호를 '-'없이 숫자만 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
+ //                        "keyboard": 
+ //                            {"type":"text"}
+ //                        };
+ // var customer_Info_Auth = { 
+ //                        "message": 
+ //                            {"text": "고객님의 핸드폰번호으로 인증번호를 전달해 드렸습니다. 확인 후 입력을 부탁 드립니다. 숫자만 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
+ //                        "keyboard": 
+ //                            {"type":"text"}
+ //                        };
+ // var depth_First_Third_Last_Response = {
+ //                        "message": 
+ //                            {"text": "문의가 정상적으로 접수되었습니다. 평일 9시~18시, 빠른 시간 안에 답변 드리겠습니다.\n 취소하시려면 '#'을 입력해 주세요."},
+ //                        "keyboard": 
+ //                            {"type":"text"}
+ //                        };
+ // var customer_Info_Auth_Response = {
+ //                        "message": 
+ //                            {"text": "요금조회 결과 문제가 없습니다. 다른 문의 사항이 있으시면 '#'을 입력하여주십시요."},
+ //                        "keyboard": 
+ //                            {"type":"text"}
+ //                        };                        
 
 declare var process, __dirname;
 
@@ -335,7 +336,7 @@ class ApiServer {
 
             if( results[3][0][0] != null ) {
                 beforeResMessage = results[3][0][0].RES_MESSAGE;
-                beforeReqMessage = returns[3][0][0].REQ_MESSAGE;
+                beforeReqMessage = results[3][0][0].REQ_MESSAGE;
             }
             else {
                 beforeResMessage = null;
@@ -365,137 +366,130 @@ class ApiServer {
         }).then(function() {
   
             if( re == null && content != "keyboard" && content != "처음으로" && content != "취소하기") {
-                if( rtnStr == null) {
-                    updateType = "INS_PHONE";
-                    // re = customer_Info_Name;
-                    let kakaoSocket = new KakaoSocket(systemContent);
-                    re = kakaoSocket.findXml("NAME");
-                } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
-                    updateType = "UPD_PHONE";
-                    // re = customer_Info_Name;
-                    let kakaoSocket = new KakaoSocket(systemContent);
-                    re = kakaoSocket.findXml("NAME");
-                } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
-                    updateType = "NAME";
-                    // re = customer_Info_Auth;
-                    let kakaoSocket = new KakaoSocket(systemContent);
-                    re = kakaoSocket.findXml("AUTH");
-                } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 == null) {
-                    updateType = "NAME";
-                    // re = customer_Info_Auth_Response; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
-                    let kakaoSocket = new KakaoSocket(systemContent);
-                    re = kakaoSocket.findXml("AUTH");
-                } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 != null) {
-                    updateType = "AUTH";
-                    // re = customer_Info_Auth_Response; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
-                    let kakaoSocket = new KakaoSocket(systemContent);
-                    if( content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
-                        //re = kakaoSocket.findXml("AUTH_OK");
-                        re = beforeResMessage;
-                        updateType = "AUTH_OK";// 인증을 성공하였으면 마지막 메뉴로 자동 이동시켜 원하는 정보를 선택하게 한다.
-                    } else {
-                        re = kakaoSocket.findXml("AUTH_NOK");
-                        updateType = "AUTH_NOK";
-                    }
+
+                if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "Y" ) {
+                    // 메뉴 중에 개인 정보가 필요하건에 대해서는 연동처리 하여 응답한다. 
+                    // 그렇다면 시나리오에 연동이 필요한것인지 필요하다면 URL, Parameter 등등 정보를 관리하여 응답할수 있도록
+                    // 기능 추가
+                    console.log("이어서 합시다!");
                 } else {
-                    let kakaoSocket = new KakaoSocket(systemContent);
-                    re = kakaoSocket.findXml("AUTH");
-                }
-//console.log("re:" + JSON.stringify(re));
-// console.log("beforeContent:" + beforeContent);
-// console.log("beforeStep:" + beforeStep);
-//console.log("rtnStr:" + JSON.stringify(rtnStr));
-// console.log("content:" + content);
-// console.log("updateType:" + updateType);
+                    if( rtnStr == null) {
+                        updateType = "INS_PHONE";
+                        let kakaoSocket = new KakaoSocket(systemContent);
+                        re = kakaoSocket.findXml("NAME");
+                    } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
+                        updateType = "UPD_PHONE";
+                        let kakaoSocket = new KakaoSocket(systemContent);
+                        re = kakaoSocket.findXml("NAME");
+                    } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
+                        updateType = "NAME";
+                        let kakaoSocket = new KakaoSocket(systemContent);
+                        re = kakaoSocket.findXml("AUTH");
+                    } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 == null) {
+                        updateType = "NAME";
+                        //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
+                        let kakaoSocket = new KakaoSocket(systemContent);
+                        re = kakaoSocket.findXml("AUTH");
+                    } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 != null) {
+                        updateType = "AUTH";
+                        //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
+                        let kakaoSocket = new KakaoSocket(systemContent);
+                        if( content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
+                            //re = kakaoSocket.findXml("AUTH_OK");
+                            re = beforeResMessage;
+                            updateType = "AUTH_OK";// 인증을 성공하였으면 마지막 메뉴로 자동 이동시켜 원하는 정보를 선택하게 한다.
+                        } else {
+                            re = kakaoSocket.findXml("AUTH_NOK");
+                            updateType = "AUTH_NOK";
+                        }
+                    } else {
+                        let kakaoSocket = new KakaoSocket(systemContent);
+                        re = kakaoSocket.findXml("AUTH_NOK");
+                    }
 
-                // if( updateType == "Init" ) {
-                //     var cust_post = {UNIQUE_ID:user_key};
-                //     pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
-                //         if(err) console.log("Query Error:", err);
-                //     });
-                // } else 
-                if( updateType == "INS_PHONE" ) {
-                    var cust_post = {UNIQUE_ID:user_key, PHONE:content};
-                    pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
-                        if(err) console.log("Query Error:", err);
-                    });
-                } else if( updateType == "UPD_PHONE" ) {
-                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
-                        if(err) console.log("Query Error:", err);
-                    });
-                } else if( updateType == "NAME" ) {
-                        const spawn = require('child_process').spawn;
-                        // const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
-                        //const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
-                        const ls = spawn('/home/icr/tmsg-v3/shorturl');
+                    if( updateType == "INS_PHONE" ) {
+                        var cust_post = {UNIQUE_ID:user_key, PHONE:content};
+                        pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
+                            if(err) console.log("Query Error:", err);
+                        });
+                    } else if( updateType == "UPD_PHONE" ) {
+                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
+                            if(err) console.log("Query Error:", err);
+                        });
+                    } else if( updateType == "NAME" ) {
+                            const spawn = require('child_process').spawn;
+                            // const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+                            //const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+                            const ls = spawn('/home/icr/tmsg-v3/shorturl');
 
-                        ls.stdout.on('data', (data) => {
-                            console.log(`stdout: ${data}`);
-                            nOTP = data;
-                            if( nOTP != null ) {
-                                // 1. send SMS customer phone
-                                // 2. DB Update
-                                // const client = socketIoClient.connect(mtURL, options);
+                            ls.stdout.on('data', (data) => {
+                                console.log(`stdout: ${data}`);
+                                nOTP = data;
+                                if( nOTP != null ) {
+                                    // 1. send SMS customer phone
+                                    // 2. DB Update
+                                    // const client = socketIoClient.connect(mtURL, options);
 
-                                // var messageSize = mtMessage.length+"";
-                                var sendMessage = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>" + nOTP + "</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>" + rtnStr.PHONE + "</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1000</IDSO></REQUEST>";
-                                var messageSize = sendMessage.length + "";
-                                while (messageSize.length < 5) messageSize = "0" + messageSize;
+                                    // var messageSize = mtMessage.length+"";
+                                    var sendMessage = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>" + nOTP + "</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>" + rtnStr.PHONE + "</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1000</IDSO></REQUEST>";
+                                    var messageSize = sendMessage.length + "";
+                                    while (messageSize.length < 5) messageSize = "0" + messageSize;
 
-                                var sendData = messageSize + sendMessage;
-                                
-                                var client = new net.Socket();
-                                client.connect(mtPort, mtIP, function () {
-                                    console.log('CONNECTED TO: ' + mtIP + ':' + mtPort);
-                                    // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
-                                    client.write(sendData);
-                                });
-                                // Add a 'data' event handler for the client socket
-                                // data is what the server sent to this socket
-                                client.on('data', function (data) {
-                                    console.log("data:" + data);
-                                    var str = data;
-                                    // Close the client socket completely
-                                    var res = new String(str.slice(5));
-                                    // res = res.replace(/\\r\\n/g, "");
-                                    if (fastXmlParser.validate(res) === true) {
-                                        var jsonObj = fastXmlParser.parse(res, options);
-                                        var resultObj = JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG;
-                                        // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
-                                        // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
-                                        // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
-                                        if (resultObj == "SUCCESS") {
-                                            pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function (err, rows, fields) {
-                                                if (err)
-                                                    console.log("Query Error:", err);
-                                            });
+                                    var sendData = messageSize + sendMessage;
+                                    
+                                    var client = new net.Socket();
+                                    client.connect(mtPort, mtIP, function () {
+                                        console.log('CONNECTED TO: ' + mtIP + ':' + mtPort);
+                                        // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
+                                        client.write(sendData);
+                                    });
+                                    // Add a 'data' event handler for the client socket
+                                    // data is what the server sent to this socket
+                                    client.on('data', function (data) {
+                                        console.log("data:" + data);
+                                        var str = data;
+                                        // Close the client socket completely
+                                        var res = new String(str.slice(5));
+                                        // res = res.replace(/\\r\\n/g, "");
+                                        if (fastXmlParser.validate(res) === true) {
+                                            var jsonObj = fastXmlParser.parse(res, options);
+                                            var resultObj = JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG;
+                                            // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
+                                            // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
+                                            // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
+                                            if (resultObj == "SUCCESS") {
+                                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function (err, rows, fields) {
+                                                    if (err)
+                                                        console.log("Query Error:", err);
+                                                });
+                                            }
                                         }
-                                    }
-                                    client.destroy();
-                                });
-                                // Add a 'close' event handler for the client socket
-                                client.on('close', function () {
-                                    console.log('Connection closed');
-                                });
-                            }
-                        });
+                                        client.destroy();
+                                    });
+                                    // Add a 'close' event handler for the client socket
+                                    client.on('close', function () {
+                                        console.log('Connection closed');
+                                    });
+                                }
+                            });
 
-                        ls.stderr.on('data', (data) => {
-                          console.log(`stderr: ${data}`);
-                          // retry ? 
-                        });
+                            ls.stderr.on('data', (data) => {
+                              console.log(`stderr: ${data}`);
+                              // retry ? 
+                            });
 
-                        ls.on('close', (code) => {
-                          console.log(`child process exited with code ${code}`);
+                            ls.on('close', (code) => {
+                              console.log(`child process exited with code ${code}`);
+                            });
+                    } else if( updateType == "AUTH_OK") {
+                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+                            if(err) console.log("Query Error:", err);
                         });
-                } else if( updateType == "AUTH_OK") {
-                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
-                        if(err) console.log("Query Error:", err);
-                    });
-                } else if( updateType == "AUTH_NOK") {
-                    pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["N", user_key], function(err, rows, fields) {
-                        if(err) console.log("Query Error:", err);
-                    });
+                    } else if( updateType == "AUTH_NOK") {
+                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["N", user_key], function(err, rows, fields) {
+                            if(err) console.log("Query Error:", err);
+                        });
+                    }
                 }
             }
         }).then(function() {
@@ -523,7 +517,9 @@ class ApiServer {
                     if (err)
                     console.log('Error while performing Query.', err);
                     });
-                    re = depth_First_Third_Last_Response;
+                    // re = depth_First_Third_Last_Response;
+                    let kakaoSocket = new KakaoSocket(systemContent);
+                    re = kakaoSocket.findXml("QUESTION_OK");
                 } else if (beforeContent == "문의사항만 입력") {
                     /*
                     등록한 사진을 어디론가 옮기고 이력저장하고 
@@ -535,8 +531,10 @@ class ApiServer {
                     if (err)
                     console.log('Error while performing Query.', err);
                     });
-                    re = depth_First_Third_Last_Response;
-                } else if (beforeContent == "문의하기") {
+                    // re = depth_First_Third_Last_Response;
+                    let kakaoSocket = new KakaoSocket(systemContent);
+                    re = kakaoSocket.findXml("QUESTION_OK");
+                } else if (beforeContent == "티브로드에 문의하기") {
                     /*
                     등록한 사진을 어디론가 옮기고 이력저장하고 
                     */
@@ -547,7 +545,9 @@ class ApiServer {
                     if (err)
                     console.log('Error while performing Query.', err);
                     });
-                    re = depth_First_Third_Last_Response;
+                    // re = depth_First_Third_Last_Response;
+                    let kakaoSocket = new KakaoSocket(systemContent);
+                    re = kakaoSocket.findXml("QUESTION_OK");
                 } else if ( beforeContent != "keyboard" && beforeStep == '3' ) {
                     re = {
                         "message": 
