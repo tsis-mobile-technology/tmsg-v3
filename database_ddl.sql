@@ -1427,6 +1427,14 @@ VALUES
   (62,-1,0,'AUTH','{\"message\": {\"text\": \"고객님의 핸드폰번호으로 인증번호를 전달해 드렸습니다. 확인 후 입력을 부탁 드립니다. 숫자만 입력해 주세요.\r\n 취소하시려면 \\\"#\\\"을 입력해 주세요.\"}, \"keyboard\": {\"type\":\"text\"}}','2017-06-26 20:15:20',NULL,'system',NULL),
   (63,-1,0,'QUESTION_OK','{\"message\":  {\"text\": \"문의가 정상적으로 접수되었습니다. 평일 9시~18시, 빠른 시간 안에 답변 드리겠습니다.\r\n 취소하시려면 \\\"#\\\"을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}','2017-06-26 20:15:20',NULL,'system',NULL);
 
+INSERT INTO `TB_AUTOCHAT_SCENARIO` (`STEP`, `TRUN`, `REQ_MESSAGE`, `RES_MESSAGE`, `ETC1`, `ETC2`, `ETC3`)
+VALUES
+  (-1, 0, 'AUTH_OK', '{\"message\":  {\"text\": \"최종 확인하였습니다. 요청하신 정보를 조회합니다. 취소하시려면 \'#\'을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}', NULL, 'system', NULL);
+
+INSERT INTO `TB_AUTOCHAT_SCENARIO` (`STEP`, `TRUN`, `REQ_MESSAGE`, `RES_MESSAGE`, `ETC1`, `ETC2`, `ETC3`)
+VALUES
+  (-1, 0, 'AUTH_NOK', '{\"message\":  {\"text\": \"입력하신 인증 번호가 정확하지 않습니다. 오류가 있으시면 채팅방 종료하시면 모든 개인정보를 안전하게 지워집니다.처음으로 가시려면 \'#\'을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}', NULL, 'system', NULL);  
+
 /*!40000 ALTER TABLE `TB_AUTOCHAT_SCENARIO` ENABLE KEYS */;
 UNLOCK TABLES;
 

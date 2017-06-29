@@ -34,12 +34,21 @@ var options = {
 // const mtURL = "http://localhost:2581";
 // const mtIP = "localhost";
 // const mtPort = 22;
+//var pool = mysql.createPool({
+//    connectionLimit: 2,
+//    host: '14.63.213.246',
+//    user: 'smarttest',
+//    password: 'test1234',
+//    port: 10003,
+//    database: 'SMART_MESSAGE_VERTWO',
+//    debug: false
+//});
 var pool = mysql.createPool({
-    connectionLimit: 2,
-    host: '14.63.213.246',
-    user: 'smarttest',
-    password: 'test1234',
-    port: 10003,
+    connectionLimit: 20,
+    host: '125.132.2.20 ',
+    user: 'icr',
+    password: '1q2w3e4r5t^Y',
+    port: 3306,
     database: 'SMART_MESSAGE_VERTWO',
     debug: false
 });
@@ -256,6 +265,9 @@ class ApiServer {
             var user_key = request.body.user_key;
             var re;
             try {
+                pool.query('DELETE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', request.params.user_key, function(err, rows, fields) {
+                        if(err) console.log("Query Error:", err);
+                });
                 re = {text:'param : ' + user_key};
             } catch (exception) {
                 console.log('chat_room del:응답 에러');
@@ -282,7 +294,8 @@ class ApiServer {
 
     private getMessageResponse(content: string, user_key: string, type: string, callback: any): void {
         var re;
-        var beforeRe;
+        var beforeResMessage;
+        var beforeReqMessage;
         var rtnStr;
         var updateType;
         var beforeContent;
@@ -320,9 +333,14 @@ class ApiServer {
                 rtnStr = results[2][0][0];
             else rtnStr = null;
 
-            if( results[3][0][0] != null )
-                beforeRe = results[3][0][0].RES_MESSAGE;
-            else beforeRe = null;
+            if( results[3][0][0] != null ) {
+                beforeResMessage = results[3][0][0].RES_MESSAGE;
+                beforeReqMessage = returns[3][0][0].REQ_MESSAGE;
+            }
+            else {
+                beforeResMessage = null;
+                beforeReqMessage = null;
+            }
 
             if( results[4][0][0] != null )
                 keyboardContent = JSON.parse(results[4][0][0].RES_MESSAGE).keyboard;
@@ -351,7 +369,7 @@ class ApiServer {
                     updateType = "INS_PHONE";
                     // re = customer_Info_Name;
                     let kakaoSocket = new KakaoSocket(systemContent);
-                    re = kakaoSocket.findXml("PHONE");
+                    re = kakaoSocket.findXml("NAME");
                 } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
                     updateType = "UPD_PHONE";
                     // re = customer_Info_Name;
@@ -372,8 +390,9 @@ class ApiServer {
                     // re = customer_Info_Auth_Response; //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
                     let kakaoSocket = new KakaoSocket(systemContent);
                     if( content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
-                        re = kakaoSocket.findXml("AUTH_OK");
-                        updateType = "AUTH_OK";
+                        //re = kakaoSocket.findXml("AUTH_OK");
+                        re = beforeResMessage;
+                        updateType = "AUTH_OK";// 인증을 성공하였으면 마지막 메뉴로 자동 이동시켜 원하는 정보를 선택하게 한다.
                     } else {
                         re = kakaoSocket.findXml("AUTH_NOK");
                         updateType = "AUTH_NOK";
@@ -382,10 +401,10 @@ class ApiServer {
                     let kakaoSocket = new KakaoSocket(systemContent);
                     re = kakaoSocket.findXml("AUTH");
                 }
-console.log("re:" + JSON.stringify(re));
+//console.log("re:" + JSON.stringify(re));
 // console.log("beforeContent:" + beforeContent);
 // console.log("beforeStep:" + beforeStep);
-console.log("rtnStr:" + JSON.stringify(rtnStr));
+//console.log("rtnStr:" + JSON.stringify(rtnStr));
 // console.log("content:" + content);
 // console.log("updateType:" + updateType);
 
@@ -407,7 +426,8 @@ console.log("rtnStr:" + JSON.stringify(rtnStr));
                 } else if( updateType == "NAME" ) {
                         const spawn = require('child_process').spawn;
                         // const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
-                        const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+                        //const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+                        const ls = spawn('/home/icr/tmsg-v3/shorturl');
 
                         ls.stdout.on('data', (data) => {
                             console.log(`stdout: ${data}`);
@@ -543,7 +563,7 @@ console.log("rtnStr:" + JSON.stringify(rtnStr));
                 } 
                     
                 if(re == null ) {
-                    re = beforeRe;
+                    re = beforeResMessage;
                 }
             }
         })
