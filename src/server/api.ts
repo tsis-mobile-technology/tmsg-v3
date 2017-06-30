@@ -35,15 +35,15 @@ var options = {
 // const mtURL = "http://localhost:2581";
 // const mtIP = "localhost";
 // const mtPort = 22;
-// var pool = mysql.createPool({
-//    connectionLimit: 2,
-//    host: '14.63.213.246',
-//    user: 'smarttest',
-//    password: 'test1234',
-//    port: 10003,
-//    database: 'SMART_MESSAGE_VERTWO',
-//    debug: false
-// });
+ var pool = mysql.createPool({
+    connectionLimit: 2,
+    host: '14.63.213.246',
+    user: 'smarttest',
+    password: 'test1234',
+    port: 10003,
+    database: 'SMART_MESSAGE_VERTWO',
+    debug: false
+ });
 // var pool = mysql.createPool({
 //     connectionLimit: 20,
 //     host: '125.132.2.20 ',
@@ -84,7 +84,7 @@ class ApiServer {
     private kakao_root: string;
     private kakao_port: number;
     private ls: any;
-    private pool: any;
+    //public pool: any;
     private mtURL: string;
     private mtIP: string;
     private mtPort: number;
@@ -133,15 +133,15 @@ class ApiServer {
         this.kakao_root = path.join(path.resolve(__dirname, '../../target'));
 
         // databse
-        this.pool = mysql.createPool({
-            connectionLimit: 2,
-            host: '14.63.213.246',
-            user: 'smarttest',
-            password: 'test1234',
-            port: 10003,
-            database: 'SMART_MESSAGE_VERTWO',
-            debug: false
-        });
+        //this.pool = mysql.createPool({
+        //    connectionLimit: 21,
+        //    host: '14.63.213.246',
+        //    user: 'smarttest',
+        //    password: 'test1234',
+        //    port: 10003,
+        //    database: 'SMART_MESSAGE_VERTWO',
+        //    debug: true
+        //});
 
         this.mtURL = "http://125.132.2.120:30063";
         this.mtIP = "125.132.2.120";
@@ -257,7 +257,7 @@ class ApiServer {
             var user_key = request.body.user_key;
             var re;
             try {
-                this.pool.query('DELETE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', request.params.user_key, function(err, rows, fields) {
+                pool.query('DELETE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', request.params.user_key, function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
                 });
                 re = {text:'param : ' + user_key};
@@ -350,7 +350,7 @@ class ApiServer {
                 var post = {UNIQUE_ID:user_key, MESSAGE:content};
                 console.log("db values:" + JSON.stringify(post));
 
-                this.pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
+                pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
                 if (err)
                     console.log('Error while performing Query.', err);
                 });
@@ -418,20 +418,20 @@ class ApiServer {
 
                     if( updateType == "INS_PHONE" ) {
                         var cust_post = {UNIQUE_ID:user_key, PHONE:content};
-                        this.pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
+                        pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
                             if(err) console.log("Query Error:", err);
                         });
                     } else if( updateType == "UPD_PHONE" ) {
-                        this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
+                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
                             if(err) console.log("Query Error:", err);
                         });
                     } else if( updateType == "NAME" ) {
                             // local case
-                            this.ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+                            //this.ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
                             // linux case
                             //this.ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
                             // tbroad case
-                            //this.ls = spawn('/home/icr/tmsg-v3/shorturl');
+                            this.ls = spawn('/home/icr/tmsg-v3/shorturl');
                             this.ls.stdout.on('data', (data) => {
                                 console.log(`stdout: ${data}`);
                                 nOTP = data;
@@ -468,7 +468,7 @@ class ApiServer {
                                             // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
                                             // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
                                             if (resultObj == "SUCCESS") {
-                                                this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function (err, rows, fields) {
+                                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function (err, rows, fields) {
                                                     if (err)
                                                         console.log("Query Error:", err);
                                                 });
@@ -492,11 +492,11 @@ class ApiServer {
                               console.log(`child process exited with code ${code}`);
                             });
                     } else if( updateType == "AUTH_OK") {
-                        this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
                             if(err) console.log("Query Error:", err);
                         });
                     } else if( updateType == "AUTH_NOK") {
-                        this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["N", user_key], function(err, rows, fields) {
+                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["N", user_key], function(err, rows, fields) {
                             if(err) console.log("Query Error:", err);
                         });
                     }
@@ -523,7 +523,7 @@ class ApiServer {
                     var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
                     console.log("db values:" + JSON.stringify(post));
 
-                    this.pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
                     if (err)
                     console.log('Error while performing Query.', err);
                     });
@@ -537,7 +537,7 @@ class ApiServer {
                     var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
                     console.log("db values:" + JSON.stringify(post));
 
-                    this.pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
                     if (err)
                     console.log('Error while performing Query.', err);
                     });
@@ -551,7 +551,7 @@ class ApiServer {
                     var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
                     console.log("db values:" + JSON.stringify(post));
 
-                    this.pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
                     if (err)
                     console.log('Error while performing Query.', err);
                     });
@@ -624,7 +624,7 @@ class ApiServer {
         var post = {UNIQUE_ID:user_key, MESSAGE:content};
         console.log("db values:" + JSON.stringify(post));
 
-        this.pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
+        pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
             if (err)
                 console.log('Error while performing Query.', err);
         });
@@ -635,15 +635,15 @@ class ApiServer {
         var post = {UNIQUE_ID:user_key, NAME:content};
         console.log("db values:" + JSON.stringify(post));
         if( updateType == "Name" ) {
-            this.pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
+            pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
                 if(err) console.log("Query Error:", err);
             });
         } else if( updateType == "Phone" ) {
-            this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+            pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
                 if(err) console.log("Query Error:", err);
             });
         } else if( updateType == "Auth") {
-            this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+            pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
                 if(err) console.log("Query Error:", err);
             });
         }
@@ -652,34 +652,34 @@ class ApiServer {
     public dbLoadCustomer(user_key: string): void {
         var defered = Q.defer();
 
-        this.pool.query('SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
+        pool.query('SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
         return defered.promise;
     }
 
     private dbSelectScenario(content: string): void {
         var defered = Q.defer();
         // console.log("content:" + content);
-        this.pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
+        pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
         return defered.promise;
     }
 
     private dbSelectScenarioSystem(content: string): void {
         var defered = Q.defer();
         // console.log("content:" + content);
-        this.pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE ETC3 = ?', content, defered.makeNodeResolver());
+        pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE ETC3 = ?', content, defered.makeNodeResolver());
         return defered.promise;
     }
 
     private dbBeforeSelectScenario(content: string, user_key: string): void {
         var defered = Q.defer();
         // console.log("content:" + content);
-        this.pool.query('SELECT a.* FROM TB_AUTOCHAT_SCENARIO as a, (select * from TB_AUTOCHAT_HISTORY where UNIQUE_ID = ? order by wrtdate desc LIMIT 1)  as b WHERE a.REQ_MESSAGE = b.MESSAGE', user_key, defered.makeNodeResolver());
+        pool.query('SELECT a.* FROM TB_AUTOCHAT_SCENARIO as a, (select * from TB_AUTOCHAT_HISTORY where UNIQUE_ID = ? order by wrtdate desc LIMIT 1)  as b WHERE a.REQ_MESSAGE = b.MESSAGE', user_key, defered.makeNodeResolver());
         return defered.promise;
     }
 
     public dbCheckHistory(content: string, user_key: string): void {
         var defered = Q.defer();
-        this.pool.query('select a.*, b.step, b.trun from TB_AUTOCHAT_HISTORY as a, TB_AUTOCHAT_SCENARIO as b where a.UNIQUE_ID = ? and b.REQ_MESSAGE = a.MESSAGE order by a.wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
+        pool.query('select a.*, b.step, b.trun from TB_AUTOCHAT_HISTORY as a, TB_AUTOCHAT_SCENARIO as b where a.UNIQUE_ID = ? and b.REQ_MESSAGE = a.MESSAGE order by a.wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
         return defered.promise;
     }
 }
