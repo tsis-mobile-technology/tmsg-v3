@@ -54,19 +54,6 @@ var options = {
 //     debug: false
 // });
 
-// const mtURL = "http://localhost:2581";
-// const mtIP = "localhost";
-// const mtPort = 22;
-// var mtURL = "http://125.132.2.120:30063";
-// var mtIP = "125.132.2.120";
-// var mtPort = 30063;
-
-// var hpURL = "http://172.16.180.224:30034"; //dev
-// var hpURL = "http://172.16.28.27:30034"; //live
-
-// var IN0002_URL = "/interface/tbroad/xml_module/CustInvoiceDtlXml";
-// var IN0002_PARAM = "?KEY_NUM=1234561234567&MONTH_CNT=2&NM_CUST=홍길동&CORP=3200&ID_INSERT=U000000000";
-
 // const mtOptions: SocketIOClient.ConnectOpts = {
 //     forceNew: true,
 //     transports: ["websocket"]
