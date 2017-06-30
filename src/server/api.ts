@@ -1,10 +1,8 @@
 import * as express from 'express'; 
-// import * as bodyParser from 'body-parser'; 
 import * as http from "http";
 import * as serveStatic from "serve-static";
 import * as path from "path";
 import * as socketIo from "socket.io";
-// import * as mongoose from "mongoose";
 
 import { KakaoSocket } from "./socket";
 
@@ -12,6 +10,9 @@ var Q      = require("q");
 var mysql  = require('mysql');
 var net = require('net');
 var fastXmlParser = require('fast-xml-parser');
+var validator = require('validator');
+var spawn = require('child_process').spawn;
+
 var options = {
     attrPrefix: "@_",
     textNodeName: "#text",
@@ -34,7 +35,7 @@ var options = {
 // const mtURL = "http://localhost:2581";
 // const mtIP = "localhost";
 // const mtPort = 22;
-//var pool = mysql.createPool({
+// var pool = mysql.createPool({
 //    connectionLimit: 2,
 //    host: '14.63.213.246',
 //    user: 'smarttest',
@@ -42,73 +43,36 @@ var options = {
 //    port: 10003,
 //    database: 'SMART_MESSAGE_VERTWO',
 //    debug: false
-//});
-var pool = mysql.createPool({
-    connectionLimit: 20,
-    host: '125.132.2.20 ',
-    user: 'icr',
-    password: '1q2w3e4r5t^Y',
-    port: 3306,
-    database: 'SMART_MESSAGE_VERTWO',
-    debug: false
-});
-
-// var connection = mysql.createConnection({
-//   host     : '14.63.213.246',
-//   user     : 'smarttest',
-//   password : 'test1234',
-//   port     : 10003,
-//   database : 'SMART_MESSAGE_VERTWO'
+// });
+// var pool = mysql.createPool({
+//     connectionLimit: 20,
+//     host: '125.132.2.20 ',
+//     user: 'icr',
+//     password: '1q2w3e4r5t^Y',
+//     port: 3306,
+//     database: 'SMART_MESSAGE_VERTWO',
+//     debug: false
 // });
 
 // const mtURL = "http://localhost:2581";
 // const mtIP = "localhost";
 // const mtPort = 22;
-var mtURL = "http://125.132.2.120:30063";
-var mtIP = "125.132.2.120";
-var mtPort = 30063;
+// var mtURL = "http://125.132.2.120:30063";
+// var mtIP = "125.132.2.120";
+// var mtPort = 30063;
 
-var hpURL = "http://migtest.tbroad.com";
-var IN0002_URL = "/interface/tbroad/xml_module/CustInvoiceDtlXml";
-var IN0002_PARAM = "?KEY_NUM=1234561234567&MONTH_CNT=2&NM_CUST=홍길동&CORP=3200&ID_INSERT=U000000000";
+// var hpURL = "http://172.16.180.224:30034"; //dev
+// var hpURL = "http://172.16.28.27:30034"; //live
+
+// var IN0002_URL = "/interface/tbroad/xml_module/CustInvoiceDtlXml";
+// var IN0002_PARAM = "?KEY_NUM=1234561234567&MONTH_CNT=2&NM_CUST=홍길동&CORP=3200&ID_INSERT=U000000000";
 
 // const mtOptions: SocketIOClient.ConnectOpts = {
 //     forceNew: true,
 //     transports: ["websocket"]
 // };
 
- var bodyParser = require('body-parser');
-
- // var customer_Info_Name = { 
- //                        "message": 
- //                            {"text": "문의 사항에 대해서 알림톡으로 회신 예정이며 이를 위해 고객님의 성함을 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
- //                        "keyboard": 
- //                            {"type":"text"}
- //                        };
- // var customer_Info_Phone = { 
- //                        "message": 
- //                            {"text": "문의 사항에 대해서 알림톡으로 회신 예정이며 이를 위해 고객님의 핸드폰번호를 '-'없이 숫자만 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
- //                        "keyboard": 
- //                            {"type":"text"}
- //                        };
- // var customer_Info_Auth = { 
- //                        "message": 
- //                            {"text": "고객님의 핸드폰번호으로 인증번호를 전달해 드렸습니다. 확인 후 입력을 부탁 드립니다. 숫자만 입력해 주세요.\n 취소하시려면 '#'을 입력해 주세요."},
- //                        "keyboard": 
- //                            {"type":"text"}
- //                        };
- // var depth_First_Third_Last_Response = {
- //                        "message": 
- //                            {"text": "문의가 정상적으로 접수되었습니다. 평일 9시~18시, 빠른 시간 안에 답변 드리겠습니다.\n 취소하시려면 '#'을 입력해 주세요."},
- //                        "keyboard": 
- //                            {"type":"text"}
- //                        };
- // var customer_Info_Auth_Response = {
- //                        "message": 
- //                            {"text": "요금조회 결과 문제가 없습니다. 다른 문의 사항이 있으시면 '#'을 입력하여주십시요."},
- //                        "keyboard": 
- //                            {"type":"text"}
- //                        };                        
+ var bodyParser = require('body-parser');                      
 
 declare var process, __dirname;
 
@@ -119,6 +83,15 @@ class ApiServer {
     private mongo: any;
     private kakao_root: string;
     private kakao_port: number;
+    private ls: any;
+    private pool: any;
+    private mtURL: string;
+    private mtIP: string;
+    private mtPort: number;
+    private hpURL: string;
+
+    private IN0002_URL: string;
+    private IN0002_PARAM: string;
 
     // Bootstrap the application.
     public static bootstrap(): ApiServer {
@@ -159,6 +132,24 @@ class ApiServer {
         // root path is under ../../target
         this.kakao_root = path.join(path.resolve(__dirname, '../../target'));
 
+        // databse
+        this.pool = mysql.createPool({
+            connectionLimit: 2,
+            host: '14.63.213.246',
+            user: 'smarttest',
+            password: 'test1234',
+            port: 10003,
+            database: 'SMART_MESSAGE_VERTWO',
+            debug: false
+        });
+
+        this.mtURL = "http://125.132.2.120:30063";
+        this.mtIP = "125.132.2.120";
+        this.mtPort = 30063;
+        this.hpURL = "http://172.16.180.224:30034"; //dev
+        // this.hpURL = "http://172.16.28.27:30034"; //live
+        this.IN0002_URL = "/interface/tbroad/xml_module/CustInvoiceDtlXml";
+        this.IN0002_PARAM = "?KEY_NUM=1234561234567&MONTH_CNT=2&NM_CUST=홍길동&CORP=3200&ID_INSERT=U000000000";
     }
 
     // Configure routes
@@ -266,7 +257,7 @@ class ApiServer {
             var user_key = request.body.user_key;
             var re;
             try {
-                pool.query('DELETE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', request.params.user_key, function(err, rows, fields) {
+                this.pool.query('DELETE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', request.params.user_key, function(err, rows, fields) {
                         if(err) console.log("Query Error:", err);
                 });
                 re = {text:'param : ' + user_key};
@@ -305,6 +296,7 @@ class ApiServer {
         var keyboardContent;
         var systemContent;
         var nOTP;
+        var contentValidation;
 
         if (content == "#") content = "keyboard";
 
@@ -358,7 +350,7 @@ class ApiServer {
                 var post = {UNIQUE_ID:user_key, MESSAGE:content};
                 console.log("db values:" + JSON.stringify(post));
 
-                pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
+                this.pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
                 if (err)
                     console.log('Error while performing Query.', err);
                 });
@@ -373,14 +365,30 @@ class ApiServer {
                     // 기능 추가
                     console.log("이어서 합시다!");
                 } else {
+                    // 근데 위 조건에 충족하지 않는다고 해서 무조건 아래와 같은것을 태우는것은 문제가 있다.
+                    // 입력된 "content"가 시나리오에서 못찾을 경우 만 거치도록 추가 수정
+                    // 고객의 가장 최근 이력(히스토리) 메뉴가 본인인증이 되어 있어야 사용가능한지를 시나리오 관리 테이블에서 추가로
+                    // 관리하자.
                     if( rtnStr == null) {
                         updateType = "INS_PHONE";
                         let kakaoSocket = new KakaoSocket(systemContent);
                         re = kakaoSocket.findXml("NAME");
+                        contentValidation = validator.isDecimal(content);
+                        if( contentValidation != true ) { // 숫자 비교해서 같은면
+                            //re = kakaoSocket.findXml("AUTH_OK");
+                            re = kakaoSocket.findXml("NAME_NOK");
+                            updateType = "NAME_NOK";
+                        }
                     } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
                         updateType = "UPD_PHONE";
                         let kakaoSocket = new KakaoSocket(systemContent);
                         re = kakaoSocket.findXml("NAME");
+                        contentValidation = validator.isDecimal(content);
+                        if( contentValidation != true ) { // 숫자 비교해서 같은면
+                            //re = kakaoSocket.findXml("AUTH_OK");
+                            re = kakaoSocket.findXml("NAME_NOK");
+                            updateType = "NAME_NOK";
+                        }
                     } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
                         updateType = "NAME";
                         let kakaoSocket = new KakaoSocket(systemContent);
@@ -394,7 +402,8 @@ class ApiServer {
                         updateType = "AUTH";
                         //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
                         let kakaoSocket = new KakaoSocket(systemContent);
-                        if( content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
+                        contentValidation = validator.isDecimal(content);
+                        if( contentValidation == true && content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
                             //re = kakaoSocket.findXml("AUTH_OK");
                             re = beforeResMessage;
                             updateType = "AUTH_OK";// 인증을 성공하였으면 마지막 메뉴로 자동 이동시켜 원하는 정보를 선택하게 한다.
@@ -409,20 +418,21 @@ class ApiServer {
 
                     if( updateType == "INS_PHONE" ) {
                         var cust_post = {UNIQUE_ID:user_key, PHONE:content};
-                        pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
+                        this.pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
                             if(err) console.log("Query Error:", err);
                         });
                     } else if( updateType == "UPD_PHONE" ) {
-                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
+                        this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
                             if(err) console.log("Query Error:", err);
                         });
                     } else if( updateType == "NAME" ) {
-                            const spawn = require('child_process').spawn;
-                            // const ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
-                            //const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
-                            const ls = spawn('/home/icr/tmsg-v3/shorturl');
-
-                            ls.stdout.on('data', (data) => {
+                            // local case
+                            this.ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+                            // linux case
+                            //this.ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+                            // tbroad case
+                            //this.ls = spawn('/home/icr/tmsg-v3/shorturl');
+                            this.ls.stdout.on('data', (data) => {
                                 console.log(`stdout: ${data}`);
                                 nOTP = data;
                                 if( nOTP != null ) {
@@ -438,8 +448,8 @@ class ApiServer {
                                     var sendData = messageSize + sendMessage;
                                     
                                     var client = new net.Socket();
-                                    client.connect(mtPort, mtIP, function () {
-                                        console.log('CONNECTED TO: ' + mtIP + ':' + mtPort);
+                                    client.connect(this.mtPort, this.mtIP, function () {
+                                        console.log('CONNECTED TO: ' + this.mtIP + ':' + this.mtPort);
                                         // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
                                         client.write(sendData);
                                     });
@@ -458,7 +468,7 @@ class ApiServer {
                                             // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
                                             // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
                                             if (resultObj == "SUCCESS") {
-                                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function (err, rows, fields) {
+                                                this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function (err, rows, fields) {
                                                     if (err)
                                                         console.log("Query Error:", err);
                                                 });
@@ -473,20 +483,20 @@ class ApiServer {
                                 }
                             });
 
-                            ls.stderr.on('data', (data) => {
+                            this.ls.stderr.on('data', (data) => {
                               console.log(`stderr: ${data}`);
                               // retry ? 
                             });
 
-                            ls.on('close', (code) => {
+                            this.ls.on('close', (code) => {
                               console.log(`child process exited with code ${code}`);
                             });
                     } else if( updateType == "AUTH_OK") {
-                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+                        this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
                             if(err) console.log("Query Error:", err);
                         });
                     } else if( updateType == "AUTH_NOK") {
-                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["N", user_key], function(err, rows, fields) {
+                        this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["N", user_key], function(err, rows, fields) {
                             if(err) console.log("Query Error:", err);
                         });
                     }
@@ -513,7 +523,7 @@ class ApiServer {
                     var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
                     console.log("db values:" + JSON.stringify(post));
 
-                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                    this.pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
                     if (err)
                     console.log('Error while performing Query.', err);
                     });
@@ -527,7 +537,7 @@ class ApiServer {
                     var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
                     console.log("db values:" + JSON.stringify(post));
 
-                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                    this.pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
                     if (err)
                     console.log('Error while performing Query.', err);
                     });
@@ -541,7 +551,7 @@ class ApiServer {
                     var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
                     console.log("db values:" + JSON.stringify(post));
 
-                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                    this.pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
                     if (err)
                     console.log('Error while performing Query.', err);
                     });
@@ -614,115 +624,64 @@ class ApiServer {
         var post = {UNIQUE_ID:user_key, MESSAGE:content};
         console.log("db values:" + JSON.stringify(post));
 
-        pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
+        this.pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
             if (err)
                 console.log('Error while performing Query.', err);
         });
     }
-
-//     private dbSaveCustomer(updateType: string, content: string, user_key: string): void {
-//         var defered = Q.defer();
-// console.log("1");
-//         var post = {UNIQUE_ID:user_key, NAME:content};
-// console.log("2");
-//         console.log("db values:" + JSON.stringify(post));
-// console.log("3");
-//         if( updateType == "Name" ) {
-// console.log("4");
-//             connection.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, defered.makeNodeResolver());
-//         } else if( updateType == "Phone" ) {
-//             connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], defered.makeNodeResolver());
-//         } else if( updateType == "Auth") {
-//             connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], defered.makeNodeResolver());
-//         }
-// console.log("5");
-//         return defered.promise;
-//     }
 
     private dbSaveCustomer(updateType: string, content: string, user_key: string): void {
 
         var post = {UNIQUE_ID:user_key, NAME:content};
         console.log("db values:" + JSON.stringify(post));
         if( updateType == "Name" ) {
-            pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
+            this.pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
                 if(err) console.log("Query Error:", err);
             });
         } else if( updateType == "Phone" ) {
-            pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+            this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
                 if(err) console.log("Query Error:", err);
             });
         } else if( updateType == "Auth") {
-            pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+            this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
                 if(err) console.log("Query Error:", err);
             });
         }
     }
 
-    // private dbSaveCustomerName(content: string, user_key: string): void {
-    //     var defered = Q.defer();
-    //     var post = {UNIQUE_ID:user_key, NAME:content};
-    //     console.log("db values:" + JSON.stringify(post));
-    //     connection.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, defered.makeNodeResolver());
-    //     return defered.promise;
-    // }
-
-    // private dbSaveCustomerPhone(content: string, user_key: string): void {
-
-    //     connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
-    //         if (err)
-    //             console.log('Error while performing Query.', err);
-    //     });
-    // }
-
-    // private dbSaveCustomerAuth(content: string, user_key: string): void {
-
-    //     connection.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
-    //         if (err)
-    //             console.log('Error while performing Query.', err);
-    //     });
-    // }
-
     public dbLoadCustomer(user_key: string): void {
         var defered = Q.defer();
 
-        pool.query('SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
+        this.pool.query('SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
         return defered.promise;
     }
 
     private dbSelectScenario(content: string): void {
         var defered = Q.defer();
         // console.log("content:" + content);
-        pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
+        this.pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
         return defered.promise;
     }
 
     private dbSelectScenarioSystem(content: string): void {
         var defered = Q.defer();
         // console.log("content:" + content);
-        pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE ETC2 = ?', content, defered.makeNodeResolver());
+        this.pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE ETC3 = ?', content, defered.makeNodeResolver());
         return defered.promise;
     }
 
     private dbBeforeSelectScenario(content: string, user_key: string): void {
         var defered = Q.defer();
         // console.log("content:" + content);
-        pool.query('SELECT a.* FROM TB_AUTOCHAT_SCENARIO as a, (select * from TB_AUTOCHAT_HISTORY where UNIQUE_ID = ? order by wrtdate desc LIMIT 1)  as b WHERE a.REQ_MESSAGE = b.MESSAGE', user_key, defered.makeNodeResolver());
+        this.pool.query('SELECT a.* FROM TB_AUTOCHAT_SCENARIO as a, (select * from TB_AUTOCHAT_HISTORY where UNIQUE_ID = ? order by wrtdate desc LIMIT 1)  as b WHERE a.REQ_MESSAGE = b.MESSAGE', user_key, defered.makeNodeResolver());
         return defered.promise;
     }
 
     public dbCheckHistory(content: string, user_key: string): void {
         var defered = Q.defer();
-        pool.query('select a.*, b.step, b.trun from TB_AUTOCHAT_HISTORY as a, TB_AUTOCHAT_SCENARIO as b where a.UNIQUE_ID = ? and b.REQ_MESSAGE = a.MESSAGE order by a.wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
+        this.pool.query('select a.*, b.step, b.trun from TB_AUTOCHAT_HISTORY as a, TB_AUTOCHAT_SCENARIO as b where a.UNIQUE_ID = ? and b.REQ_MESSAGE = a.MESSAGE order by a.wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
         return defered.promise;
     }
-
-    // public dbConnection(): void {
-    //     connection.connect();
-    // }
-
-    // public dbRelease(): void {
-    //     connection.end();
-    // }
 }
 
 // Bootstrap the server

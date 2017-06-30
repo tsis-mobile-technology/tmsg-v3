@@ -1422,18 +1422,23 @@ VALUES
   (40,3,0,'콜센터 전화번호','{\"keyboard\":{\"type\":\"text\"},\"message\":{\"message_button\":{\"label\":\"홈페이지방문\",\"url\":\"http:\\/\\/www.tbroad.com\\/\"},\"text\":\"가입관련 자세한 문의는 티브로드 콜센터 1877-7000으로 연락주세요. \\r\\n\\r\\n처음으로 가시려면 \\\"돌아가기\\\" 또는 \\\"#\\\"을 입력해 주세요.\"}}','2017-06-21 20:34:30','일반 문의','24',NULL),
   (41,3,0,'홈페이지주소','{\"keyboard\":{\"type\":\"text\"},\"message\":{\"message_button\":{\"label\":\"홈페이지방문\",\"url\":\"http:\\/\\/www.tbroad.com\\/\"},\"text\":\"홈페이지 주소는 http:\\/\\/www.tbroad.com 입니다. 방문을 원하시면 아래 버튼을 선택해주세요.\\r\\n\\r\\n처음으로 가시려면 \\\"돌아가기\\\"  선택 하시거나 또는 \\\"#\\\"을 입력해주세요.\"}}','2017-06-21 20:35:12','일반 문의','24',NULL),
   (42,0,0,'테스트버튼','{\"keyboard\":{\"type\":\"buttons\"},\"message\":{\"text\":\"1111\"}}','2017-06-23 13:48:06',NULL,NULL,NULL),
-  (60,-1,0,'NAME','{\"message\": {\"text\": \"문의 사항에 대해서 알림톡으로 회신 예정이며 이를 위해 고객님의 성함을 입력해 주세요.\r\n 취소하시려면 \\\"#\\\"을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}','2017-06-26 20:15:00',NULL,'system',NULL),
-  (61,-1,0,'PHONE','{\"message\": {\"text\": \"문의 사항에 대해서 알림톡으로 회신 예정이며 이를 위해 고객님의 핸드폰번호를 - 없이 숫자만 입력해 주세요.\r\n 취소하시려면 \\\"#\\\"을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}','2017-06-26 20:15:19',NULL,'system',NULL),
-  (62,-1,0,'AUTH','{\"message\": {\"text\": \"고객님의 핸드폰번호으로 인증번호를 전달해 드렸습니다. 확인 후 입력을 부탁 드립니다. 숫자만 입력해 주세요.\r\n 취소하시려면 \\\"#\\\"을 입력해 주세요.\"}, \"keyboard\": {\"type\":\"text\"}}','2017-06-26 20:15:20',NULL,'system',NULL),
-  (63,-1,0,'QUESTION_OK','{\"message\":  {\"text\": \"문의가 정상적으로 접수되었습니다. 평일 9시~18시, 빠른 시간 안에 답변 드리겠습니다.\r\n 취소하시려면 \\\"#\\\"을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}','2017-06-26 20:15:20',NULL,'system',NULL);
+  (60,-1,0,'NAME','{\"message\": {\"text\": \"문의 사항에 대해서 알림톡으로 회신 예정이며 이를 위해 고객님의 성함을 입력해 주세요.\r\n 취소하시려면 \\\"#\\\"을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}','2017-06-26 20:15:00',NULL,NULL,'system'),
+  (61,-1,0,'PHONE','{\"message\": {\"text\": \"문의 사항에 대해서 알림톡으로 회신 예정이며 이를 위해 고객님의 핸드폰번호를 - 없이 숫자만 입력해 주세요.\r\n 취소하시려면 \\\"#\\\"을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}','2017-06-26 20:15:19',NULL,NULL,'system'),
+  (62,-1,0,'AUTH','{\"message\": {\"text\": \"고객님의 핸드폰번호으로 인증번호를 전달해 드렸습니다. 확인 후 입력을 부탁 드립니다. 숫자만 입력해 주세요.\r\n 취소하시려면 \\\"#\\\"을 입력해 주세요.\"}, \"keyboard\": {\"type\":\"text\"}}','2017-06-26 20:15:20',NULL,NULL,'system'),
+  (63,-1,0,'QUESTION_OK','{\"message\":  {\"text\": \"문의가 정상적으로 접수되었습니다. 평일 9시~18시, 빠른 시간 안에 답변 드리겠습니다.\r\n 취소하시려면 \\\"#\\\"을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}','2017-06-26 20:15:20',NULL,NULL,'system');
 
 INSERT INTO `TB_AUTOCHAT_SCENARIO` (`STEP`, `TRUN`, `REQ_MESSAGE`, `RES_MESSAGE`, `ETC1`, `ETC2`, `ETC3`)
 VALUES
-  (-1, 0, 'AUTH_OK', '{\"message\":  {\"text\": \"최종 확인하였습니다. 요청하신 정보를 조회합니다. 취소하시려면 \'#\'을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}', NULL, 'system', NULL);
+  (-1, 0, 'AUTH_OK', '{\"message\":  {\"text\": \"최종 확인하였습니다. 요청하신 정보를 조회합니다. 취소하시려면 \'#\'을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}', NULL, NULL, 'system');
 
 INSERT INTO `TB_AUTOCHAT_SCENARIO` (`STEP`, `TRUN`, `REQ_MESSAGE`, `RES_MESSAGE`, `ETC1`, `ETC2`, `ETC3`)
 VALUES
-  (-1, 0, 'AUTH_NOK', '{\"message\":  {\"text\": \"입력하신 인증 번호가 정확하지 않습니다. 오류가 있으시면 채팅방 종료하시면 모든 개인정보를 안전하게 지워집니다.처음으로 가시려면 \'#\'을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}', NULL, 'system', NULL);  
+  (-1, 0, 'AUTH_NOK', '{\"message\":  {\"text\": \"입력하신 인증 번호가 정확하지 않습니다. 오류가 있으시면 채팅방 종료하시면 모든 개인정보를 안전하게 지워집니다.처음으로 가시려면 \'#\'을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}', NULL, NULL, 'system');  
+
+INSERT INTO `TB_AUTOCHAT_SCENARIO` (`STEP`, `TRUN`, `REQ_MESSAGE`, `RES_MESSAGE`, `ETC1`, `ETC2`, `ETC3`)
+VALUES
+  (-1, 0, 'NAME_NOK', '{\"message\":  {\"text\": \"입력하신 전화번호가 정확하지 않습니다. 전화번호는 숫자만 입력하여 주십시요. 이전으로 가시려면 \'#\'을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}', NULL, NULL, 'system');  
+
 
 /*!40000 ALTER TABLE `TB_AUTOCHAT_SCENARIO` ENABLE KEYS */;
 UNLOCK TABLES;

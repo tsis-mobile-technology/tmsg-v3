@@ -82,7 +82,8 @@
     "xmlhttprequest-ssl": "jussikinnula/node-XMLHttpRequest",
     "yamlparser": "*",
     "zone.js": "~0.6.25", 
-    "fast-xml-parser": "~2.5.0"
+    "fast-xml-parser": "~2.5.0",
+    "validator": "~7.2.0"
   },
   "devDependencies": {
     "connect-history-api-fallback": "~1.3.0",
