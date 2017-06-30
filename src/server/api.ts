@@ -587,7 +587,7 @@ class ApiServer {
         // Get socket.io handle
         this.kakao_io = socketIo(this.kakao_server);
 
-        let kakaoSocket = new KakaoSocket(this.kakao_io);
+        // let kakaoSocket = new KakaoSocket(this.kakao_io);
    }
 
     // Start HTTP server listening
