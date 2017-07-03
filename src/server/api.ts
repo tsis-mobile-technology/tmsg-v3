@@ -71,14 +71,6 @@ class ApiServer {
     private kakao_root: string;
     private kakao_port: number;
     private ls: any;
-    //public pool: any;
-    private mtURL: string;
-    private mtIP: string;
-    private mtPort: number;
-    private hpURL: string;
-
-    private IN0002_URL: string;
-    private IN0002_PARAM: string;
 
     // Bootstrap the application.
     public static bootstrap(): ApiServer {
@@ -129,14 +121,6 @@ class ApiServer {
         //    database: 'SMART_MESSAGE_VERTWO',
         //    debug: true
         //});
-
-        this.mtURL = "http://125.132.2.120:30063";
-        this.mtIP = "125.132.2.120";
-        this.mtPort = 30063;
-        this.hpURL = "http://172.16.180.224:30034"; //dev
-        // this.hpURL = "http://172.16.28.27:30034"; //live
-        this.IN0002_URL = "/interface/tbroad/xml_module/CustInvoiceDtlXml";
-        this.IN0002_PARAM = "?KEY_NUM=1234561234567&MONTH_CNT=2&NM_CUST=홍길동&CORP=3200&ID_INSERT=U000000000";
     }
 
     // Configure routes
@@ -290,14 +274,21 @@ class ApiServer {
         Q.all([this.dbSelectScenario(content),this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key),this.dbBeforeSelectScenario(content, user_key),this.dbSelectScenario("keyboard"),this.dbSelectScenarioSystem("system")]).then(function(results){
             //console.log("results:" + JSON.stringify(results));
             if( results[0][0][0] != null ) {
-                re = results[0][0][0].RES_MESSAGE;
-                nowStep = results[0][0][0].STEP;
-                if( nowStep != '1' ) {
-                    var msg = JSON.parse(re);
-                    if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
-                        msg.keyboard.buttons.push("처음으로");
-                        console.log(msg.keyboard.buttons);
-                        re = JSON.stringify(msg);
+                if(content == "요금조회") {
+                    let kakaoSocket = new KakaoSocket(null);
+                    kakaoSocket.getHomepageRequest(content);
+                } 
+                /* else */
+                {
+                    re = results[0][0][0].RES_MESSAGE;
+                    nowStep = results[0][0][0].STEP;
+                    if( nowStep != '1' ) {
+                        var msg = JSON.parse(re);
+                        if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
+                            msg.keyboard.buttons.push("처음으로");
+                            console.log(msg.keyboard.buttons);
+                            re = JSON.stringify(msg);
+                        }
                     }
                 }
             }
@@ -351,6 +342,10 @@ class ApiServer {
                     // 그렇다면 시나리오에 연동이 필요한것인지 필요하다면 URL, Parameter 등등 정보를 관리하여 응답할수 있도록
                     // 기능 추가
                     console.log("이어서 합시다!");
+                    let kakaoSocket = new KakaoSocket(systemContent);
+                    kakaoSocket.getHomepageRequest(content);
+                    // this.fetch = createFetch( base(this.hpURL));
+                    // this.fetch(this.IN0002_URL + this.IN0002_PARAM);
                 } else {
                     // 근데 위 조건에 충족하지 않는다고 해서 무조건 아래와 같은것을 태우는것은 문제가 있다.
                     // 입력된 "content"가 시나리오에서 못찾을 경우 만 거치도록 추가 수정
