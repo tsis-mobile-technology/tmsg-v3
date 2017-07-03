@@ -12,6 +12,7 @@ var net = require('net');
 var fastXmlParser = require('fast-xml-parser');
 var validator = require('validator');
 var spawn = require('child_process').spawn;
+var bodyParser = require('body-parser');
 
 var options = {
     attrPrefix: "@_",
@@ -58,8 +59,6 @@ var options = {
 //     forceNew: true,
 //     transports: ["websocket"]
 // };
-
- var bodyParser = require('body-parser');                      
 
 declare var process, __dirname;
 

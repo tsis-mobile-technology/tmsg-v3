@@ -21,6 +21,7 @@ export class KakaoSocket {
     private hpURL: string;
     private IN0002_URL: string;
     private IN0002_PARAM: string;
+
     constructor(private io: TB_AUTOCHAT_SCENARIO[]) {
         this.inputDatas = io;
 
@@ -30,7 +31,8 @@ export class KakaoSocket {
         this.hpURL = "http://172.16.180.224:30034"; //dev
         // this.hpURL = "http://172.16.28.27:30034"; //live
         this.IN0002_URL = "/interface/tbroad/xml_module/CustInvoiceDtlXml";
-        this.IN0002_PARAM = "?KEY_NUM=1234561234567&MONTH_CNT=2&NM_CUST=홍길동&CORP=3200&ID_INSERT=U000000000";
+        //this.IN0002_PARAM = "KEY_NUM=1234561234567&MONTH_CNT=2&NM_CUST=홍길동&CORP=3200&ID_INSERT=U000000000";
+        this.IN0002_PARAM = "CORP=TBRD&KEY_NUM=MC0GCCqGSIb3DQIJAyEAgw8aXEa%2FEaSbidYQzkCI9WfamqzaFtL%2F7NOaD8JNWGU%3D&NM_CUST=%C1%A4%BC%B1%BF%B5&MONTH_CNT=2";
     }
 
     // Add signal
@@ -45,14 +47,32 @@ export class KakaoSocket {
     }
 
     public getHomepageRequest(method: string): string {
+        //var bodyParser = require('body-parser');
+        //bodyParser.urlencoded(KEY_NUM, 'euc-kr');
+
+        // response charset EUC-KR -> UTF-8
+        var Iconv = require('iconv').Iconv;
+        var iconv = new Iconv('EUC-KR', 'UTF-8');
+
+        var options = {
+            method: 'POST',
+            uri: this.hpURL + this.IN0002_URL,
+            body: this.IN0002_PARAM,
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded; charset=euc-kr'
+            }
+        };
+
         console.log("getHomepageRequest:" + method);
         var rp = require('request-promise');
-        rp(this.hpURL + this.IN0002_URL + this.IN0002_PARAM)
+        //rp(this.hpURL + this.IN0002_URL + this.IN0002_PARAM)
+        rp(options)
         .then(function(htmlString) {
-            console.log(htmlString);
+            console.log("success:" + htmlString);
+            console.log("iconv:" + iconv.convert(htmlString));
         })
         .catch(function(err) {
-            console.log(err);
+            console.log("error:" + err);
         });
         // this.http.get(this.hpURL + this.IN0002_URL + this.IN0002_PARAM ).toPromise()
         // .then(response => console.log("response:" + response.toString()));
