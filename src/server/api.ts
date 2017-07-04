@@ -36,24 +36,24 @@ var options = {
 // const mtURL = "http://localhost:2581";
 // const mtIP = "localhost";
 // const mtPort = 22;
- var pool = mysql.createPool({
-    connectionLimit: 2,
-    host: '14.63.213.246',
-    user: 'smarttest',
-    password: 'test1234',
-    port: 10003,
-    database: 'SMART_MESSAGE_VERTWO',
-    debug: false
- });
 // var pool = mysql.createPool({
-//     connectionLimit: 20,
-//     host: '125.132.2.20 ',
-//     user: 'icr',
-//     password: '1q2w3e4r5t^Y',
-//     port: 3306,
-//     database: 'SMART_MESSAGE_VERTWO',
-//     debug: false
+//    connectionLimit: 2,
+//    host: '14.63.213.246',
+//    user: 'smarttest',
+//    password: 'test1234',
+//    port: 10003,
+//    database: 'SMART_MESSAGE_VERTWO',
+//    debug: false
 // });
+ var pool = mysql.createPool({
+     connectionLimit: 20,
+     host: '125.132.2.20 ',
+     user: 'icr',
+     password: '1q2w3e4r5t^Y',
+     port: 3306,
+     database: 'SMART_MESSAGE_VERTWO',
+     debug: false
+ });
 
 // const mtOptions: SocketIOClient.ConnectOpts = {
 //     forceNew: true,
@@ -273,10 +273,13 @@ class ApiServer {
         Q.all([this.dbSelectScenario(content),this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key),this.dbBeforeSelectScenario(content, user_key),this.dbSelectScenario("keyboard"),this.dbSelectScenarioSystem("system")]).then(function(results){
             //console.log("results:" + JSON.stringify(results));
             if( results[0][0][0] != null ) {
+                /*
                 if(content == "요금조회") {
                     let kakaoSocket = new KakaoSocket(null);
-                    kakaoSocket.getHomepageRequest(content);
-                } 
+                    re = kakaoSocket.getHomepageRequest(content);
+                    console.log("re:" + re);
+                }
+                */
                 /* else */
                 {
                     re = results[0][0][0].RES_MESSAGE;
@@ -557,13 +560,29 @@ class ApiServer {
                     re = beforeResMessage;
                 }
             }
-        })
-        .then(function() {
+        })/*.then(function() {
             //console.log("out re:" + JSON.stringify(re)); 
             callback(null, re);
-        })
-        .done();
+        })*/.then(function() {
+            if(content == "요금조회") {
+                let kakaoSocket = new KakaoSocket(null);
+                //re = kakaoSocket.getHomepageRequest(content);
+                //console.log("re:" + JSON.stringify(re));
+                
+                Q.all([kakaoSocket.getHomepageRequest(content)]).then(function(result){
+                    console.log("result:" + JSON.stringify(result));
+                    re = "{\"message\":{\"text\":\"" + result + "\"},\"keyboard\":{\"type\":\"text\"}}";
+                }).then(function() {
+                    callback(null, re);
+                }).done();
+                //re = "{\"message\":{\"text\":\"안녕하세요!\\n고객명:\\n고객ID:4020520882\\n계열사ID:3400\\n주소:\\n전화번호:010-4898-0329\\n핸드폰:\\n이메일:\\n납무자명:\\n납부계정ID:4002184313\\n납입일:20\\n납부방법:신용카드\\n청구매체:이메일\\n은행(카드사)명:KEB하나카드\\n계좌or카드번호:4029109550****\\n고객상태:사용 중\\n고객신분:N\\n상품리스트:\\n\\n처음으로 가시려면 '#'을 입력하여 주십시요!\"},\"keyboard\":{\"type\":\"text\"}}";
+            } else {
+                callback(null, re);
+            }
+        }).done();
     }
+
+
 
     // Configure databases
     // private databases(): void {
@@ -661,6 +680,13 @@ class ApiServer {
     public dbCheckHistory(content: string, user_key: string): void {
         var defered = Q.defer();
         pool.query('select a.*, b.step, b.trun from TB_AUTOCHAT_HISTORY as a, TB_AUTOCHAT_SCENARIO as b where a.UNIQUE_ID = ? and b.REQ_MESSAGE = a.MESSAGE order by a.wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
+        return defered.promise;
+    }
+
+    public callHp(content: string): string {
+        var defered = Q.defer();
+        let kakaoSocket = new KakaoSocket(null);
+        defered.makeNodeResolver(kakaoSocket.getHomepageRequest(content));
         return defered.promise;
     }
 }

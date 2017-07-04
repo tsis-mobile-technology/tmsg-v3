@@ -64,13 +64,12 @@ export interface IN0002_CUSTOMER {
 }
 
 export interface IN0002_RESULT {
-    customer: IN0002_CUSTOMER; 
-    code: IN_CODE;   
+    customer: IN0002_CUSTOMER[]; 
+    code: IN_CODE[];   
 }
 
 export class KakaoSocket {
     public inputDatas: TB_AUTOCHAT_SCENARIO[];
-    public resultSets: IN0002_RESULT;
     public errorSuccess = '{"keyboard":{"type":"text"}, "message":{"text":"고객님의 죄송합니다!. 시스템 점검중으로 잠시후 다시 시도하여 주십시요.\n 처음으로 가시려면 "#"을 입력해 주세요."}}';
     private mtURL: string;
     private mtIP: string;
@@ -103,42 +102,74 @@ export class KakaoSocket {
         else { return this.errorSuccess;}
     }
 
-    public getHomepageRequest(method: string): string {
+    public getHomepageRequest(cmd: string): string {
         //var bodyParser = require('body-parser');
         //bodyParser.urlencoded(KEY_NUM, 'euc-kr');
 
         // response charset EUC-KR -> UTF-8
         var Iconv = require('iconv').Iconv;
-        var iconv = new Iconv('EUC-KR', 'UTF-8');
+        var iconv = new Iconv('euc-kr', 'UTF-8//TRANSLIT//IGNORE');
 
         var options = {
             method: 'POST',
             uri: this.hpURL + this.IN0002_URL,
             body: this.IN0002_PARAM,
             headers: {
-                'content-type': 'application/x-www-form-urlencoded; charset=euc-kr'
+                'content-type': 'application/x-www-form-urlencoded'
             }
+            //; charset=euc-kr;
         };
-
-        console.log("getHomepageRequest:" + method);
+        var fastXmlParser = require('fast-xml-parser');
+        var xmlOptions = {
+                attrPrefix: "@_",
+                textNodeName: "#text",
+                ignoreNonTextNodeAttr: true,
+                ignoreTextNodeAttr: true,
+                ignoreNameSpace: true,
+                textNodeConversion: true
+            };
         var rp = require('request-promise');
-        //rp(this.hpURL + this.IN0002_URL + this.IN0002_PARAM)
+        var Q      = require("q");
+        var deferred = Q.defer();
+
         rp(options)
         .then(function(htmlString) {
-            console.log("success:" + htmlString);
-            console.log("iconv:" + iconv.convert(htmlString));
-            this.resultSets = iconv.convert(htmlString);
-            if( this.resultSets != null ) {
-                return this.resultSets.customer.Id;
+
+            if (fastXmlParser.validate(htmlString) === true) {
+                var jsonObj = fastXmlParser.parse(htmlString, xmlOptions);
+                //var resultObj = JSON.parse(JSON.stringify(jsonObj.list)).customer;
+                var resultSets: IN0002_CUSTOMER;
+                resultSets = jsonObj.list.customer;
+                console.log(JSON.stringify(resultSets));
+                //console.log(JSON.stringify(resultSets.Name));
+                console.log("resultSets.Name:" + iconv.convert(resultSets.Name));
+                // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
+                // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
+                // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
+                // console.log(resultObj);
+                //return resultSets.Name + "/" + resultSets.Id + "/" + resultSets.AccountId;
+                deferred.resolve(resultSets.Name + "/" + resultSets.Id + "/" + resultSets.AccountId);
             }
+            
+            /*
+            var resultSets: string;
+            resultSets = iconv.convert(htmlString);
+            if( resultSets != null ) {
+                console.log(resultSets);
+                return resultSets;
+            }
+            */
         })
         .catch(function(err) {
-            console.log("error:" + err);
+            //console.log("error:" + err);
+            //return err;
+            deferred.reject(err);
         });
         // this.http.get(this.hpURL + this.IN0002_URL + this.IN0002_PARAM ).toPromise()
         // .then(response => console.log("response:" + response.toString()));
 
-        return "";
+        //return "default";
+        return deferred.promise;
     }
 }
 
