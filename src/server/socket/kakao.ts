@@ -102,21 +102,69 @@ export class KakaoSocket {
         else { return this.errorSuccess;}
     }
 
+    public getTest(): void {
+	var Iconv  = require('iconv').Iconv;
+
+	var euckr2utf8 = new Iconv('EUC-KR', 'UTF-8');
+	var utf82euckr = new Iconv('UTF-8', 'EUC-KR');
+
+	// utf8 안녕하세요
+	var buff_utf8 = new Buffer(15); 
+	buff_utf8[0] = 0xec;
+	buff_utf8[1] = 0x95;
+	buff_utf8[2] = 0x88;
+	buff_utf8[3] = 0xeb;
+	buff_utf8[4] = 0x85;
+	buff_utf8[5] = 0x95;
+	buff_utf8[6] = 0xed;
+	buff_utf8[7] = 0x95;
+	buff_utf8[8] = 0x98;
+	buff_utf8[9] = 0xec;
+	buff_utf8[10] = 0x84;
+	buff_utf8[11] = 0xb8;
+	buff_utf8[12] = 0xec;
+	buff_utf8[13] = 0x9a;
+	buff_utf8[14] = 0x94;
+
+	// euc-kr 안녕하세요
+	var buff_euckr = new Buffer(10);
+	buff_euckr[0] = 0xbe;
+	buff_euckr[1] = 0xc8;
+	buff_euckr[2] = 0xb3;
+	buff_euckr[3] = 0xe7;
+	buff_euckr[4] = 0xc7;
+	buff_euckr[5] = 0xcf;
+	buff_euckr[6] = 0xbc;
+	buff_euckr[7] = 0xbc;
+	buff_euckr[8] = 0xbf;
+	buff_euckr[9] = 0xe4;
+
+	console.log("---------------------------------------");
+	console.log("euckr : "+buff_euckr.toString());
+	console.log("euckr2uf8 : "+euckr2utf8.convert(buff_euckr));
+
+	console.log("\n---------------------------------------");
+	console.log("utf8 : "+buff_utf8.toString());
+	console.log("utf82euckr : "+utf82euckr.convert(buff_utf8));
+    }
+
     public getHomepageRequest(cmd: string): string {
         //var bodyParser = require('body-parser');
         //bodyParser.urlencoded(KEY_NUM, 'euc-kr');
 
         // response charset EUC-KR -> UTF-8
         var Iconv = require('iconv').Iconv;
-        var iconv = new Iconv('euc-kr', 'UTF-8//TRANSLIT//IGNORE');
+        //var euckr2utf8 = new Iconv('EUC-KR', 'UTF-8//TRANSLIT//IGNORE');
+        var euckr2utf8 = new Iconv('euc-kr', 'utf-8');
 
         var options = {
             method: 'POST',
             uri: this.hpURL + this.IN0002_URL,
             body: this.IN0002_PARAM,
             headers: {
-                'content-type': 'application/x-www-form-urlencoded'
-            }
+                'content-type': 'application/x-www-form-urlencoded; charset=EUC-KR'
+            },
+            encoding: 'binary'
             //; charset=euc-kr;
         };
         var fastXmlParser = require('fast-xml-parser');
@@ -136,24 +184,45 @@ export class KakaoSocket {
         .then(function(htmlString) {
 
             if (fastXmlParser.validate(htmlString) === true) {
+                //var data = euckr2utf8.convert(htmlString).toString('utf-8');
+                //console.log("from: " + htmlString);
+                //console.log("to: " + data);
                 var jsonObj = fastXmlParser.parse(htmlString, xmlOptions);
                 //var resultObj = JSON.parse(JSON.stringify(jsonObj.list)).customer;
+
                 var resultSets: IN0002_CUSTOMER;
                 resultSets = jsonObj.list.customer;
-                console.log(JSON.stringify(resultSets));
-                //console.log(JSON.stringify(resultSets.Name));
-                console.log("resultSets.Name:" + iconv.convert(resultSets.Name));
+                var binaryName = new Buffer(resultSets.Name, 'binary');
+                console.log("resultSets.Name:from" + binaryName);
+                console.log("resultSets.Name:to" + euckr2utf8.convert(binaryName));
+                console.log("resultSets.Name:to" + euckr2utf8.convert(binaryName).toString());
+                console.log("resultSets.Name:to" + euckr2utf8.convert(binaryName).toString('UTF-8'));
+	// euc-kr 안녕하세요
+	var buff_euckr = new Buffer(10);
+	buff_euckr[0] = 0xbe;
+	buff_euckr[1] = 0xc8;
+	buff_euckr[2] = 0xb3;
+	buff_euckr[3] = 0xe7;
+	buff_euckr[4] = 0xc7;
+	buff_euckr[5] = 0xcf;
+	buff_euckr[6] = 0xbc;
+	buff_euckr[7] = 0xbc;
+	buff_euckr[8] = 0xbf;
+	buff_euckr[9] = 0xe4;
+                console.log("resultSets.Name:from" + buff_euckr);
+                console.log("resultSets.Name:to" + euckr2utf8.convert(buff_euckr));
+
                 // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
                 // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
                 // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
                 // console.log(resultObj);
                 //return resultSets.Name + "/" + resultSets.Id + "/" + resultSets.AccountId;
-                deferred.resolve(resultSets.Name + "/" + resultSets.Id + "/" + resultSets.AccountId);
+                deferred.resolve( euckr2utf8.convert(binaryName) + "/" + resultSets.Id + "/" + resultSets.AccountId);
             }
             
             /*
             var resultSets: string;
-            resultSets = iconv.convert(htmlString);
+            resultSets = euckr2utf8.convert(htmlString);
             if( resultSets != null ) {
                 console.log(resultSets);
                 return resultSets;

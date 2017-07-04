@@ -568,6 +568,8 @@ class ApiServer {
                 let kakaoSocket = new KakaoSocket(null);
                 //re = kakaoSocket.getHomepageRequest(content);
                 //console.log("re:" + JSON.stringify(re));
+                // for Test
+                kakaoSocket.getTest();
                 
                 Q.all([kakaoSocket.getHomepageRequest(content)]).then(function(result){
                     console.log("result:" + JSON.stringify(result));
