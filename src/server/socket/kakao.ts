@@ -12,8 +12,65 @@ export interface TB_AUTOCHAT_SCENARIO {
     ETC3: string;
 }
 
+export interface IN_CODE {
+    Code: string; //<Code>0000</Code>  
+}
+
+export interface IN0002_CUSTOMER {
+    Name: string;
+    Id: string;
+    IdSo: string;
+    Address: string;
+    Phone: string;
+    HandPhone: string;
+    Email: string;
+    AccountName: string;
+    AccountId: string;
+    IssueDate: string;
+    PayMethod: string;
+    Media: string;
+    FinancialName: string;
+    Account: string;
+    Status: string;
+    Social: string;
+    Products: string;
+    SumAmtCurInv: string;
+    SumAmtCurNonpmt: string;
+    /*
+    <Invoices>    
+        <invoice YyyymmInv="201706" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="0" AmtUnpmt="33600" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170501" CalcEndDay="20170531">     
+            <ProdUseDtls>      
+                <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="0" AmtUnpmt="7700" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
+                <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="0" AmtUnpmt="600" AmtSupply="0" AmtVat="0" AmtTrunc="0" />      
+                <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="0" AmtUnpmt="25300" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />     
+            </ProdUseDtls>    
+        </invoice>    
+        <invoice YyyymmInv="201705" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="33600" AmtUnpmt="0" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170401" CalcEndDay="20170430">     
+            <ProdUseDtls>      
+                <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="7700" AmtUnpmt="0" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
+                <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="25300" AmtUnpmt="0" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />      
+                <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="600" AmtUnpmt="0" AmtSupply="0" AmtVat="0" AmtTrunc="0" />     
+            </ProdUseDtls>    
+        </invoice>    
+        <invoice YyyymmInv="201704" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="33600" AmtUnpmt="0" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170301" CalcEndDay="20170331">     
+            <ProdUseDtls>      
+                <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="7700" AmtUnpmt="0" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
+                <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="25300" AmtUnpmt="0" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />      
+                <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="600" AmtUnpmt="0" AmtSupply="0" AmtVat="0" AmtTrunc="0" />     
+            </ProdUseDtls>    
+        </invoice>   
+    </Invoices>  
+    */
+}
+
+export interface IN0002_RESULT {
+    customer: IN0002_CUSTOMER; 
+    code: IN_CODE;   
+}
+
 export class KakaoSocket {
     public inputDatas: TB_AUTOCHAT_SCENARIO[];
+    public resultSets: IN0002_RESULT;
     public errorSuccess = '{"keyboard":{"type":"text"}, "message":{"text":"고객님의 죄송합니다!. 시스템 점검중으로 잠시후 다시 시도하여 주십시요.\n 처음으로 가시려면 "#"을 입력해 주세요."}}';
     private mtURL: string;
     private mtIP: string;
@@ -70,6 +127,10 @@ export class KakaoSocket {
         .then(function(htmlString) {
             console.log("success:" + htmlString);
             console.log("iconv:" + iconv.convert(htmlString));
+            this.resultSets = iconv.convert(htmlString);
+            if( this.resultSets != null ) {
+                return this.resultSets.customer.Id;
+            }
         })
         .catch(function(err) {
             console.log("error:" + err);
@@ -80,3 +141,56 @@ export class KakaoSocket {
         return "";
     }
 }
+
+/* IN0002 result XML
+<?xml version="1.0" encoding="euc-kr"?>
+<list>  
+    <customer>   
+        <Name>������</Name>   
+        <Id>4020520882</Id>   
+        <IdSo>3400</IdSo>   
+        <Address>���⵵ �Ȼ��� �ܿ��� �κη�5�� 5  3101ȣ</Address>   
+        <Phone></Phone>   
+        <HandPhone>010-4898-0329</HandPhone>   
+        <Email></Email>   
+        <AccountName>������</AccountName>   
+        <AccountId>4002184313</AccountId>   
+        <IssueDate>20</IssueDate>   
+        <PayMethod>�����ڵ���ü</PayMethod>   
+        <Media>�˸���</Media>   
+        <FinancialName>KEB�ϳ�</FinancialName>   
+        <Account>4029109550****</Account>   
+        <Status>������</Status>   
+        <Social>N</Social>   
+        <Products></Products>   
+        <SumAmtCurInv></SumAmtCurInv>   
+        <SumAmtCurNonpmt></SumAmtCurNonpmt>   
+        <Invoices>    
+            <invoice YyyymmInv="201706" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="0" AmtUnpmt="33600" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170501" CalcEndDay="20170531">     
+                <ProdUseDtls>      
+                    <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="0" AmtUnpmt="7700" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
+                    <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="0" AmtUnpmt="600" AmtSupply="0" AmtVat="0" AmtTrunc="0" />      
+                    <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="0" AmtUnpmt="25300" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />     
+                </ProdUseDtls>    
+            </invoice>    
+            <invoice YyyymmInv="201705" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="33600" AmtUnpmt="0" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170401" CalcEndDay="20170430">     
+                <ProdUseDtls>      
+                    <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="7700" AmtUnpmt="0" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
+                    <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="25300" AmtUnpmt="0" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />      
+                    <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="600" AmtUnpmt="0" AmtSupply="0" AmtVat="0" AmtTrunc="0" />     
+                </ProdUseDtls>    
+            </invoice>    
+            <invoice YyyymmInv="201704" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="33600" AmtUnpmt="0" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170301" CalcEndDay="20170331">     
+                <ProdUseDtls>      
+                    <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="7700" AmtUnpmt="0" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
+                    <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="25300" AmtUnpmt="0" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />      
+                    <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="600" AmtUnpmt="0" AmtSupply="0" AmtVat="0" AmtTrunc="0" />     
+                </ProdUseDtls>    
+            </invoice>   
+        </Invoices>  
+    </customer>  
+    <code>   
+        <Code>0000</Code>  
+    </code> 
+</list>
+*/
