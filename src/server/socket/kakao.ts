@@ -204,7 +204,8 @@ export class KakaoSocket {
                 //var data = euckr2utf8.convert(htmlString).toString('utf-8');
                 //console.log("from: " + htmlString);
                 //console.log("to: " + data);
-                var jsonObj = fastXmlParser.parse(htmlString, xmlOptions);
+                //var jsonObj = fastXmlParser.parse(htmlString, xmlOptions);
+                var jsonObj = fastXmlParser.parse(euckr2utf8.convert(binaryString), xmlOptions);
                 //var resultObj = JSON.parse(JSON.stringify(jsonObj.list)).customer;
 
                 var resultSets: IN0002_CUSTOMER;
@@ -221,7 +222,7 @@ export class KakaoSocket {
                 // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
                 // console.log(resultObj);
                 //return resultSets.Name + "/" + resultSets.Id + "/" + resultSets.AccountId;
-                deferred.resolve( euckr2utf8.convert(binaryName) + "/" + resultSets.Id + "/" + resultSets.AccountId);
+                deferred.resolve( resultSets.Name + "/" + resultSets.Id + "/" + resultSets.AccountId);
             }
             
             /*

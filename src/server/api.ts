@@ -24,15 +24,15 @@ var options = {
 };
 
 // open test
- var pool = mysql.createPool({
-    connectionLimit: 10, //important
-    host     : 'localhost',
-    user     : 'icr',
-    password : '1q2w3e4r',
-    port     : 3306,
-    database : 'SMART_MESSAGE_VERTWO',
-    debug: false
-});
+// var pool = mysql.createPool({
+//    connectionLimit: 10, //important
+//    host     : 'localhost',
+//    user     : 'icr',
+//    password : '1q2w3e4r',
+//    port     : 3306,
+//    database : 'SMART_MESSAGE_VERTWO',
+//    debug: false
+//});
 // const mtURL = "http://localhost:2581";
 // const mtIP = "localhost";
 // const mtPort = 22;
@@ -45,15 +45,15 @@ var options = {
 //    database: 'SMART_MESSAGE_VERTWO',
 //    debug: false
 // });
- // var pool = mysql.createPool({
- //     connectionLimit: 20,
- //     host: '125.132.2.20 ',
- //     user: 'icr',
- //     password: '1q2w3e4r5t^Y',
- //     port: 3306,
- //     database: 'SMART_MESSAGE_VERTWO',
- //     debug: false
- // });
+  var pool = mysql.createPool({
+      connectionLimit: 20,
+      host: '125.132.2.20 ',
+      user: 'icr',
+      password: '1q2w3e4r5t^Y',
+      port: 3306,
+      database: 'SMART_MESSAGE_VERTWO',
+      debug: false
+  });
 
 declare var process, __dirname;
 
@@ -261,6 +261,7 @@ class ApiServer {
         var systemContent = null;
         var nOTP = null;
         var contentValidation = null;
+        var hpIf = null;
 
         if (content == "#" || content == "처음으로") content = "keyboard";
 
@@ -270,6 +271,7 @@ class ApiServer {
             if( results[0][0][0] != null ) {
                 re = results[0][0][0].RES_MESSAGE;
                 nowStep = results[0][0][0].STEP;
+                hpIf = results[0][0][0].ETC3;
                 if( nowStep != '1' ) {
                     var msg = JSON.parse(re);
                     if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
@@ -279,7 +281,7 @@ class ApiServer {
                 }
             }
         }).then(function() {
-            if(re != null) {
+            if(re != null && hpIf == null) {
 
                 if( re != null ) {
                     var post = {UNIQUE_ID:user_key, MESSAGE:content};
@@ -466,7 +468,8 @@ console.log("re is null");
                                 contentValidation = validator.isDecimal(content);
                                 if( contentValidation == true && content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
                                     //re = kakaoSocket.findXml("AUTH_OK");
-                                    re = beforeResMessage;
+                                    //re = beforeResMessage;
+                                    re = keyboardContent;
                                     updateType = "AUTH_OK";// 인증을 성공하였으면 마지막 메뉴로 자동 이동시켜 원하는 정보를 선택하게 한다.
                                 } else {
                                     re = kakaoSocket.findXml("AUTH_NOK");
@@ -490,9 +493,9 @@ console.log("re is null");
                                 // local case
                                 //this.ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
                                 // linux case
-                                kakaoSocket.ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+                                //kakaoSocket.ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
                                 // tbroad case
-                                // this.ls = spawn('/home/icr/tmsg-v3/shorturl');
+                                kakaoSocket.ls = spawn('/home/icr/tmsg-v3/shorturl');
                                 kakaoSocket.ls.stdout.on('data', (data) => {
                                     console.log(`stdout: ${data}`);
                                     nOTP = data;

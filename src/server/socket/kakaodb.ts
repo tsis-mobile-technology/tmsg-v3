@@ -2,15 +2,24 @@
 export class KakaoDb {
 	private Q      = require("q");
 	private mysql  = require('mysql');
-	private pool = this.mysql.createPool({
-		connectionLimit: 10, //important
-		host     : 'localhost',
-		user     : 'icr',
-		password : '1q2w3e4r',
-		port     : 3306,
-		database : 'SMART_MESSAGE_VERTWO',
-		debug: false
-	});
+	//private pool = this.mysql.createPool({
+	//	connectionLimit: 10, //important
+	//	host     : 'localhost',
+	//	user     : 'icr',
+	//	password : '1q2w3e4r',
+	//	port     : 3306,
+	//	database : 'SMART_MESSAGE_VERTWO',
+	//	debug: false
+	//});
+    private pool = this.mysql.createPool({
+      connectionLimit: 20,
+      host: '125.132.2.20 ',
+      user: 'icr',
+      password: '1q2w3e4r5t^Y',
+      port: 3306,
+      database: 'SMART_MESSAGE_VERTWO',
+      debug: false
+    });
 
     constructor() { }
 
