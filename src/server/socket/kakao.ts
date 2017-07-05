@@ -184,6 +184,8 @@ export class KakaoSocket {
         .then(function(htmlString) {
 
             if (fastXmlParser.validate(htmlString) === true) {
+                var binaryString = new Buffer(htmlString, 'binary');
+                console.log("htmlString:to" + euckr2utf8.convert(binaryString));
                 //var data = euckr2utf8.convert(htmlString).toString('utf-8');
                 //console.log("from: " + htmlString);
                 //console.log("to: " + data);

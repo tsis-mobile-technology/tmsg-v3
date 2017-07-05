@@ -55,11 +55,6 @@ var options = {
      debug: false
  });
 
-// const mtOptions: SocketIOClient.ConnectOpts = {
-//     forceNew: true,
-//     transports: ["websocket"]
-// };
-
 declare var process, __dirname;
 
 class ApiServer {
@@ -211,6 +206,9 @@ class ApiServer {
             var user_key = request.body.user_key;
             var re;
             try {
+                pool.query('DELETE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', request.params.user_key, function(err, rows, fields) {
+                        if(err) console.log("Query Error:", err);
+                });
                 re = {text:'param : ' + user_key};
             } catch (exception) {
                 console.log('friend del:응답 에러');
@@ -227,9 +225,6 @@ class ApiServer {
             var user_key = request.body.user_key;
             var re;
             try {
-                pool.query('DELETE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', request.params.user_key, function(err, rows, fields) {
-                        if(err) console.log("Query Error:", err);
-                });
                 re = {text:'param : ' + user_key};
             } catch (exception) {
                 console.log('chat_room del:응답 에러');
@@ -255,331 +250,344 @@ class ApiServer {
     }
 
     private getMessageResponse(content: string, user_key: string, type: string, callback: any): void {
-        var re;
-        var beforeResMessage;
-        var beforeReqMessage;
-        var rtnStr;
-        var updateType;
-        var beforeContent;
-        var beforeStep;
-        var nowStep;
-        var keyboardContent;
-        var systemContent;
-        var nOTP;
-        var contentValidation;
+        var re = null;
+        var beforeResMessage = null;
+        var beforeReqMessage = null;
+        var rtnStr = null;
+        var updateType = null;
+        var beforeContent = null;
+        var beforeStep = null;
+        var nowStep = null;
+        var keyboardContent = null;
+        var systemContent = null;
+        var nOTP = null;
+        var contentValidation = null;
 
-        if (content == "#") content = "keyboard";
+        if (content == "#" || content == "처음으로") content = "keyboard";
 
-        Q.all([this.dbSelectScenario(content),this.dbCheckHistory(content, user_key),this.dbLoadCustomer(user_key),this.dbBeforeSelectScenario(content, user_key),this.dbSelectScenario("keyboard"),this.dbSelectScenarioSystem("system")]).then(function(results){
-            //console.log("results:" + JSON.stringify(results));
+        Q.all([this.dbSelectScenario(content)]) // 1. 요청 문구에 대한 시나리오 확인
+            .then(function(results) {
+
             if( results[0][0][0] != null ) {
-                /*
-                if(content == "요금조회") {
-                    let kakaoSocket = new KakaoSocket(null);
-                    re = kakaoSocket.getHomepageRequest(content);
-                    console.log("re:" + re);
-                }
-                */
-                /* else */
-                {
-                    re = results[0][0][0].RES_MESSAGE;
-                    nowStep = results[0][0][0].STEP;
-                    if( nowStep != '1' ) {
-                        var msg = JSON.parse(re);
-                        if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
-                            msg.keyboard.buttons.push("처음으로");
-                            console.log(msg.keyboard.buttons);
-                            re = JSON.stringify(msg);
-                        }
-                    }
-                }
-            }
-            else re = null;
-            
-            if( results[1][0][0] != null ) {
-                beforeContent = results[1][0][0].MESSAGE;
-                beforeStep = results[1][0][0].STEP;
-            }
-            else beforeContent = null;
-
-            if( results[2][0][0] != null )
-                rtnStr = results[2][0][0];
-            else rtnStr = null;
-
-            if( results[3][0][0] != null ) {
-                beforeResMessage = results[3][0][0].RES_MESSAGE;
-                beforeReqMessage = results[3][0][0].REQ_MESSAGE;
-            }
-            else {
-                beforeResMessage = null;
-                beforeReqMessage = null;
-            }
-
-            if( results[4][0][0] != null )
-                keyboardContent = JSON.parse(results[4][0][0].RES_MESSAGE).keyboard;
-            else keyboardContent = null;
-
-            if (results[5][0][0] != null) {
-                systemContent = results[5][0];
-            }
-            else
-                systemContent = null;
-        }).then(function() {
-            // this.dbSaveHistory(content, user_key, type);
-            if( re != null ) {
-                var post = {UNIQUE_ID:user_key, MESSAGE:content};
-                console.log("db values:" + JSON.stringify(post));
-
-                pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
-                if (err)
-                    console.log('Error while performing Query.', err);
-                });
-            }
-        }).then(function() {
-  
-            if( re == null && content != "keyboard" && content != "처음으로" && content != "취소하기") {
-
-                if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "Y" ) {
-                    // 메뉴 중에 개인 정보가 필요하건에 대해서는 연동처리 하여 응답한다. 
-                    // 그렇다면 시나리오에 연동이 필요한것인지 필요하다면 URL, Parameter 등등 정보를 관리하여 응답할수 있도록
-                    // 기능 추가
-                    console.log("이어서 합시다!");
-                    let kakaoSocket = new KakaoSocket(systemContent);
-                    kakaoSocket.getHomepageRequest(content);
-                    // this.fetch = createFetch( base(this.hpURL));
-                    // this.fetch(this.IN0002_URL + this.IN0002_PARAM);
-                } else {
-                    // 근데 위 조건에 충족하지 않는다고 해서 무조건 아래와 같은것을 태우는것은 문제가 있다.
-                    // 입력된 "content"가 시나리오에서 못찾을 경우 만 거치도록 추가 수정
-                    // 고객의 가장 최근 이력(히스토리) 메뉴가 본인인증이 되어 있어야 사용가능한지를 시나리오 관리 테이블에서 추가로
-                    // 관리하자.
-                    if( rtnStr == null) {
-                        updateType = "INS_PHONE";
-                        let kakaoSocket = new KakaoSocket(systemContent);
-                        re = kakaoSocket.findXml("NAME");
-                        contentValidation = validator.isDecimal(content);
-                        if( contentValidation != true ) { // 숫자 비교해서 같은면
-                            //re = kakaoSocket.findXml("AUTH_OK");
-                            re = kakaoSocket.findXml("NAME_NOK");
-                            updateType = "NAME_NOK";
-                        }
-                    } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
-                        updateType = "UPD_PHONE";
-                        let kakaoSocket = new KakaoSocket(systemContent);
-                        re = kakaoSocket.findXml("NAME");
-                        contentValidation = validator.isDecimal(content);
-                        if( contentValidation != true ) { // 숫자 비교해서 같은면
-                            //re = kakaoSocket.findXml("AUTH_OK");
-                            re = kakaoSocket.findXml("NAME_NOK");
-                            updateType = "NAME_NOK";
-                        }
-                    } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
-                        updateType = "NAME";
-                        let kakaoSocket = new KakaoSocket(systemContent);
-                        re = kakaoSocket.findXml("AUTH");
-                    } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 == null) {
-                        updateType = "NAME";
-                        //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
-                        let kakaoSocket = new KakaoSocket(systemContent);
-                        re = kakaoSocket.findXml("AUTH");
-                    } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 != null) {
-                        updateType = "AUTH";
-                        //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
-                        let kakaoSocket = new KakaoSocket(systemContent);
-                        contentValidation = validator.isDecimal(content);
-                        if( contentValidation == true && content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
-                            //re = kakaoSocket.findXml("AUTH_OK");
-                            re = beforeResMessage;
-                            updateType = "AUTH_OK";// 인증을 성공하였으면 마지막 메뉴로 자동 이동시켜 원하는 정보를 선택하게 한다.
-                        } else {
-                            re = kakaoSocket.findXml("AUTH_NOK");
-                            updateType = "AUTH_NOK";
-                        }
-                    } else {
-                        let kakaoSocket = new KakaoSocket(systemContent);
-                        re = kakaoSocket.findXml("AUTH_NOK");
-                    }
-
-                    if( updateType == "INS_PHONE" ) {
-                        var cust_post = {UNIQUE_ID:user_key, PHONE:content};
-                        pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
-                            if(err) console.log("Query Error:", err);
-                        });
-                    } else if( updateType == "UPD_PHONE" ) {
-                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
-                            if(err) console.log("Query Error:", err);
-                        });
-                    } else if( updateType == "NAME" ) {
-                            // local case
-                            //this.ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
-                            // linux case
-                            //this.ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
-                            // tbroad case
-                            this.ls = spawn('/home/icr/tmsg-v3/shorturl');
-                            this.ls.stdout.on('data', (data) => {
-                                console.log(`stdout: ${data}`);
-                                nOTP = data;
-                                if( nOTP != null ) {
-                                    // 1. send SMS customer phone
-                                    // 2. DB Update
-                                    // const client = socketIoClient.connect(mtURL, options);
-
-                                    // var messageSize = mtMessage.length+"";
-                                    var sendMessage = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>" + nOTP + "</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>" + rtnStr.PHONE + "</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1000</IDSO></REQUEST>";
-                                    var messageSize = sendMessage.length + "";
-                                    while (messageSize.length < 5) messageSize = "0" + messageSize;
-
-                                    var sendData = messageSize + sendMessage;
-                                    
-                                    var client = new net.Socket();
-                                    client.connect(this.mtPort, this.mtIP, function () {
-                                        console.log('CONNECTED TO: ' + this.mtIP + ':' + this.mtPort);
-                                        // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
-                                        client.write(sendData);
-                                    });
-                                    // Add a 'data' event handler for the client socket
-                                    // data is what the server sent to this socket
-                                    client.on('data', function (data) {
-                                        console.log("data:" + data);
-                                        var str = data;
-                                        // Close the client socket completely
-                                        var res = new String(str.slice(5));
-                                        // res = res.replace(/\\r\\n/g, "");
-                                        if (fastXmlParser.validate(res) === true) {
-                                            var jsonObj = fastXmlParser.parse(res, options);
-                                            var resultObj = JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG;
-                                            // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
-                                            // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
-                                            // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
-                                            if (resultObj == "SUCCESS") {
-                                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function (err, rows, fields) {
-                                                    if (err)
-                                                        console.log("Query Error:", err);
-                                                });
-                                            }
-                                        }
-                                        client.destroy();
-                                    });
-                                    // Add a 'close' event handler for the client socket
-                                    client.on('close', function () {
-                                        console.log('Connection closed');
-                                    });
-                                }
-                            });
-
-                            this.ls.stderr.on('data', (data) => {
-                              console.log(`stderr: ${data}`);
-                              // retry ? 
-                            });
-
-                            this.ls.on('close', (code) => {
-                              console.log(`child process exited with code ${code}`);
-                            });
-                    } else if( updateType == "AUTH_OK") {
-                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
-                            if(err) console.log("Query Error:", err);
-                        });
-                    } else if( updateType == "AUTH_NOK") {
-                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["N", user_key], function(err, rows, fields) {
-                            if(err) console.log("Query Error:", err);
-                        });
+                re = results[0][0][0].RES_MESSAGE;
+                nowStep = results[0][0][0].STEP;
+                if( nowStep != '1' ) {
+                    var msg = JSON.parse(re);
+                    if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
+                        msg.keyboard.buttons.push("처음으로");
+                        console.log(msg.keyboard.buttons);
+                        re = JSON.stringify(msg);
                     }
                 }
             }
         }).then(function() {
-
-            if (re == null) {
-// console.log("beforeContent:" + beforeContent);
-// console.log("beforeStep:" + beforeStep);
-// console.log("rtnStr:" + rtnStr);
-/* 답변 처리에 대한 로직이 추가 되어야 한다. */
-                // if (beforeContent == "주문 조회") {
-                //     re = depth_First_Second_First_Response;
-                // } else if (beforeContent == "배송지 변경") {
-                //     re = depth_First_Second_Second_Response;
-                // } else if (beforeContent == "주문 최소") {
-                //     re = depth_First_Second_Third_Response;
-                // } else 
-                if (beforeContent == "사진 첨부 후 문의하기") {
-                    /*
-                    등록한 사진을 어디론가 옮기고 이력저장하고 
-                    */
-                    var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
-                    console.log("db values:" + JSON.stringify(post));
-
-                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
-                    if (err)
-                    console.log('Error while performing Query.', err);
-                    });
-                    // re = depth_First_Third_Last_Response;
-                    let kakaoSocket = new KakaoSocket(systemContent);
-                    re = kakaoSocket.findXml("QUESTION_OK");
-                } else if (beforeContent == "문의사항만 입력") {
-                    /*
-                    등록한 사진을 어디론가 옮기고 이력저장하고 
-                    */
-                    var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
-                    console.log("db values:" + JSON.stringify(post));
-
-                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
-                    if (err)
-                    console.log('Error while performing Query.', err);
-                    });
-                    // re = depth_First_Third_Last_Response;
-                    let kakaoSocket = new KakaoSocket(systemContent);
-                    re = kakaoSocket.findXml("QUESTION_OK");
-                } else if (beforeContent == "티브로드에 문의하기") {
-                    /*
-                    등록한 사진을 어디론가 옮기고 이력저장하고 
-                    */
-                    var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
-                    console.log("db values:" + JSON.stringify(post));
-
-                    pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
-                    if (err)
-                    console.log('Error while performing Query.', err);
-                    });
-                    // re = depth_First_Third_Last_Response;
-                    let kakaoSocket = new KakaoSocket(systemContent);
-                    re = kakaoSocket.findXml("QUESTION_OK");
-                } else if ( beforeContent != "keyboard" && beforeStep == '3' ) {
-                    re = {
-                        "message": 
-                            {"text": "1:1 자동응답 기능 테스트 용입니다. 좀더 다양한 기능은 추후 제공 하도록 하겠습니다.\n 처음으로 돌아가시려면 '#'을 입력하세요!"},
-                        "keyboard": 
-                            {"type":"text"}
-                        };;
-                } 
-                var depth_First;
-
-                if(content == '취소하기' || content == '#' || content == '처음으로') {
-                    re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": keyboardContent};
-                } 
-                    
-                if(re == null ) {
-                    re = beforeResMessage;
-                }
-            }
-        })/*.then(function() {
-            //console.log("out re:" + JSON.stringify(re)); 
-            callback(null, re);
-        })*/.then(function() {
-            if(content == "요금조회") {
-                let kakaoSocket = new KakaoSocket(null);
-                //re = kakaoSocket.getHomepageRequest(content);
-                //console.log("re:" + JSON.stringify(re));
-                // for Test
-                kakaoSocket.getTest();
-                
-                Q.all([kakaoSocket.getHomepageRequest(content)]).then(function(result){
-                    console.log("result:" + JSON.stringify(result));
-                    re = "{\"message\":{\"text\":\"" + result + "\"},\"keyboard\":{\"type\":\"text\"}}";
-                }).then(function() {
-                    callback(null, re);
-                }).done();
-                //re = "{\"message\":{\"text\":\"안녕하세요!\\n고객명:\\n고객ID:4020520882\\n계열사ID:3400\\n주소:\\n전화번호:010-4898-0329\\n핸드폰:\\n이메일:\\n납무자명:\\n납부계정ID:4002184313\\n납입일:20\\n납부방법:신용카드\\n청구매체:이메일\\n은행(카드사)명:KEB하나카드\\n계좌or카드번호:4029109550****\\n고객상태:사용 중\\n고객신분:N\\n상품리스트:\\n\\n처음으로 가시려면 '#'을 입력하여 주십시요!\"},\"keyboard\":{\"type\":\"text\"}}";
-            } else {
+console.log(JSON.stringify(re));
+            if(re != null) {
                 callback(null, re);
+            } else {
+                Q.all([ this.dbCheckHistory(content, user_key),             // 2. 사용자별 최종 사용(메뉴)이력 확인(TB_AUTOCHAT_HISTORY)
+                        this.dbLoadCustomer(user_key),                      // 3. 사용자 정보 조회
+                        this.dbBeforeSelectScenario(content, user_key),     // 4. 사용자별 최종 접근(메뉴)이력 확인(TB_AUTOCHAT_SCENARIO)
+                        this.dbSelectScenario("keyboard"),                  // 5. "#"등 기본 응답 메세지 선택
+                        this.dbSelectScenarioSystem("system")])             // 6. 본 시스템에서 사용하는 기본 메세지 
+                .then(function(results){
+                    
+                    if( results[0][0][0] != null ) {
+                        beforeContent = results[0][0][0].MESSAGE;
+                        beforeStep = results[0][0][0].STEP;
+                    }
+                    else beforeContent = null;
+
+                    if( results[1][0][0] != null )
+                        rtnStr = results[1][0][0];
+                    else rtnStr = null;
+
+                    if( results[2][0][0] != null ) {
+                        beforeResMessage = results[2][0][0].RES_MESSAGE;
+                        beforeReqMessage = results[2][0][0].REQ_MESSAGE;
+                    }
+                    else {
+                        beforeResMessage = null;
+                        beforeReqMessage = null;
+                    }
+
+                    if( results[3][0][0] != null )
+                        keyboardContent = JSON.parse(results[3][0][0].RES_MESSAGE).keyboard;
+                    else keyboardContent = null;
+
+                    if (results[4][0][0] != null) {
+                        systemContent = results[4][0];
+                    }
+                    else
+                        systemContent = null;
+
+                    console.log("beforeContent:" + beforeContent);
+                    console.log("beforeStep:" + beforeStep);
+                    console.log("beforeResMessage:" + beforeResMessage);
+                    console.log("beforeReqMessage:" + beforeReqMessage);
+                }).then(function() {
+                    // this.dbSaveHistory(content, user_key, type);
+                    if( re != null ) {
+                        var post = {UNIQUE_ID:user_key, MESSAGE:content};
+                        console.log("db values:" + JSON.stringify(post));
+
+                        pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, function(err, rows, fields) {
+                        if (err)
+                            console.log('Error while performing Query.', err);
+                        });
+                    }
+                }).then(function() {
+                    if (re == null) {
+                        if (beforeContent == "사진 첨부 후 문의하기") {
+                            /*
+                            등록한 사진을 어디론가 옮기고 이력저장하고 
+                            */
+                            var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
+                            console.log("db values:" + JSON.stringify(post));
+
+                            pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                            if (err)
+                            console.log('Error while performing Query.', err);
+                            });
+
+                            let kakaoSocket = new KakaoSocket(systemContent);
+                            re = kakaoSocket.findXml("QUESTION_OK");
+                            var msg = JSON.parse(re);
+                            if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
+                                msg.keyboard.buttons.push("처음으로");
+                                re = JSON.stringify(msg);
+                            }
+                        } else if (beforeContent == "문의사항만 입력") {
+                            /*
+                            등록한 사진을 어디론가 옮기고 이력저장하고 
+                            */
+                            var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
+                            console.log("db values:" + JSON.stringify(post));
+
+                            pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                            if (err)
+                            console.log('Error while performing Query.', err);
+                            });
+
+                            let kakaoSocket = new KakaoSocket(systemContent);
+                            re = kakaoSocket.findXml("QUESTION_OK");
+                            var msg = JSON.parse(re);
+                            if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
+                                msg.keyboard.buttons.push("처음으로");
+                                re = JSON.stringify(msg);
+                            }
+                        } else if (beforeContent == "티브로드에 문의하기") {
+                            /*
+                            등록한 사진을 어디론가 옮기고 이력저장하고 
+                            */
+                            var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
+                            console.log("db values:" + JSON.stringify(post));
+
+                            pool.query('INSERT INTO TB_AUTOCHAT_QUESTION SET ?', post, function(err, rows, fields) {
+                            if (err)
+                            console.log('Error while performing Query.', err);
+                            });
+
+                            let kakaoSocket = new KakaoSocket(systemContent);
+                            re = kakaoSocket.findXml("QUESTION_OK");
+                            var msg = JSON.parse(re);
+                            if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
+                                msg.keyboard.buttons.push("처음으로");
+                                re = JSON.stringify(msg);
+                            }
+                        } else if ( beforeContent != "keyboard" && beforeStep == '3' ) {
+                            re = {
+                                "message": 
+                                    {"text": "1:1 자동응답 기능 테스트 용입니다. 좀더 다양한 기능은 추후 제공 하도록 하겠습니다.\n 처음으로 돌아가시려면 '#'을 입력하세요!"},
+                                "keyboard": 
+                                    {"type":"text"}
+                                };;
+                        } 
+
+                        if(content == '취소하기' || content == '#' || content == '처음으로' || content == '돌아가기') {
+                            re = { "message": {"text": "아래 내용 중 선택해 주세요!"},"keyboard": keyboardContent};
+                        } 
+                            
+                        if(re == null && beforeResMessage != null ) {
+                            re = beforeResMessage;
+                        }
+                    }
+                }).then(function() {
+          
+                    if( re == null && content != "keyboard" && content != "처음으로" && content != "취소하기") {
+
+                        if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "Y" ) {
+                            // 메뉴 중에 개인 정보가 필요하건에 대해서는 연동처리 하여 응답한다. 
+                            // 그렇다면 시나리오에 연동이 필요한것인지 필요하다면 URL, Parameter 등등 정보를 관리하여 응답할수 있도록
+                            // 기능 추가
+                            console.log("이어서 합시다!");
+                            let kakaoSocket = new KakaoSocket(systemContent);
+                            kakaoSocket.getHomepageRequest(content);
+                            // this.fetch = createFetch( base(this.hpURL));
+                            // this.fetch(this.IN0002_URL + this.IN0002_PARAM);
+                        } else {
+                            // 근데 위 조건에 충족하지 않는다고 해서 무조건 아래와 같은것을 태우는것은 문제가 있다.
+                            // 입력된 "content"가 시나리오에서 못찾을 경우 만 거치도록 추가 수정
+                            // 고객의 가장 최근 이력(히스토리) 메뉴가 본인인증이 되어 있어야 사용가능한지를 시나리오 관리 테이블에서 추가로
+                            // 관리하자.
+                            if( rtnStr == null) {
+                                updateType = "INS_PHONE";
+                                let kakaoSocket = new KakaoSocket(systemContent);
+                                re = kakaoSocket.findXml("NAME");
+                                contentValidation = validator.isDecimal(content);
+                                if( contentValidation != true ) { // 숫자 비교해서 같은면
+                                    //re = kakaoSocket.findXml("AUTH_OK");
+                                    re = kakaoSocket.findXml("PHONE_NOK");
+                                    updateType = "PHONE_NOK";
+                                }
+                            } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
+                                updateType = "UPD_PHONE";
+                                let kakaoSocket = new KakaoSocket(systemContent);
+                                re = kakaoSocket.findXml("NAME");
+                                contentValidation = validator.isDecimal(content);
+                                if( contentValidation != true ) { // 숫자 비교해서 같은면
+                                    //re = kakaoSocket.findXml("AUTH_OK");
+                                    re = kakaoSocket.findXml("PHONE_NOK");
+                                    updateType = "PHONE_NOK";
+                                }
+                            } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
+                                updateType = "NAME";
+                                let kakaoSocket = new KakaoSocket(systemContent);
+                                re = kakaoSocket.findXml("AUTH");
+                            } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 == null) {
+                                updateType = "NAME";
+                                //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
+                                let kakaoSocket = new KakaoSocket(systemContent);
+                                re = kakaoSocket.findXml("AUTH");
+                            } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 != null) {
+                                updateType = "AUTH";
+                                //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
+                                let kakaoSocket = new KakaoSocket(systemContent);
+                                contentValidation = validator.isDecimal(content);
+                                if( contentValidation == true && content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
+                                    //re = kakaoSocket.findXml("AUTH_OK");
+                                    re = beforeResMessage;
+                                    updateType = "AUTH_OK";// 인증을 성공하였으면 마지막 메뉴로 자동 이동시켜 원하는 정보를 선택하게 한다.
+                                } else {
+                                    re = kakaoSocket.findXml("AUTH_NOK");
+                                    updateType = "AUTH_NOK";
+                                }
+                            } else {
+                                let kakaoSocket = new KakaoSocket(systemContent);
+                                re = kakaoSocket.findXml("AUTH_NOK");
+                            }
+
+                            if( updateType == "INS_PHONE" ) {
+                                var cust_post = {UNIQUE_ID:user_key, PHONE:content};
+                                pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
+                                    if(err) console.log("Query Error:", err);
+                                });
+                            } else if( updateType == "UPD_PHONE" ) {
+                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
+                                    if(err) console.log("Query Error:", err);
+                                });
+                            } else if( updateType == "NAME" ) {
+                                    // local case
+                                    //this.ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+                                    // linux case
+                                    //this.ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+                                    // tbroad case
+                                    this.ls = spawn('/home/icr/tmsg-v3/shorturl');
+                                    this.ls.stdout.on('data', (data) => {
+                                        console.log(`stdout: ${data}`);
+                                        nOTP = data;
+                                        if( nOTP != null ) {
+                                            // 1. send SMS customer phone
+                                            // 2. DB Update
+                                            // const client = socketIoClient.connect(mtURL, options);
+
+                                            // var messageSize = mtMessage.length+"";
+                                            var sendMessage = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>" + nOTP + "</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>" + rtnStr.PHONE + "</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1000</IDSO></REQUEST>";
+                                            var messageSize = sendMessage.length + "";
+                                            while (messageSize.length < 5) messageSize = "0" + messageSize;
+
+                                            var sendData = messageSize + sendMessage;
+                                            
+                                            var client = new net.Socket();
+                                            client.connect(this.mtPort, this.mtIP, function () {
+                                                console.log('CONNECTED TO: ' + this.mtIP + ':' + this.mtPort);
+                                                // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
+                                                client.write(sendData);
+                                            });
+                                            // Add a 'data' event handler for the client socket
+                                            // data is what the server sent to this socket
+                                            client.on('data', function (data) {
+                                                console.log("data:" + data);
+                                                var str = data;
+                                                // Close the client socket completely
+                                                var res = new String(str.slice(5));
+                                                // res = res.replace(/\\r\\n/g, "");
+                                                if (fastXmlParser.validate(res) === true) {
+                                                    var jsonObj = fastXmlParser.parse(res, options);
+                                                    var resultObj = JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG;
+                                                    // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
+                                                    // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
+                                                    // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
+                                                    if (resultObj == "SUCCESS") {
+                                                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function (err, rows, fields) {
+                                                            if (err)
+                                                                console.log("Query Error:", err);
+                                                        });
+                                                    }
+                                                }
+                                                client.destroy();
+                                            });
+                                            // Add a 'close' event handler for the client socket
+                                            client.on('close', function () {
+                                                console.log('Connection closed');
+                                            });
+                                        }
+                                    });
+
+                                    this.ls.stderr.on('data', (data) => {
+                                      console.log(`stderr: ${data}`);
+                                      // retry ? 
+                                    });
+
+                                    this.ls.on('close', (code) => {
+                                      console.log(`child process exited with code ${code}`);
+                                    });
+                            } else if( updateType == "AUTH_OK") {
+                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+                                    if(err) console.log("Query Error:", err);
+                                });
+                            } else if( updateType == "AUTH_NOK") {
+                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["N", user_key], function(err, rows, fields) {
+                                    if(err) console.log("Query Error:", err);
+                                });
+                            } else if( updateType == "PHONE_NOK") {
+                                let kakaoSocket = new KakaoSocket(systemContent);
+                                re = kakaoSocket.findXml("PHONE_NOK");
+                            }
+                        }
+                    }
+                })/*.then(function() {
+                    //console.log("out re:" + JSON.stringify(re)); 
+                    callback(null, re);
+                })*/.then(function() {
+                    if(content == "요금조회") {
+                        let kakaoSocket = new KakaoSocket(null);
+                        //re = kakaoSocket.getHomepageRequest(content);
+                        //console.log("re:" + JSON.stringify(re));
+                        // for Test
+                        kakaoSocket.getTest();
+                        
+                        Q.all([kakaoSocket.getHomepageRequest(content)]).then(function(result){
+                            console.log("result:" + JSON.stringify(result));
+                            re = "{\"message\":{\"text\":\"" + result + "\"},\"keyboard\":{\"type\":\"text\"}}";
+                        }).then(function() {
+                            callback(null, re);
+                        }).done();
+                        //re = "{\"message\":{\"text\":\"안녕하세요!\\n고객명:\\n고객ID:4020520882\\n계열사ID:3400\\n주소:\\n전화번호:010-4898-0329\\n핸드폰:\\n이메일:\\n납무자명:\\n납부계정ID:4002184313\\n납입일:20\\n납부방법:신용카드\\n청구매체:이메일\\n은행(카드사)명:KEB하나카드\\n계좌or카드번호:4029109550****\\n고객상태:사용 중\\n고객신분:N\\n상품리스트:\\n\\n처음으로 가시려면 '#'을 입력하여 주십시요!\"},\"keyboard\":{\"type\":\"text\"}}";
+                    } else {
+                        callback(null, re);
+                    }
+                }).done();
             }
         }).done();
     }
@@ -660,7 +668,7 @@ class ApiServer {
 
     private dbSelectScenario(content: string): void {
         var defered = Q.defer();
-        // console.log("content:" + content);
+        console.log("content:" + content);
         pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
         return defered.promise;
     }
