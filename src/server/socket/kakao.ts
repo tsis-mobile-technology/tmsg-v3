@@ -72,11 +72,18 @@ export class KakaoSocket {
     public inputDatas: TB_AUTOCHAT_SCENARIO[];
     public errorSuccess = '{"keyboard":{"type":"text"}, "message":{"text":"고객님의 죄송합니다!. 시스템 점검중으로 잠시후 다시 시도하여 주십시요.\n 처음으로 가시려면 "#"을 입력해 주세요."}}';
     private mtURL: string;
-    private mtIP: string;
-    private mtPort: number;
+    public mtIP: string;
+    public mtPort: number;
     private hpURL: string;
     private IN0002_URL: string;
     private IN0002_PARAM: string;
+    public ls: any;
+    private spawn = require('child_process').spawn;
+    private nOTP = null;
+    private net = require('net');
+    private fastXmlParser = require('fast-xml-parser');
+    private options = null;
+    private validator = require('validator');
 
     constructor(private io: TB_AUTOCHAT_SCENARIO[]) {
         this.inputDatas = io;
@@ -89,6 +96,14 @@ export class KakaoSocket {
         this.IN0002_URL = "/interface/tbroad/xml_module/CustInvoiceDtlXml";
         //this.IN0002_PARAM = "KEY_NUM=1234561234567&MONTH_CNT=2&NM_CUST=홍길동&CORP=3200&ID_INSERT=U000000000";
         this.IN0002_PARAM = "CORP=TBRD&KEY_NUM=MC0GCCqGSIb3DQIJAyEAgw8aXEa%2FEaSbidYQzkCI9WfamqzaFtL%2F7NOaD8JNWGU%3D&NM_CUST=%C1%A4%BC%B1%BF%B5&MONTH_CNT=2";
+        this.options = {
+                            attrPrefix: "@_",
+                            textNodeName: "#text",
+                            ignoreNonTextNodeAttr: true,
+                            ignoreTextNodeAttr: true,
+                            ignoreNameSpace: true,
+                            textNodeConversion: true
+                        };        
     }
 
     // Add signal
@@ -228,6 +243,252 @@ export class KakaoSocket {
 
         //return "default";
         return deferred.promise;
+    }
+
+    public getMTEventRequest(content:string, user_key:string, pool:any, rtnStr:any): string {
+        var Q      = require("q");
+        var deferred = Q.defer();
+        // local case
+        //this.ls = this.spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+        // linux case
+        this.ls = this.spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+        // tbroad case
+        // this.ls = this.spawn('/home/icr/tmsg-v3/shorturl');
+        this.ls.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+        this.nOTP = data;
+        if( this.nOTP != null ) {
+            // 1. send SMS customer phone
+            // 2. DB Update
+            // const client = socketIoClient.connect(mtURL, options);
+
+            // var messageSize = mtMessage.length+"";
+            var sendMessage = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>" + this.nOTP + "</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>" + rtnStr.PHONE + "</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1000</IDSO></REQUEST>";
+            var messageSize = sendMessage.length + "";
+            while (messageSize.length < 5) messageSize = "0" + messageSize;
+
+            var sendData = messageSize + sendMessage;
+            
+            var client = new this.net.Socket();
+            client.setTimeout(1000);
+            client.connect(this.mtPort, this.mtIP, function () {
+                console.log('CONNECTED TO: ' + this.mtIP + ':' + this.mtPort);
+                // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
+                client.write(sendData);
+            });
+            // Add a 'data' event handler for the client socket
+            // data is what the server sent to this socket
+            client.on('data', function (data) {
+                console.log("data:" + data);
+                var str = data;
+                // Close the client socket completely
+                var res = new String(str.slice(5));
+                // res = res.replace(/\\r\\n/g, "");
+                if (this.fastXmlParser.validate(res) === true) {
+                    var jsonObj = this.fastXmlParser.parse(res, this.options);
+                    var resultObj = JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG;
+                    // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
+                    // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
+                    // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
+                    if (resultObj == "SUCCESS") {
+                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", this.nOTP, user_key], function (err, rows, fields) {
+                            if (err)
+                                console.log("Query Error:", err);
+                        });
+                        deferred.resolve("success");
+                    }
+                }
+                client.destroy();
+            });
+            // Add a 'close' event handler for the client socket
+            client.on('close', function () {
+                console.log('Connection closed');
+            });
+
+            client.on('timeout', function() {
+                console.log('Socket Timeout'); 
+                deferred.resolve("timeout");
+            })
+
+            client.on('error', function(error) {
+                console.log('Socket Error:' + error); 
+                deferred.resolve("timeout");
+            })
+        }
+        });
+
+        this.ls.stderr.on('data', (data) => {
+            console.log(`stderr: ${data}`);
+        // retry ? 
+        });
+
+        this.ls.on('close', (code) => {
+            console.log(`child process exited with code ${code}`);
+        });
+
+        return deferred.promise;
+    }
+
+    public checkCustomerInfo(rtnStr: any, content: any, kakaoSocket: any, beforeResMessage: any): any {
+        // var Q      = require("q");
+        // var defered = Q.defer();
+        var updateType = null;
+        var contentValidation = null;
+        var re = null;
+
+        if( rtnStr == null) {
+            updateType = "INS_PHONE";
+            re = kakaoSocket.findXml("NAME");
+            contentValidation = this.validator.isDecimal(content);
+            if( contentValidation != true ) { // 숫자 비교해서 같은면
+                //re = kakaoSocket.findXml("AUTH_OK");
+                re = kakaoSocket.findXml("PHONE_NOK");
+                updateType = "PHONE_NOK";
+            }
+        } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
+            updateType = "UPD_PHONE";
+            re = kakaoSocket.findXml("NAME");
+            contentValidation = this.validator.isDecimal(content);
+            if( contentValidation != true ) { // 숫자 비교해서 같은면
+                //re = kakaoSocket.findXml("AUTH_OK");
+                re = kakaoSocket.findXml("PHONE_NOK");
+                updateType = "PHONE_NOK";
+            }
+        } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
+            updateType = "NAME";
+            re = kakaoSocket.findXml("AUTH");
+        } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 == null) {
+            updateType = "NAME";
+            //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
+            re = kakaoSocket.findXml("AUTH");
+        } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 != null) {
+            updateType = "AUTH";
+            //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
+            contentValidation = this.validator.isDecimal(content);
+            if( contentValidation == true && content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
+                //re = kakaoSocket.findXml("AUTH_OK");
+                re = beforeResMessage;
+                updateType = "AUTH_OK";// 인증을 성공하였으면 마지막 메뉴로 자동 이동시켜 원하는 정보를 선택하게 한다.
+            } else {
+                re = kakaoSocket.findXml("AUTH_NOK");
+                updateType = "AUTH_NOK";
+            }
+        } else {
+            re = kakaoSocket.findXml("AUTH_NOK");
+        }
+        console.log(">updateType:" + updateType);
+        console.log(">re:" + JSON.stringify(re));
+
+        //defered.makeNodeResolver(updateType + "," + re);
+        var result = {"updateType": updateType, "re":re};
+        
+        // defered.resolve(result);
+
+        return result;
+    }
+
+    public updateCustomerInfo(updateType:string, user_key:string, content:string, pool:any, rtnStr:any): any {
+        var Q  = require("q");
+        var deferred = Q.defer();
+        var re = null;
+                            if( updateType == "INS_PHONE" ) {
+                                var cust_post = {UNIQUE_ID:user_key, PHONE:content};
+                                pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', cust_post, function(err, rows, fields) {
+                                    if(err) console.log("Query Error:", err);
+                                });
+                            } else if( updateType == "UPD_PHONE" ) {
+                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, YN_AUTH = ? WHERE UNIQUE_ID = ?', [content, "N", user_key], function(err, rows, fields) {
+                                    if(err) console.log("Query Error:", err);
+                                });
+                            } else if( updateType == "NAME" ) {
+                                    Q.all([this.getMTEventRequest(content, user_key, pool, rtnStr)]).then(function(result){
+                                        console.log("call getMTEventRequest Result:" + result);
+                                        if(result != "success") 
+                                            re = this.findXml("AUTH_NO_SEND");
+                                    }).then(function() {
+                                        return re;
+                                    }).done();
+
+/*
+                                    // local case
+                                    //this.ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+                                    // linux case
+                                    kakaoSocket.ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+                                    // tbroad case
+                                    // this.ls = spawn('/home/icr/tmsg-v3/shorturl');
+                                    kakaoSocket.ls.stdout.on('data', (data) => {
+                                        console.log(`stdout: ${data}`);
+                                        nOTP = data;
+                                        if( nOTP != null ) {
+                                            // 1. send SMS customer phone
+                                            // 2. DB Update
+                                            // const client = socketIoClient.connect(mtURL, options);
+
+                                            // var messageSize = mtMessage.length+"";
+                                            var sendMessage = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>" + nOTP + "</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>" + rtnStr.PHONE + "</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1000</IDSO></REQUEST>";
+                                            var messageSize = sendMessage.length + "";
+                                            while (messageSize.length < 5) messageSize = "0" + messageSize;
+
+                                            var sendData = messageSize + sendMessage;
+                                            
+                                            var client = new net.Socket();
+                                            client.connect(kakaoSocket.mtPort, kakaoSocket.mtIP, function () {
+                                                console.log('CONNECTED TO: ' + kakaoSocket.mtIP + ':' + kakaoSocket.mtPort);
+                                                // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
+                                                client.write(sendData);
+                                            });
+                                            // Add a 'data' event handler for the client socket
+                                            // data is what the server sent to this socket
+                                            client.on('data', function (data) {
+                                                console.log("data:" + data);
+                                                var str = data;
+                                                // Close the client socket completely
+                                                var res = new String(str.slice(5));
+                                                // res = res.replace(/\\r\\n/g, "");
+                                                if (fastXmlParser.validate(res) === true) {
+                                                    var jsonObj = fastXmlParser.parse(res, options);
+                                                    var resultObj = JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG;
+                                                    // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
+                                                    // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
+                                                    // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
+                                                    if (resultObj == "SUCCESS") {
+                                                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function (err, rows, fields) {
+                                                            if (err)
+                                                                console.log("Query Error:", err);
+                                                        });
+                                                    }
+                                                }
+                                                client.destroy();
+                                            });
+                                            // Add a 'close' event handler for the client socket
+                                            client.on('close', function () {
+                                                console.log('Connection closed');
+                                            });
+                                        }
+                                    });
+
+                                    kakaoSocket.ls.stderr.on('data', (data) => {
+                                      console.log(`stderr: ${data}`);
+                                      // retry ? 
+                                    });
+
+                                    kakaoSocket.ls.on('close', (code) => {
+                                      console.log(`child process exited with code ${code}`);
+                                    });
+*/
+                            } else if( updateType == "AUTH_OK") {
+                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+                                    if(err) console.log("Query Error:", err);
+                                });
+                            } else if( updateType == "AUTH_NOK") {
+                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["N", user_key], function(err, rows, fields) {
+                                    if(err) console.log("Query Error:", err);
+                                });
+                            } else if( updateType == "PHONE_NOK") {
+                                re = this.findXml("PHONE_NOK");
+                            }
+deferred.resolve(re);
+                            return deferred.promise;
     }
 }
 
