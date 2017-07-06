@@ -200,7 +200,7 @@ export class KakaoSocket {
 
             if (fastXmlParser.validate(htmlString) === true) {
                 var binaryString = new Buffer(htmlString, 'binary');
-                console.log("htmlString:to" + euckr2utf8.convert(binaryString));
+                //console.log("htmlString:to" + euckr2utf8.convert(binaryString));
                 //var data = euckr2utf8.convert(htmlString).toString('utf-8');
                 //console.log("from: " + htmlString);
                 //console.log("to: " + data);
@@ -210,11 +210,11 @@ export class KakaoSocket {
 
                 var resultSets: IN0002_CUSTOMER;
                 resultSets = jsonObj.list.customer;
-                var binaryName = new Buffer(resultSets.Name, 'binary');
-                console.log("resultSets.Name:from" + binaryName);
-                console.log("resultSets.Name:to" + euckr2utf8.convert(binaryName));
-                console.log("resultSets.Name:to" + euckr2utf8.convert(binaryName).toString());
-                console.log("resultSets.Name:to" + euckr2utf8.convert(binaryName).toString('UTF-8'));
+                //var binaryName = new Buffer(resultSets.Name, 'binary');
+                //console.log("resultSets.Name:from" + binaryName);
+                //console.log("resultSets.Name:to" + euckr2utf8.convert(binaryName));
+                //console.log("resultSets.Name:to" + euckr2utf8.convert(binaryName).toString());
+                //console.log("resultSets.Name:to" + euckr2utf8.convert(binaryName).toString('UTF-8'));
 
 
                 // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
@@ -222,7 +222,31 @@ export class KakaoSocket {
                 // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
                 // console.log(resultObj);
                 //return resultSets.Name + "/" + resultSets.Id + "/" + resultSets.AccountId;
-                deferred.resolve( resultSets.Name + "/" + resultSets.Id + "/" + resultSets.AccountId);
+                var returnMsg = "고객님 안녕하세요.\\n" +
+                                    "요청하신 정보는 다음과 같습니다. \\n" +
+                                    "고객명>" + resultSets.Name + "\\n" +
+                                    "고객ID>" + resultSets.Id + "\\n" +
+                                    "계열사ID>" + resultSets.IdSo + "\\n" +
+                                    "주소>" + resultSets.Address + "\\n" +
+                                    "전화번호>" + resultSets.Phone + "\\n" +
+                                    "핸드폰>" + resultSets.HandPhone + "\\n" +
+                                    "이메일>" + resultSets.Email + "\\n" +
+                                    "납부자명>" + resultSets.AccountName + "\\n" +
+                                    "납부계정ID>" + resultSets.AccountId + "\\n" +
+                                    "납입일>" + resultSets.IssueDate + "\\n" +
+                                    "납부방법>" + resultSets.PayMethod + "\\n" +
+                                    "청구매체>" + resultSets.Media + "\\n" +
+                                    "은행(카드사)명>" + resultSets.FinancialName + "\\n" +
+                                    "계좌or카드번호>" + resultSets.Account + "\\n" +
+                                    "고객상태>" + resultSets.Status + "\n" +
+                                    "고객신분>" + resultSets.Social + "\\n" +
+                                    "당월총청구금액>" + resultSets.SumAmtCurInv + "\\n" +
+                                    "당월미납금액>" + resultSets.SumAmtCurNonpmt + "\\n" +
+                                    "\\n 처음으로 가시려면 #을 입력하여주십시요!";
+                var returnString = "{\"message\":{\"text\":\"" + returnMsg + "\"},\"keyboard\":{\"type\":\"text\"}}";
+
+                //deferred.resolve( resultSets.Name + "/" + resultSets.Id + "/" + resultSets.AccountId);
+                deferred.resolve( returnString );
             }
             
             /*

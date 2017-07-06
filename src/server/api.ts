@@ -281,7 +281,7 @@ class ApiServer {
                 }
             }
         }).then(function() {
-            if(re != null && hpIf == null) {
+            if(re != null /*&& hpIf == null*/ && content != "요금조회") {
 
                 if( re != null ) {
                     var post = {UNIQUE_ID:user_key, MESSAGE:content};
@@ -294,8 +294,8 @@ class ApiServer {
 
                 callback(null, re);
             } else {
-console.log("content:" + content);
-console.log("user_key:" + user_key);
+console.log("else content:" + content);
+console.log("else user_key:" + user_key);
                 let kakaoDb = new KakaoDb();
 
                 Q.all([ kakaoDb.dbCheckHistory(content, user_key),             // 2. 사용자별 최종 사용(메뉴)이력 확인(TB_AUTOCHAT_HISTORY)
@@ -404,7 +404,7 @@ console.log("re is null");
                                     {"text": "1:1 자동응답 기능 테스트 용입니다. 좀더 다양한 기능은 추후 제공 하도록 하겠습니다.\n 처음으로 돌아가시려면 '#'을 입력하세요!"},
                                 "keyboard": 
                                     {"type":"text"}
-                                };;
+                                };
                         } 
 
                         if(content == '취소하기' || content == '#' || content == '처음으로' || content == '돌아가기') {
@@ -417,14 +417,27 @@ console.log("re is null");
                     }
                 }).then(function() {
                     let kakaoSocket = new KakaoSocket(systemContent);
-                    if( re == null && content != "keyboard" && content != "처음으로" && content != "취소하기") {
+                    if( re == null && content != "keyboard" && content != "처음으로" && content != "취소하기" && beforeReqMessage == "요금조회" ) {
 
                         if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "Y" ) {
                             // 메뉴 중에 개인 정보가 필요하건에 대해서는 연동처리 하여 응답한다. 
                             // 그렇다면 시나리오에 연동이 필요한것인지 필요하다면 URL, Parameter 등등 정보를 관리하여 응답할수 있도록
                             // 기능 추가
                             console.log("이어서 합시다!");
-                            kakaoSocket.getHomepageRequest(content);
+                            let kakaoSocket = new KakaoSocket(null);
+                        
+                            Q.all([kakaoSocket.getHomepageRequest(content)]).then(function(result){
+                                console.log("요금조회, result:" + result);
+                                //re = kakaoSocket.findXml("RES_MSG");
+                                //var msg = JSON.parse(JSON.stringify(re));
+                                //msg.message. text.push(result);
+                                //re = JSON.stringify(msg);
+                                //console.log(JSON.stringify(re));
+                                //re = JSON.stringify(result);
+                                re = "{\"message\":{\"text\":\"고객님 안녕하세요.\\n요청하신 정보는 다음과 같습니다.\\n고객명>정선영\\n주소>경기도 안산시 단원구 부부로5길 5  3101호\\n이메일>\\n납부자명>정선영\\n납입일>20\\n납부방법>은행자동이체\\n청구매체>알림톡\\n은행(카드사)명>KEB하나\\n계좌or카드번호>4029109550****\\n당월총청구금액>\\n당월미납금액> 처음으로 이동하시려면 #을 입력하여주십시요!\"},\"keyboard\":{\"type\":\"text\"}}";
+                            }).then(function() {
+                                callback(null, re);
+                            }).done();
                             // this.fetch = createFetch( base(this.hpURL));
                             // this.fetch(this.IN0002_URL + this.IN0002_PARAM);
                         } else {
@@ -581,16 +594,23 @@ console.log("re is null");
                         console.log("updateCustomerInfo->result:" + JSON.stringify(result));
                     }).done();
                 })*/.then(function() {
-                    if(content == "요금조회") {
+
+                    if(content == "요금조회" && rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "Y") {
                         let kakaoSocket = new KakaoSocket(null);
                         
                         Q.all([kakaoSocket.getHomepageRequest(content)]).then(function(result){
-                            console.log("result:" + JSON.stringify(result));
-                            re = "{\"message\":{\"text\":\"" + result + "\"},\"keyboard\":{\"type\":\"text\"}}";
+                            console.log("요금조회, result:" + result);
+                            //re = kakaoSocket.findXml("RES_MSG");
+                            //var msg = JSON.parse(JSON.stringify(re));
+                            //msg.message. text.push(result);
+                            //re = JSON.stringify(msg);
+                            //console.log(JSON.stringify(re));
+                            //re = JSON.stringify(result);
+                            re = "{\"message\":{\"text\":\"고객님 안녕하세요.\\n요청하신 정보는 다음과 같습니다.\\n고객명>정선영\\n주소>경기도 안산시 단원구 부부로5길 5  3101호\\n이메일>\\n납부자명>정선영\\n납입일>20\\n납부방법>은행자동이체\\n청구매체>알림톡\\n은행(카드사)명>KEB하나\\n계좌or카드번호>4029109550****\\n당월총청구금액>\\n당월미납금액> 처음으로 이동하시려면 #을 입력하여주십시요!\"},\"keyboard\":{\"type\":\"text\"}}";
                         }).then(function() {
                             callback(null, re);
                         }).done();
-                        //re = "{\"message\":{\"text\":\"안녕하세요!\\n고객명:\\n고객ID:4020520882\\n계열사ID:3400\\n주소:\\n전화번호:010-4898-0329\\n핸드폰:\\n이메일:\\n납무자명:\\n납부계정ID:4002184313\\n납입일:20\\n납부방법:신용카드\\n청구매체:이메일\\n은행(카드사)명:KEB하나카드\\n계좌or카드번호:4029109550****\\n고객상태:사용 중\\n고객신분:N\\n상품리스트:\\n\\n처음으로 가시려면 '#'을 입력하여 주십시요!\"},\"keyboard\":{\"type\":\"text\"}}";
+                        //re = "{\"message\":{\"text\":\"고객님 안녕하세요.\\n요청하신 정보는 다음과 같습니다.\\n고객명>정선영\\n고객ID>4020520882\\n계열사ID>3400\\n주소>경기도 안산시 단원구 부부로5길 5  3101호\\n전화번호>\\n핸드폰>010-4898-0329\\n이메일>\\n납부자명>정선영\\n납부계정ID>4002184313\\n납입일>20\\n납부방법>은행자동이체\\n청구매체>알림톡\\n은행(카드사)명>KEB하나\\n계좌or카드번호>4029109550****\\n고객상태>사용중\\n고객신분>N\\n당월총청구금액>\\n당월미납금액>\"},\"keyboard\":{\"type\":\"text\"}}";
                     } else {
                         callback(null, re);
                     }
