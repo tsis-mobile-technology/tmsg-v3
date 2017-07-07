@@ -36,24 +36,24 @@ var options = {
 // const mtURL = "http://localhost:2581";
 // const mtIP = "localhost";
 // const mtPort = 22;
-// var pool = mysql.createPool({
-//    connectionLimit: 2,
-//    host: '14.63.213.246',
-//    user: 'smarttest',
-//    password: 'test1234',
-//    port: 10003,
-//    database: 'SMART_MESSAGE_VERTWO',
-//    debug: false
-// });
-  var pool = mysql.createPool({
-      connectionLimit: 20,
-      host: '125.132.2.20 ',
-      user: 'icr',
-      password: '1q2w3e4r5t^Y',
-      port: 3306,
-      database: 'SMART_MESSAGE_VERTWO',
-      debug: false
-  });
+var pool = mysql.createPool({
+   connectionLimit: 2,
+   host: '14.63.213.246',
+   user: 'smarttest',
+   password: 'test1234',
+   port: 10003,
+   database: 'SMART_MESSAGE_VERTWO',
+   debug: false
+});
+  // var pool = mysql.createPool({
+  //     connectionLimit: 20,
+  //     host: '125.132.2.20 ',
+  //     user: 'icr',
+  //     password: '1q2w3e4r5t^Y',
+  //     port: 3306,
+  //     database: 'SMART_MESSAGE_VERTWO',
+  //     debug: false
+  // });
 
 declare var process, __dirname;
 
@@ -64,6 +64,8 @@ class ApiServer {
     private mongo: any;
     private kakao_root: string;
     private kakao_port: number;
+    private kakaoDb: any;
+    private kakaoSocket: any;
 
     // Bootstrap the application.
     public static bootstrap(): ApiServer {
@@ -74,6 +76,8 @@ class ApiServer {
     constructor() {
         console.log("Server constructor");
         // Create expressjs application
+        this.kakaoDb = new KakaoDb();
+        this.kakaoSocket = new KakaoSocket(this.kakaoDb.dbSelectScenarioSystem("system"));
         this.kakao_app = express();
 
         // Configure application
@@ -143,7 +147,7 @@ class ApiServer {
             var re;
             var content = "keyboard";
             try {
-                this.getKeyboardResponse(content, function(err, data) {
+                this.kakaoSocket.getKeyboardResponse(content, function(err, data) {
                     if(err) {
                         console.log('keyboard:응답 에러');
                     } else {
@@ -167,7 +171,7 @@ class ApiServer {
             var re;
             this.kakao_io.emit('chat message', content);
             try {
-                this.getMessageResponse(content, user_key, type, function(err, data) {
+                this.kakaoSocket.getMessageResponseNew(content, user_key, type, function(err, data) {
                     if(err) {
                         console.log('message:응답 에러');
                     } else {
@@ -205,9 +209,10 @@ class ApiServer {
             var user_key = request.body.user_key;
             var re;
             try {
-                pool.query('DELETE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', request.params.user_key, function(err, rows, fields) {
-                        if(err) console.log("Query Error:", err);
-                });
+                // pool.query('DELETE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', request.params.user_key, function(err, rows, fields) {
+                //         if(err) console.log("Query Error:", err);
+                // });
+                this.kakaoDb.dbClearCustomer(user_key);
                 re = {text:'param : ' + user_key};
             } catch (exception) {
                 console.log('friend del:응답 에러');
@@ -234,9 +239,10 @@ class ApiServer {
         });
     }
 
+/*
     private getKeyboardResponse(content: string, callback: any): void {
         var re;
-        Q.all([this.dbSelectScenario(content)]).then(function(results){
+        Q.all([this.kakaoDb.dbSelectScenario(content)]).then(function(results){
             // console.log("results:" + JSON.stringify(results));
             re = results[0][0][0];
             // console.log("re:" + JSON.stringify(re));
@@ -247,7 +253,8 @@ class ApiServer {
         })
         .done();
     }
-
+*/
+/*
     private getMessageResponse(content: string, user_key: string, type: string, callback: any): void {
         var re = null;
         var beforeResMessage = null;
@@ -281,7 +288,7 @@ class ApiServer {
                 }
             }
         }).then(function() {
-            if(re != null /*&& hpIf == null*/ && content != "요금조회") {
+            if(re != null /*&& hpIf == null* / && content != "요금조회") {
 
                 if( re != null ) {
                     var post = {UNIQUE_ID:user_key, MESSAGE:content};
@@ -344,7 +351,7 @@ console.log("re is null");
                         if (beforeContent == "사진 첨부 후 문의하기") {
                             /*
                             등록한 사진을 어디론가 옮기고 이력저장하고 
-                            */
+                            * /
                             var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
                             console.log("db values:" + JSON.stringify(post));
 
@@ -354,7 +361,7 @@ console.log("re is null");
                             });
 
                             let kakaoSocket = new KakaoSocket(systemContent);
-                            re = kakaoSocket.findXml("QUESTION_OK");
+                            re = kakaoSocket.findScenario("QUESTION_OK");
                             var msg = JSON.parse(re);
                             if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
                                 msg.keyboard.buttons.push("처음으로");
@@ -363,7 +370,7 @@ console.log("re is null");
                         } else if (beforeContent == "문의사항만 입력") {
                             /*
                             등록한 사진을 어디론가 옮기고 이력저장하고 
-                            */
+                            * /
                             var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
                             console.log("db values:" + JSON.stringify(post));
 
@@ -373,7 +380,7 @@ console.log("re is null");
                             });
 
                             let kakaoSocket = new KakaoSocket(systemContent);
-                            re = kakaoSocket.findXml("QUESTION_OK");
+                            re = kakaoSocket.findScenario("QUESTION_OK");
                             var msg = JSON.parse(re);
                             if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
                                 msg.keyboard.buttons.push("처음으로");
@@ -382,7 +389,7 @@ console.log("re is null");
                         } else if (beforeContent == "티브로드에 문의하기") {
                             /*
                             등록한 사진을 어디론가 옮기고 이력저장하고 
-                            */
+                            * /
                             var post = {UNIQUE_ID:user_key, REQ_MESSAGE:content};
                             console.log("db values:" + JSON.stringify(post));
 
@@ -392,7 +399,7 @@ console.log("re is null");
                             });
 
                             let kakaoSocket = new KakaoSocket(systemContent);
-                            re = kakaoSocket.findXml("QUESTION_OK");
+                            re = kakaoSocket.findScenario("QUESTION_OK");
                             var msg = JSON.parse(re);
                             if( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
                                 msg.keyboard.buttons.push("처음으로");
@@ -428,7 +435,7 @@ console.log("re is null");
                         
                             Q.all([kakaoSocket.getHomepageRequest(content)]).then(function(result){
                                 console.log("요금조회, result:" + result);
-                                //re = kakaoSocket.findXml("RES_MSG");
+                                //re = kakaoSocket.findScenario("RES_MSG");
                                 //var msg = JSON.parse(JSON.stringify(re));
                                 //msg.message. text.push(result);
                                 //re = JSON.stringify(msg);
@@ -452,44 +459,44 @@ console.log("re is null");
                             
                             if( rtnStr == null) {
                                 updateType = "INS_PHONE";
-                                re = kakaoSocket.findXml("NAME");
+                                re = kakaoSocket.findScenario("NAME");
                                 contentValidation = validator.isDecimal(content);
                                 if( contentValidation != true ) { // 숫자 비교해서 같은면
-                                    //re = kakaoSocket.findXml("AUTH_OK");
-                                    re = kakaoSocket.findXml("PHONE_NOK");
+                                    //re = kakaoSocket.findScenario("AUTH_OK");
+                                    re = kakaoSocket.findScenario("PHONE_NOK");
                                     updateType = "PHONE_NOK";
                                 }
                             } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
                                 updateType = "UPD_PHONE";
-                                re = kakaoSocket.findXml("NAME");
+                                re = kakaoSocket.findScenario("NAME");
                                 contentValidation = validator.isDecimal(content);
                                 if( contentValidation != true ) { // 숫자 비교해서 같은면
-                                    //re = kakaoSocket.findXml("AUTH_OK");
-                                    re = kakaoSocket.findXml("PHONE_NOK");
+                                    //re = kakaoSocket.findScenario("AUTH_OK");
+                                    re = kakaoSocket.findScenario("PHONE_NOK");
                                     updateType = "PHONE_NOK";
                                 }
                             } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
                                 updateType = "NAME";
-                                re = kakaoSocket.findXml("AUTH");
+                                re = kakaoSocket.findScenario("AUTH");
                             } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 == null) {
                                 updateType = "NAME";
                                 //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
-                                re = kakaoSocket.findXml("AUTH");
+                                re = kakaoSocket.findScenario("AUTH");
                             } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 != null) {
                                 updateType = "AUTH";
                                 //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
                                 contentValidation = validator.isDecimal(content);
                                 if( contentValidation == true && content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
-                                    //re = kakaoSocket.findXml("AUTH_OK");
+                                    //re = kakaoSocket.findScenario("AUTH_OK");
                                     //re = beforeResMessage;
                                     re = keyboardContent;
                                     updateType = "AUTH_OK";// 인증을 성공하였으면 마지막 메뉴로 자동 이동시켜 원하는 정보를 선택하게 한다.
                                 } else {
-                                    re = kakaoSocket.findXml("AUTH_NOK");
+                                    re = kakaoSocket.findScenario("AUTH_NOK");
                                     updateType = "AUTH_NOK";
                                 }
                             } else {
-                                re = kakaoSocket.findXml("AUTH_NOK");
+                                re = kakaoSocket.findScenario("AUTH_NOK");
                             }
                         }
 
@@ -585,7 +592,7 @@ console.log("re is null");
                                 if(err) console.log("Query Error:", err);
                             });
                         } else if( updateType == "PHONE_NOK") {
-                            re = this.findXml("PHONE_NOK");
+                            re = this.findScenario("PHONE_NOK");
                         }
                     }
                 })/*.then(function() {
@@ -593,14 +600,14 @@ console.log("re is null");
                     Q.all([kakaoSocket.updateCustomerInfo(updateType, user_key, content, pool, rtnStr)]).then(function(result){
                         console.log("updateCustomerInfo->result:" + JSON.stringify(result));
                     }).done();
-                })*/.then(function() {
+                })* /.then(function() {
 
                     if(content == "요금조회" && rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "Y") {
                         let kakaoSocket = new KakaoSocket(null);
                         
                         Q.all([kakaoSocket.getHomepageRequest(content)]).then(function(result){
                             console.log("요금조회, result:" + result);
-                            //re = kakaoSocket.findXml("RES_MSG");
+                            //re = kakaoSocket.findScenario("RES_MSG");
                             //var msg = JSON.parse(JSON.stringify(re));
                             //msg.message. text.push(result);
                             //re = JSON.stringify(msg);
@@ -619,7 +626,7 @@ console.log("re is null");
         }).done();       
     }
 
-
+*/
 
     // Configure databases
     // private databases(): void {
@@ -656,7 +663,7 @@ console.log("re is null");
             console.log('==> Listening on port %s. Open up http://localhost:%s/ in your browser.', this.kakao_port, this.kakao_port);            
         });
     }
-
+/*
     private dbSaveHistory(content: string, user_key: string, type: string): void {
         var post = {UNIQUE_ID:user_key, MESSAGE:content};
         console.log("db values:" + JSON.stringify(post));
@@ -666,7 +673,8 @@ console.log("re is null");
                 console.log('Error while performing Query.', err);
         });
     }
-
+*/
+/*
     private dbSaveCustomer(updateType: string, content: string, user_key: string): void {
 
         var post = {UNIQUE_ID:user_key, NAME:content};
@@ -685,6 +693,7 @@ console.log("re is null");
             });
         }
     }
+*/
 
     // public dbLoadCustomer(user_key: string): void {
     //     var defered = Q.defer();
@@ -693,12 +702,12 @@ console.log("re is null");
     //     return defered.promise;
     // }
 
-    public dbSelectScenario(content: string): void {
-        var defered = Q.defer();
-        console.log("content:" + content);
-        pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
-        return defered.promise;
-    }
+    // public dbSelectScenario(content: string): void {
+    //     var defered = Q.defer();
+    //     console.log("content:" + content);
+    //     pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
+    //     return defered.promise;
+    // }
 
     // public dbSelectScenarioSystem(content: string): void {
     //     var defered = Q.defer();
@@ -719,13 +728,14 @@ console.log("re is null");
     //     pool.query('select a.*, b.step, b.trun from TB_AUTOCHAT_HISTORY as a, TB_AUTOCHAT_SCENARIO as b where a.UNIQUE_ID = ? and b.REQ_MESSAGE = a.MESSAGE order by a.wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
     //     return defered.promise;
     // }
-
+    /*
     public callHp(content: string): string {
         var defered = Q.defer();
         let kakaoSocket = new KakaoSocket(null);
         defered.makeNodeResolver(kakaoSocket.getHomepageRequest(content));
         return defered.promise;
     }
+    */
 }
 
 // Bootstrap the server

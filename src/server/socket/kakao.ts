@@ -69,22 +69,28 @@ export interface IN0002_RESULT {
 }
 
 export class KakaoSocket {
-    public inputDatas: TB_AUTOCHAT_SCENARIO[];
-    public errorSuccess = '{"keyboard":{"type":"text"}, "message":{"text":"고객님의 죄송합니다!. 시스템 점검중으로 잠시후 다시 시도하여 주십시요.\n 처음으로 가시려면 "#"을 입력해 주세요."}}';
+    private mtIP: string;
     private mtURL: string;
-    public mtIP: string;
-    public mtPort: number;
+    private mtPort: number;
     private hpURL: string;
     private IN0002_URL: string;
     private IN0002_PARAM: string;
-    public ls: any;
-    private spawn = require('child_process').spawn;
-    private nOTP = null;
-    private net = require('net');
+    private ls: any;
+    private nOTP: any;
+    private options: any;
+    private kakaoDb: any;
+    private inputDatas: TB_AUTOCHAT_SCENARIO[];
+    private validator     = require('validator');
+    private Q             = require("q");
+    private net           = require('net');
+    private spawn         = require('child_process').spawn;
     private fastXmlParser = require('fast-xml-parser');
-    private options = null;
-    private validator = require('validator');
+    private errorSuccess = '{"keyboard":{"type":"text"}, "message":{"text":"고객님의 죄송합니다!. 시스템 점검중으로 잠시후 다시 시도하여 주십시요.\n 처음으로 가시려면 "#"을 입력해 주세요."}}';
+                        //  위 시스템 회신 문자는  SYS_ERR
 
+    /* private io의 경우 본 api 서버가 기동 될때 한번 불러와서 여러번 사용한다. 
+       그렇게 되면 본 class를 사용하는 쪽에서 한번에 생성해야 한다.
+    */
     constructor(private io: TB_AUTOCHAT_SCENARIO[]) {
         this.inputDatas = io;
 
@@ -107,14 +113,30 @@ export class KakaoSocket {
     }
 
     // Add signal
-    public findXml(tagName: string): string {
-        console.log("findXml call:" + tagName);
+    public findScenario(tagName: string): string {
+        console.log("findScenario call:" + tagName);
         if( this.inputDatas != null ) {
             // this.inputData.filter(function (item) { console.log(item.REQ_MESSAGE); return item.REQ_MESSAGE === tagName; });
             var rtnObj: TB_AUTOCHAT_SCENARIO[] = this.inputDatas.filter( inputData => inputData.REQ_MESSAGE === tagName);
             return rtnObj[0].RES_MESSAGE;
         }
         else { return this.errorSuccess;}
+    }
+
+    private getKeyboardResponse(content: string, callback: any): void {
+        console.log("call KakaoSocket.getKeyboardResponse!:" + content);
+        var re;
+        this.Q.all([this.kakaoDb.dbSelectScenario(content)]).then(function(results){
+            re = results[0][0][0];
+
+        }).then(function() {
+            callback(null, JSON.parse(re.RES_MESSAGE).keyboard);
+        })
+        .done();
+    }
+
+    private getMessageResponseNew(content: string, user_key: string, type: string, callback: any): void {
+        console.log("call KakaoSocket.getMessageResponseNew!:" + content);
     }
 
     public getTest(): void {
@@ -363,43 +385,43 @@ export class KakaoSocket {
 
         if( rtnStr == null) {
             updateType = "INS_PHONE";
-            re = kakaoSocket.findXml("NAME");
+            re = kakaoSocket.findScenario("NAME");
             contentValidation = this.validator.isDecimal(content);
             if( contentValidation != true ) { // 숫자 비교해서 같은면
-                //re = kakaoSocket.findXml("AUTH_OK");
-                re = kakaoSocket.findXml("PHONE_NOK");
+                //re = kakaoSocket.findScenario("AUTH_OK");
+                re = kakaoSocket.findScenario("PHONE_NOK");
                 updateType = "PHONE_NOK";
             }
         } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
             updateType = "UPD_PHONE";
-            re = kakaoSocket.findXml("NAME");
+            re = kakaoSocket.findScenario("NAME");
             contentValidation = this.validator.isDecimal(content);
             if( contentValidation != true ) { // 숫자 비교해서 같은면
-                //re = kakaoSocket.findXml("AUTH_OK");
-                re = kakaoSocket.findXml("PHONE_NOK");
+                //re = kakaoSocket.findScenario("AUTH_OK");
+                re = kakaoSocket.findScenario("PHONE_NOK");
                 updateType = "PHONE_NOK";
             }
         } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
             updateType = "NAME";
-            re = kakaoSocket.findXml("AUTH");
+            re = kakaoSocket.findScenario("AUTH");
         } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 == null) {
             updateType = "NAME";
             //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
-            re = kakaoSocket.findXml("AUTH");
+            re = kakaoSocket.findScenario("AUTH");
         } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 != null) {
             updateType = "AUTH";
             //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
             contentValidation = this.validator.isDecimal(content);
             if( contentValidation == true && content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
-                //re = kakaoSocket.findXml("AUTH_OK");
+                //re = kakaoSocket.findScenario("AUTH_OK");
                 re = beforeResMessage;
                 updateType = "AUTH_OK";// 인증을 성공하였으면 마지막 메뉴로 자동 이동시켜 원하는 정보를 선택하게 한다.
             } else {
-                re = kakaoSocket.findXml("AUTH_NOK");
+                re = kakaoSocket.findScenario("AUTH_NOK");
                 updateType = "AUTH_NOK";
             }
         } else {
-            re = kakaoSocket.findXml("AUTH_NOK");
+            re = kakaoSocket.findScenario("AUTH_NOK");
         }
         console.log(">updateType:" + updateType);
         console.log(">re:" + JSON.stringify(re));
@@ -429,7 +451,7 @@ export class KakaoSocket {
                                     Q.all([this.getMTEventRequest(content, user_key, pool, rtnStr)]).then(function(result){
                                         console.log("call getMTEventRequest Result:" + result);
                                         if(result != "success") 
-                                            re = this.findXml("AUTH_NO_SEND");
+                                            re = this.findScenario("AUTH_NO_SEND");
                                     }).then(function() {
                                         return re;
                                     }).done();
@@ -510,7 +532,7 @@ export class KakaoSocket {
                                     if(err) console.log("Query Error:", err);
                                 });
                             } else if( updateType == "PHONE_NOK") {
-                                re = this.findXml("PHONE_NOK");
+                                re = this.findScenario("PHONE_NOK");
                             }
 deferred.resolve(re);
                             return deferred.promise;
