@@ -148,8 +148,8 @@ VALUES
   (46, -1, 0, 'AUTH_OK', '{\"message\":{\"text\":\"인증을 최종 확인하였습니다. 다시 원하시는 메뉴를 누르시면 확인 가능하십니다.\"},\"keyboard\":{\"buttons\":[],\"type\":\"text\"}}', '2017-06-29 19:55:42', '', 'system', 'system'),
   (47, -1, 0, 'AUTH_NOK', '{\"message\":{\"text\":\"입력하신 인증 번호가 정확하지 않습니다. 오류가 있으시면 채팅방 종료하시면 모든 개인정보를 안전하게 지워집니다.처음으로 가시려면 \'#\'을 입력해 주세요.\"},\"keyboard\":{\"buttons\":[],\"type\":\"text\"}}', '2017-06-29 19:55:43', '', 'system', 'system'),
   (48, -1, 0, 'PHONE_NOK', '{\"message\":  {\"text\": \"입력하신 전화번호가 정확하지 않습니다. 전화번호는 숫자만 입력하여 주십시요. 이전으로 가시려면 \'#\'을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}', '2017-07-05 13:00:50', NULL, NULL, 'system'),
-  (49, -1, 0, 'RES_MSG', '{\"message\":  {\"text\": \"\"},\"keyboard\": {\"type\":\"text\"}}', '2017-07-05 13:00:50', NULL, NULL, 'system');
-
+  (49, -1, 0, 'RES_MSG', '{\"message\":  {\"text\": \"\"},\"keyboard\": {\"type\":\"text\"}}', '2017-07-05 13:00:50', NULL, NULL, 'system'),
+  (50, -1, 0, 'SYS_ERR', '{\"message\":  {\"text\": \"고객님의 죄송합니다!. 시스템 점검중으로 잠시후 다시 시도하여 주십시요.\n 처음으로 가시려면 "#"을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}', '2017-07-05 13:00:50', NULL, NULL, 'system');
 
 /*!40000 ALTER TABLE `TB_AUTOCHAT_SCENARIO` ENABLE KEYS */;
 UNLOCK TABLES;
