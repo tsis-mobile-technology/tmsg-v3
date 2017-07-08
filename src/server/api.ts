@@ -65,7 +65,7 @@ class ApiServer {
     private kakao_root: string;
     private kakao_port: number;
     private kakaoDb: any;
-    private kakaoSocket: any;
+    public kakaoSocket: any;
 
     // Bootstrap the application.
     public static bootstrap(): ApiServer {
@@ -77,7 +77,7 @@ class ApiServer {
         console.log("Server constructor");
         // Create expressjs application
         this.kakaoDb = new KakaoDb();
-        this.kakaoSocket = new KakaoSocket(this.kakaoDb.dbSelectScenarioSystem("system"));
+        this.kakaoSocket = new KakaoSocket(null, null);
         this.kakao_app = express();
 
         // Configure application
@@ -90,7 +90,7 @@ class ApiServer {
         this.kakao_server = http.createServer(this.kakao_app);
 
         // Create database connections
-        //this.databases();
+        this.kakaoInitial();
 
         // Handle websockets
         this.kakaoSockets();
@@ -157,7 +157,7 @@ class ApiServer {
                     }
                 });
             } catch (exception) {
-                console.log('keyboard:응답 에러');
+                console.log('keyboard:응답 에러:'+ exception);
             }
 
         });
@@ -662,6 +662,14 @@ console.log("re is null");
         this.kakao_server.on("listening", () => {
             console.log('==> Listening on port %s. Open up http://localhost:%s/ in your browser.', this.kakao_port, this.kakao_port);            
         });
+    }
+
+    // Database initail 
+    private kakaoInitial(): void {
+        Q.all([this.kakaoDb.dbSelectScenarioSystem("system")]).then(function(results) {
+            this.kakaoSocket.setSystemScenario(results);
+        });
+        this.kakaoSocket.setKakaoDb(this.kakaoDb);
     }
 /*
     private dbSaveHistory(content: string, user_key: string, type: string): void {

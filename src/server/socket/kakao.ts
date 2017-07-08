@@ -91,9 +91,12 @@ export class KakaoSocket {
     /* private io의 경우 본 api 서버가 기동 될때 한번 불러와서 여러번 사용한다. 
        그렇게 되면 본 class를 사용하는 쪽에서 한번에 생성해야 한다.
     */
-    constructor(private io: TB_AUTOCHAT_SCENARIO[]) {
+    // constructor(private io: TB_AUTOCHAT_SCENARIO[]) {
+     constructor( private io: any, private db: any) {
+// console.log("private io:" + JSON.stringify(io));
         this.inputDatas = io;
-
+        this.kakaoDb = db;
+// console.log("this.inputDatas:" + JSON.stringify(this.inputDatas));
         this.mtURL = "http://125.132.2.120:30063";
         this.mtIP = "125.132.2.120";
         this.mtPort = 30063;
@@ -109,8 +112,18 @@ export class KakaoSocket {
                             ignoreTextNodeAttr: true,
                             ignoreNameSpace: true,
                             textNodeConversion: true
-                        };        
+                        };
+
     }
+
+
+  public setSystemScenario(results: any): void {
+    this.inputDatas = results[0][0][0];
+  }
+
+  public setKakaoDb(Db: any): void {
+    this.kakaoDb = Db;
+  }
 
     // Add signal
     public findScenario(tagName: string): string {
@@ -123,19 +136,19 @@ export class KakaoSocket {
         else { return this.errorSuccess;}
     }
 
-    private getKeyboardResponse(content: string, callback: any): void {
+    public getKeyboardResponse(content: string, callback: any): void {
         console.log("call KakaoSocket.getKeyboardResponse!:" + content);
         var re;
         this.Q.all([this.kakaoDb.dbSelectScenario(content)]).then(function(results){
+console.log("call KakaoSocket.getKeyboardResponse!>>>>>:" + results);
             re = results[0][0][0];
-
         }).then(function() {
             callback(null, JSON.parse(re.RES_MESSAGE).keyboard);
         })
         .done();
     }
 
-    private getMessageResponseNew(content: string, user_key: string, type: string, callback: any): void {
+    public getMessageResponseNew(content: string, user_key: string, type: string, callback: any): void {
         console.log("call KakaoSocket.getMessageResponseNew!:" + content);
     }
 

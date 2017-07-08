@@ -4,26 +4,27 @@ export class KakaoDb {
 	private mysql  = require('mysql');
 	private pool   = null;
 
-    constructor() { 
-      this.pool = this.mysql.createPool({
-                    connectionLimit: 10, //important
-                    host     : 'localhost',
-                    user     : 'icr',
-                    password : '1q2w3e4r',
-                    port     : 3306,
-                    database : 'SMART_MESSAGE_VERTWO',
-                    debug: false
-                  });
-    // this.pool = this.mysql.createPool({
-    //   connectionLimit: 20,
-    //   host: '125.132.2.20 ',
-    //   user: 'icr',
-    //   password: '1q2w3e4r5t^Y',
-    //   port: 3306,
-    //   database: 'SMART_MESSAGE_VERTWO',
-    //   debug: false
-    // });
-    }
+  constructor() { 
+    this.pool = this.mysql.createPool({
+                  connectionLimit: 10, //important
+                  host     : 'localhost',
+                  user     : 'icr',
+                  password : '1q2w3e4r',
+                  port     : 3306,
+                  database : 'SMART_MESSAGE_VERTWO',
+                  debug: false
+                });
+    console.log("KakaoDB constructor()");
+  // this.pool = this.mysql.createPool({
+  //   connectionLimit: 20,
+  //   host: '125.132.2.20 ',
+  //   user: 'icr',
+  //   password: '1q2w3e4r5t^Y',
+  //   port: 3306,
+  //   database: 'SMART_MESSAGE_VERTWO',
+  //   debug: false
+  // });
+  }
 
 	public dbCheckHistory(content: string, user_key: string): any {
 		var defered = this.Q.defer();
@@ -54,14 +55,14 @@ export class KakaoDb {
 
   public dbSelectScenario(content: string): any {
     var defered = this.Q.defer();
-    console.log("content:" + content);
+    console.log("dbSelectScenario:" + content);
     this.pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE REQ_MESSAGE = ?', content, defered.makeNodeResolver());
     return defered.promise;
   }
 
   public dbSelectScenarioSystem(content: string): any {
     var defered = this.Q.defer();
-    // console.log("content:" + content);
+    // console.log("dbSelectScenarioSystem:" + content);
     this.pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE ETC3 = ?', content, defered.makeNodeResolver());
     return defered.promise;
   }
