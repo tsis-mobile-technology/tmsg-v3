@@ -6,54 +6,13 @@ import * as socketIo from "socket.io";
 
 import { KakaoSocket, KakaoDb } from "./socket";
 
-var Q      = require("q");
+// var Q = require('q');
 var mysql  = require('mysql');
-var net = require('net');
+var net    = require('net');
 var fastXmlParser = require('fast-xml-parser');
-var validator = require('validator');
-var spawn = require('child_process').spawn;
-var bodyParser = require('body-parser');
-
-var options = {
-    attrPrefix: "@_",
-    textNodeName: "#text",
-    ignoreNonTextNodeAttr: true,
-    ignoreTextNodeAttr: true,
-    ignoreNameSpace: true,
-    textNodeConversion: true
-};
-
-// open test
-// var pool = mysql.createPool({
-//    connectionLimit: 10, //important
-//    host     : 'localhost',
-//    user     : 'icr',
-//    password : '1q2w3e4r',
-//    port     : 3306,
-//    database : 'SMART_MESSAGE_VERTWO',
-//    debug: false
-//});
-// const mtURL = "http://localhost:2581";
-// const mtIP = "localhost";
-// const mtPort = 22;
-var pool = mysql.createPool({
-   connectionLimit: 2,
-   host: '14.63.213.246',
-   user: 'smarttest',
-   password: 'test1234',
-   port: 10003,
-   database: 'SMART_MESSAGE_VERTWO',
-   debug: false
-});
-  // var pool = mysql.createPool({
-  //     connectionLimit: 20,
-  //     host: '125.132.2.20 ',
-  //     user: 'icr',
-  //     password: '1q2w3e4r5t^Y',
-  //     port: 3306,
-  //     database: 'SMART_MESSAGE_VERTWO',
-  //     debug: false
-  // });
+var validator     = require('validator');
+var spawn         = require('child_process').spawn;
+var bodyParser    = require('body-parser');
 
 declare var process, __dirname;
 
@@ -107,17 +66,6 @@ class ApiServer {
 
         // root path is under ../../target
         this.kakao_root = path.join(path.resolve(__dirname, '../../target'));
-
-        // databse
-        //this.pool = mysql.createPool({
-        //    connectionLimit: 21,
-        //    host: '14.63.213.246',
-        //    user: 'smarttest',
-        //    password: 'test1234',
-        //    port: 10003,
-        //    database: 'SMART_MESSAGE_VERTWO',
-        //    debug: true
-        //});
     }
 
     // Configure routes
@@ -173,10 +121,12 @@ class ApiServer {
             try {
                 this.kakaoSocket.getMessageResponseNew(content, user_key, type, function(err, data) {
                     if(err) {
-                        console.log('message:응답 에러');
+                        console.log('message:응답 에러:'+err);
+                        re = data;
+                        result.status(200).send(re);
                     } else {
                         re = data;
-                        // console.log("response:" + JSON.stringify(re));
+                        console.log("response:" + JSON.stringify(re));
                         result.status(200).send(re);
                         console.log('message:응답 성공');
                     }
@@ -209,9 +159,6 @@ class ApiServer {
             var user_key = request.body.user_key;
             var re;
             try {
-                // pool.query('DELETE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', request.params.user_key, function(err, rows, fields) {
-                //         if(err) console.log("Query Error:", err);
-                // });
                 this.kakaoDb.dbClearCustomer(user_key);
                 re = {text:'param : ' + user_key};
             } catch (exception) {
@@ -239,21 +186,41 @@ class ApiServer {
         });
     }
 
-/*
-    private getKeyboardResponse(content: string, callback: any): void {
-        var re;
-        Q.all([this.kakaoDb.dbSelectScenario(content)]).then(function(results){
-            // console.log("results:" + JSON.stringify(results));
-            re = results[0][0][0];
-            // console.log("re:" + JSON.stringify(re));
-            // console.log("re.RES_MESSAGE:" + JSON.stringify(re.RES_MESSAGE));
-            // console.log("re.RES_MESSAGE.keyboard):" + JSON.stringify(JSON.parse(re.RES_MESSAGE).keyboard));
-        }).then(function() {
-            callback(null, JSON.parse(re.RES_MESSAGE).keyboard);
-        })
-        .done();
+    private kakaoSockets(): void {
+        console.log("Server kakaoSockets");
+        // Get socket.io handle
+        this.kakao_io = socketIo(this.kakao_server);
+
+        // let kakaoSocket = new KakaoSocket(this.kakao_io);
+   }
+
+    // Start HTTP server listening
+    private kakaoListen(): void {
+        console.log("Server kakaoListen");
+        //listen on provided ports
+        this.kakao_server.listen(this.kakao_port);
+
+        //add error handler
+        this.kakao_server.on("error", error => {
+            console.log("ERROR", error);
+        });
+
+        //start listening on port
+        this.kakao_server.on("listening", () => {
+            console.log('==> Listening on port %s. Open up http://localhost:%s/ in your browser.', this.kakao_port, this.kakao_port);            
+        });
     }
-*/
+
+    // Database initail 
+    private kakaoInitial(): void {
+        var Q = require('q');
+        var GKakaoSocket = this.kakaoSocket;
+        var GKakaoDb = this.kakaoDb;
+        Q.all([this.kakaoDb.dbSelectScenarioSystem("system")]).then(function(results) {
+            GKakaoSocket.setSystemScenario(results[0][0]);
+            GKakaoSocket.setKakaoDb(GKakaoDb);
+        }).done();
+    }
 /*
     private getMessageResponse(content: string, user_key: string, type: string, callback: any): void {
         var re = null;
@@ -639,38 +606,7 @@ console.log("re is null");
     // }
     
     // Configure sockets
-    private kakaoSockets(): void {
-        console.log("Server kakaoSockets");
-        // Get socket.io handle
-        this.kakao_io = socketIo(this.kakao_server);
 
-        // let kakaoSocket = new KakaoSocket(this.kakao_io);
-   }
-
-    // Start HTTP server listening
-    private kakaoListen(): void {
-        console.log("Server kakaoListen");
-        //listen on provided ports
-        this.kakao_server.listen(this.kakao_port);
-
-        //add error handler
-        this.kakao_server.on("error", error => {
-            console.log("ERROR", error);
-        });
-
-        //start listening on port
-        this.kakao_server.on("listening", () => {
-            console.log('==> Listening on port %s. Open up http://localhost:%s/ in your browser.', this.kakao_port, this.kakao_port);            
-        });
-    }
-
-    // Database initail 
-    private kakaoInitial(): void {
-        Q.all([this.kakaoDb.dbSelectScenarioSystem("system")]).then(function(results) {
-            this.kakaoSocket.setSystemScenario(results);
-        });
-        this.kakaoSocket.setKakaoDb(this.kakaoDb);
-    }
 /*
     private dbSaveHistory(content: string, user_key: string, type: string): void {
         var post = {UNIQUE_ID:user_key, MESSAGE:content};

@@ -1,5 +1,4 @@
 
-
 export interface TB_AUTOCHAT_SCENARIO {
     SEQ: number;
     STEP: number;
@@ -93,10 +92,8 @@ export class KakaoSocket {
     */
     // constructor(private io: TB_AUTOCHAT_SCENARIO[]) {
      constructor( private io: any, private db: any) {
-// console.log("private io:" + JSON.stringify(io));
         this.inputDatas = io;
         this.kakaoDb = db;
-// console.log("this.inputDatas:" + JSON.stringify(this.inputDatas));
         this.mtURL = "http://125.132.2.120:30063";
         this.mtIP = "125.132.2.120";
         this.mtPort = 30063;
@@ -118,7 +115,7 @@ export class KakaoSocket {
 
 
   public setSystemScenario(results: any): void {
-    this.inputDatas = results[0][0][0];
+    this.inputDatas = results;
   }
 
   public setKakaoDb(Db: any): void {
@@ -127,9 +124,9 @@ export class KakaoSocket {
 
     // Add signal
     public findScenario(tagName: string): string {
-        console.log("findScenario call:" + tagName);
+    // console.log("findScenario call:" + tagName);
         if( this.inputDatas != null ) {
-            // this.inputData.filter(function (item) { console.log(item.REQ_MESSAGE); return item.REQ_MESSAGE === tagName; });
+        // this.inputData.filter(function (item) { console.log(item.REQ_MESSAGE); return item.REQ_MESSAGE === tagName; });
             var rtnObj: TB_AUTOCHAT_SCENARIO[] = this.inputDatas.filter( inputData => inputData.REQ_MESSAGE === tagName);
             return rtnObj[0].RES_MESSAGE;
         }
@@ -137,10 +134,8 @@ export class KakaoSocket {
     }
 
     public getKeyboardResponse(content: string, callback: any): void {
-        console.log("call KakaoSocket.getKeyboardResponse!:" + content);
         var re;
         this.Q.all([this.kakaoDb.dbSelectScenario(content)]).then(function(results){
-console.log("call KakaoSocket.getKeyboardResponse!>>>>>:" + results);
             re = results[0][0][0];
         }).then(function() {
             callback(null, JSON.parse(re.RES_MESSAGE).keyboard);
@@ -149,7 +144,68 @@ console.log("call KakaoSocket.getKeyboardResponse!>>>>>:" + results);
     }
 
     public getMessageResponseNew(content: string, user_key: string, type: string, callback: any): void {
-        console.log("call KakaoSocket.getMessageResponseNew!:" + content);
+// console.log("call KakaoSocket.getMessageResponseNew!");
+        var re;
+        var kakaoDb = this.kakaoDb;
+        var customerInfo = null;
+        var kakaoSocket = this;
+        if(user_key != null && content != null) {
+            this.Q.all([this.kakaoDb.dbLoadCustomer(user_key)]).then(function(results){
+                customerInfo = results[0][0][0];
+                console.log("getMessageResponseNew:customerInfo:" + JSON.stringify(customerInfo));
+                re = kakaoSocket.checkCustomerInfo(customerInfo);
+            }).then(function() {
+                if(re != null) {
+                    callback(null, re);
+                } else {
+                    this.Q.all([this.kakaoDb.dbSelectScenario(content)]).then(function(results) {
+                        re = results[0][0][0];
+                    }).then(function() {
+                        if(re != null) callback(null, re);
+                    }).done();
+                }
+            }).done();            
+        } else {
+            callback("user Key 또는 입력 정보가 NULL 입니다.", this.findScenario("SYS_ERR"));
+        }
+    }
+
+    public checkCustomerInfo(rtnStr: any): any {
+        var updateType = null;
+        var contentValidation = null;
+        var re = null;
+
+        if( rtnStr == null) {
+            updateType = "INS_PHONE";
+            re = this.findScenario("PHONE");
+            return re;
+        } else if (rtnStr != null && rtnStr.PHONE == null ) {
+            updateType = "UPD_PHONE";
+            re = this.findScenario("PHONE");
+            return re;
+        } else if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME == null ) {
+            updateType = "NAME";
+            re = this.findScenario("NAME");
+            return re;
+        } else if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == 'N' ) {
+            updateType = "AUTH";
+            re = this.findScenario("AUTH");
+        } else if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == 'Y' ) {
+            updateType = "AUTH_OK";
+            re = null;
+            return re;
+        } else {
+            re = this.findScenario("AUTH_NOK");
+        }
+        // console.log(">updateType:" + updateType);
+        // console.log(">re:" + JSON.stringify(re));
+
+        // //defered.makeNodeResolver(updateType + "," + re);
+        // var result = {"updateType": updateType, "re":re};
+        
+        // // defered.resolve(result);
+
+        return re;
     }
 
     public getTest(): void {
@@ -309,9 +365,9 @@ console.log("call KakaoSocket.getKeyboardResponse!>>>>>:" + results);
         var Q      = require("q");
         var deferred = Q.defer();
         // local case
-        //this.ls = this.spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+        this.ls = this.spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
         // linux case
-        this.ls = this.spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+        //this.ls = this.spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
         // tbroad case
         // this.ls = this.spawn('/home/icr/tmsg-v3/shorturl');
         this.ls.stdout.on('data', (data) => {
@@ -387,64 +443,6 @@ console.log("call KakaoSocket.getKeyboardResponse!>>>>>:" + results);
         });
 
         return deferred.promise;
-    }
-
-    public checkCustomerInfo(rtnStr: any, content: any, kakaoSocket: any, beforeResMessage: any): any {
-        // var Q      = require("q");
-        // var defered = Q.defer();
-        var updateType = null;
-        var contentValidation = null;
-        var re = null;
-
-        if( rtnStr == null) {
-            updateType = "INS_PHONE";
-            re = kakaoSocket.findScenario("NAME");
-            contentValidation = this.validator.isDecimal(content);
-            if( contentValidation != true ) { // 숫자 비교해서 같은면
-                //re = kakaoSocket.findScenario("AUTH_OK");
-                re = kakaoSocket.findScenario("PHONE_NOK");
-                updateType = "PHONE_NOK";
-            }
-        } else if (rtnStr.PHONE == null && rtnStr.NAME == null) {
-            updateType = "UPD_PHONE";
-            re = kakaoSocket.findScenario("NAME");
-            contentValidation = this.validator.isDecimal(content);
-            if( contentValidation != true ) { // 숫자 비교해서 같은면
-                //re = kakaoSocket.findScenario("AUTH_OK");
-                re = kakaoSocket.findScenario("PHONE_NOK");
-                updateType = "PHONE_NOK";
-            }
-        } else if (rtnStr.PHONE != null && rtnStr.NAME == null) {
-            updateType = "NAME";
-            re = kakaoSocket.findScenario("AUTH");
-        } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 == null) {
-            updateType = "NAME";
-            //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
-            re = kakaoSocket.findScenario("AUTH");
-        } else if (rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == "N" && rtnStr.ETC1 != null) {
-            updateType = "AUTH";
-            //  beforeContent에 해당하는 기간계 정보를 호출한다. (20170615)
-            contentValidation = this.validator.isDecimal(content);
-            if( contentValidation == true && content == rtnStr.ETC1 ) { // 숫자 비교해서 같은면
-                //re = kakaoSocket.findScenario("AUTH_OK");
-                re = beforeResMessage;
-                updateType = "AUTH_OK";// 인증을 성공하였으면 마지막 메뉴로 자동 이동시켜 원하는 정보를 선택하게 한다.
-            } else {
-                re = kakaoSocket.findScenario("AUTH_NOK");
-                updateType = "AUTH_NOK";
-            }
-        } else {
-            re = kakaoSocket.findScenario("AUTH_NOK");
-        }
-        console.log(">updateType:" + updateType);
-        console.log(">re:" + JSON.stringify(re));
-
-        //defered.makeNodeResolver(updateType + "," + re);
-        var result = {"updateType": updateType, "re":re};
-        
-        // defered.resolve(result);
-
-        return result;
     }
 
     public updateCustomerInfo(updateType:string, user_key:string, content:string, pool:any, rtnStr:any): any {

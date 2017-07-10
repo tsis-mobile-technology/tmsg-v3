@@ -4,17 +4,26 @@ export class KakaoDb {
 	private mysql  = require('mysql');
 	private pool   = null;
 
-  constructor() { 
+  constructor() {  
     this.pool = this.mysql.createPool({
-                  connectionLimit: 10, //important
-                  host     : 'localhost',
-                  user     : 'icr',
-                  password : '1q2w3e4r',
-                  port     : 3306,
-                  database : 'SMART_MESSAGE_VERTWO',
-                  debug: false
-                });
-    console.log("KakaoDB constructor()");
+      connectionLimit: 2,
+      host: '14.63.213.246',
+      user: 'smarttest',
+      password: 'test1234',
+      port: 10003,
+      database: 'SMART_MESSAGE_VERTWO',
+      debug: false
+    });
+  // this.pool = this.mysql.createPool({
+  //   connectionLimit: 10, //important
+  //   host     : 'localhost',
+  //   user     : 'icr',
+  //   password : '1q2w3e4r',
+  //   port     : 3306,
+  //   database : 'SMART_MESSAGE_VERTWO',
+  //   debug: false
+  // });
+  // console.log("KakaoDB constructor()");
   // this.pool = this.mysql.createPool({
   //   connectionLimit: 20,
   //   host: '125.132.2.20 ',
@@ -62,7 +71,7 @@ export class KakaoDb {
 
   public dbSelectScenarioSystem(content: string): any {
     var defered = this.Q.defer();
-    // console.log("dbSelectScenarioSystem:" + content);
+console.log("dbSelectScenarioSystem:" + content);
     this.pool.query('SELECT * FROM TB_AUTOCHAT_SCENARIO WHERE ETC3 = ?', content, defered.makeNodeResolver());
     return defered.promise;
   }
