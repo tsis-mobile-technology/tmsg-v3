@@ -5,24 +5,24 @@ export class KakaoDb {
 	private pool   = null;
 
   constructor() {  
-    this.pool = this.mysql.createPool({
-      connectionLimit: 2,
-      host: '14.63.213.246',
-      user: 'smarttest',
-      password: 'test1234',
-      port: 10003,
-      database: 'SMART_MESSAGE_VERTWO',
-      debug: false
-    });
-  // this.pool = this.mysql.createPool({
-  //   connectionLimit: 10, //important
-  //   host     : 'localhost',
-  //   user     : 'icr',
-  //   password : '1q2w3e4r',
-  //   port     : 3306,
-  //   database : 'SMART_MESSAGE_VERTWO',
-  //   debug: false
-  // });
+    // this.pool = this.mysql.createPool({
+    //   connectionLimit: 2,
+    //   host: '14.63.213.246',
+    //   user: 'smarttest',
+    //   password: 'test1234',
+    //   port: 10003,
+    //   database: 'SMART_MESSAGE_VERTWO',
+    //   debug: false
+    // });
+  this.pool = this.mysql.createPool({
+    connectionLimit: 10, //important
+    host     : 'localhost',
+    user     : 'icr',
+    password : '1q2w3e4r',
+    port     : 3306,
+    database : 'SMART_MESSAGE_VERTWO',
+    debug: false
+  });
   // console.log("KakaoDB constructor()");
   // this.pool = this.mysql.createPool({
   //   connectionLimit: 20,
@@ -79,7 +79,7 @@ console.log("dbSelectScenarioSystem:" + content);
   private dbSaveHistory(content: string, user_key: string, res_message: string): any {
     var defered = this.Q.defer();
     var post = {UNIQUE_ID:user_key, MESSAGE:content, ETC1:res_message};
-
+console.log("post:" + JSON.stringify(post));
     this.pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, defered.makeNodeResolver());
     return defered.promise;
   }

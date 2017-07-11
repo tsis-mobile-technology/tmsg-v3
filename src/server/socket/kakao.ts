@@ -114,13 +114,13 @@ export class KakaoSocket {
     }
 
 
-  public setSystemScenario(results: any): void {
-    this.inputDatas = results;
-  }
+    public setSystemScenario(results: any): void {
+        this.inputDatas = results;
+    }
 
-  public setKakaoDb(Db: any): void {
-    this.kakaoDb = Db;
-  }
+    public setKakaoDb(Db: any): void {
+        this.kakaoDb = Db;
+    }
 
     // Add signal
     public findScenario(tagName: string): string {
@@ -161,8 +161,8 @@ export class KakaoSocket {
             Q.all([this.kakaoDb.dbLoadCustomer(user_key), this.kakaoDb.dbCheckHistory(user_key)]).then(function(results){
                 customerInfo = results[0][0][0];
                 customerHistoryInfo = results[1][0][0];
-                console.log("getMessageResponseNew:customerInfo:" + JSON.stringify(customerInfo));
-                console.log("getMessageResponseNew:customerHistoryInfo:" + JSON.stringify(customerHistoryInfo));
+                // console.log("getMessageResponseNew:customerInfo:" + JSON.stringify(customerInfo));
+                // console.log("getMessageResponseNew:customerHistoryInfo:" + JSON.stringify(customerHistoryInfo));
                 // 아래 function은 다음 단계에서 개인정보(가입유무)가 필요한 step에서 처리
                 //re = kakaoSocket.checkCustomerInfo(customerInfo);
                 // if(re != null) {
@@ -174,9 +174,11 @@ export class KakaoSocket {
                 //         if(re != null) callback(null, re);
                 //     }).done();
                 // }
-            }).then(function() {
+            }).then(function() { // case#4 first
                 /*사용자의 입력 이력, 사용자 정보가 없는 경우 입력된 'content'가 등록된것 이면 해당 시나리오를 출력 아니면 오류 처리*/
                 if(customerHistoryInfo == null || customerInfo == null ) {
+                    // Default setting
+                    if(content == "#" || content == "처음으로") content = "keyboard";
                     Q.all([kakaoDb.dbSelectScenario(content)]).then(function(results) {
                         if( results[0][0][0] != null ) {
                             console.log(JSON.stringify(results[0][0][0]));
@@ -184,26 +186,48 @@ export class KakaoSocket {
                             re = re.RES_MESSAGE;
                         }
                     }).then(function() {
-                        re = kakaoSocket.findScenario("INPUT_ERR");
-                        // if( re != null ) {
-                        //     re = kakaoSocket.setStartButton(re);
-                        // }
-                        // else {
-                        //     re = kakaoSocket.findScenario("keyboard");
-                        // }
+                        if(re == null) re = kakaoSocket.findScenario("INPUT_ERR");
                     }).then(function() {
-                        callback(null, re);
+                        //callback(null, re);
+                        kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
+                    }).done();
+                } else if(customerHistoryInfo != null) {
+                    /* 사용자의 히스토리가있을 경우 */
+                    console.log(JSON.stringify(customerHistoryInfo));
+                    if(content == "#" || content == "처음으로") content = "keyboard";
+                    Q.all([kakaoDb.dbSelectScenario(content)]).then(function(results) {
+                        if( results[0][0][0] != null ) {
+                            console.log(JSON.stringify(results[0][0][0]));
+                            re = results[0][0][0];
+                            re = re.RES_MESSAGE;
+                        }
+                    }).then(function() {
+                        if(re == null) re = kakaoSocket.findScenario("INPUT_ERR");
+                    }).then(function() {
+                        //callback(null, re);
+                        kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
+                    }).done();
+                } else {
+                    Q.all([kakaoDb.dbSelectScenario("keyboard")]).then(function(results) {
+                        if( results[0][0][0] != null ) {
+                            console.log(JSON.stringify(results[0][0][0]));
+                            re = results[0][0][0];
+                            re = re.RES_MESSAGE;
+                        }
+                    }).then(function() {
+                        // callback(null, re);
+                        kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
                     }).done();
                 }
             }).then(function() {
                 /*사용자 히스토리가 있는 경우 blah....*/
                 console.log("나 여기야!");
 
-            }).then(function() {
+            })/*.then(function() {
                 Q.all([kakaoDb.dbSaveHistory(content, user_key, re)]).then(function(results) {
-                        console.log(JSON.stringify(results));
-                    }).done();
-            }).done();            
+                    console.log(JSON.stringify(results));
+                }).done();
+            })*/.done();
         } else {
             callback("user Key 또는 입력 정보가 NULL 입니다.", this.findScenario("SYS_ERR"));
         }
@@ -218,6 +242,14 @@ export class KakaoSocket {
             re = JSON.stringify(msg);
         }
         return re;
+    }
+
+    public insertHistoryAndCallback(content: string, user_key: string, re: any, err:any, callback: any) {
+        var Q = require('q');
+        Q.all([this.kakaoDb.dbSaveHistory(content, user_key, re)]).then(function(results) {
+            console.log(JSON.stringify(results));
+            callback(err, re);
+        }).done();
     }
 
     public checkCustomerInfo(rtnStr: any): any {
