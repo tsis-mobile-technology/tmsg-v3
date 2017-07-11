@@ -35,7 +35,7 @@ export class KakaoDb {
   // });
   }
 
-	public dbCheckHistory(content: string, user_key: string): any {
+	public dbCheckHistory(user_key: string): any {
 		var defered = this.Q.defer();
 		this.pool.query('select a.*, b.step, b.trun from TB_AUTOCHAT_HISTORY as a, TB_AUTOCHAT_SCENARIO as b where a.UNIQUE_ID = ? and b.REQ_MESSAGE = a.MESSAGE order by a.wrtdate desc LIMIT 1', [user_key], defered.makeNodeResolver());
 		return defered.promise;
@@ -76,9 +76,9 @@ console.log("dbSelectScenarioSystem:" + content);
     return defered.promise;
   }
 
-  private dbSaveHistory(content: string, user_key: string, type: string): any {
+  private dbSaveHistory(content: string, user_key: string, res_message: string): any {
     var defered = this.Q.defer();
-    var post = {UNIQUE_ID:user_key, MESSAGE:content};
+    var post = {UNIQUE_ID:user_key, MESSAGE:content, ETC1:res_message};
 
     this.pool.query('INSERT INTO TB_AUTOCHAT_HISTORY SET ?', post, defered.makeNodeResolver());
     return defered.promise;

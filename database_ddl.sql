@@ -61,13 +61,13 @@ CREATE TABLE `TB_AUTOCHAT_HISTORY` (
   `UNIQUE_ID` varchar(64) NOT NULL,
   `MESSAGE` varchar(1024) NOT NULL DEFAULT '0',
   `WRTDATE` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `ETC1` varchar(64) DEFAULT NULL,
+  `ETC1` varchar(1024) DEFAULT NULL,
   `ETC2` varchar(64) DEFAULT NULL,
   `ETC3` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`SEQ`),
   KEY `TB_AUTOCHAT_HISTORY_IDX1` (`UNIQUE_ID`),
   KEY `TB_AUTOCHAT_HISTORY_IDX2` (`ETC1`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 LOCK TABLES `TB_AUTOCHAT_HISTORY` WRITE;
 /*!40000 ALTER TABLE `TB_AUTOCHAT_HISTORY` DISABLE KEYS */;
@@ -150,6 +150,11 @@ VALUES
   (48, -1, 0, 'PHONE_NOK', '{\"message\":  {\"text\": \"입력하신 전화번호가 정확하지 않습니다. 전화번호는 숫자만 입력하여 주십시요. 이전으로 가시려면 \'#\'을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}', '2017-07-05 13:00:50', NULL, NULL, 'system'),
   (49, -1, 0, 'RES_MSG', '{\"message\":  {\"text\": \"\"},\"keyboard\": {\"type\":\"text\"}}', '2017-07-05 13:00:50', NULL, NULL, 'system'),
   (50, -1, 0, 'SYS_ERR', '{\"message\":  {\"text\": \"고객님의 죄송합니다!. 시스템 점검중으로 잠시후 다시 시도하여 주십시요.\n 처음으로 가시려면 "#"을 입력해 주세요.\"},\"keyboard\": {\"type\":\"text\"}}', '2017-07-05 13:00:50', NULL, NULL, 'system');
+
+
+INSERT INTO `TB_AUTOCHAT_SCENARIO` (`SEQ`, `STEP`, `TRUN`, `REQ_MESSAGE`, `RES_MESSAGE`, `WRTDATE`, `ETC1`, `ETC2`, `ETC3`)
+VALUES
+  (67, -1, 0, 'INPUT_ERR', '{\"message\":  {\"text\": \"고객님의 죄송합니다!. 선택(입력)하신 정보가 정확하지 않습니다.\n 처음으로 가시려면 \'처음으로\'를 선택하시거나 \'#\'을 입력해 주세요.\"},\"keyboard\": {\"buttons\",[\"처음으로\"],\"type\":\"buttons\"}}', '2017-07-11 20:10:20', NULL, NULL, 'system');
 
 /*!40000 ALTER TABLE `TB_AUTOCHAT_SCENARIO` ENABLE KEYS */;
 UNLOCK TABLES;

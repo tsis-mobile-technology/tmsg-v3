@@ -79,12 +79,12 @@ export class KakaoSocket {
     private options: any;
     private kakaoDb: any;
     private inputDatas: TB_AUTOCHAT_SCENARIO[];
+    // public  Q             = require("q");
     private validator     = require('validator');
-    private Q             = require("q");
     private net           = require('net');
     private spawn         = require('child_process').spawn;
     private fastXmlParser = require('fast-xml-parser');
-    private errorSuccess = '{"keyboard":{"type":"text"}, "message":{"text":"고객님의 죄송합니다!. 시스템 점검중으로 잠시후 다시 시도하여 주십시요.\n 처음으로 가시려면 "#"을 입력해 주세요."}}';
+    private errorSuccess  = '{"keyboard":{"type":"text"}, "message":{"text":"고객님의 죄송합니다!. 시스템 점검중으로 잠시후 다시 시도하여 주십시요.\n 처음으로 가시려면 "#"을 입력해 주세요."}}';
                         //  위 시스템 회신 문자는  SYS_ERR
 
     /* private io의 경우 본 api 서버가 기동 될때 한번 불러와서 여러번 사용한다. 
@@ -124,18 +124,23 @@ export class KakaoSocket {
 
     // Add signal
     public findScenario(tagName: string): string {
-    // console.log("findScenario call:" + tagName);
         if( this.inputDatas != null ) {
         // this.inputData.filter(function (item) { console.log(item.REQ_MESSAGE); return item.REQ_MESSAGE === tagName; });
             var rtnObj: TB_AUTOCHAT_SCENARIO[] = this.inputDatas.filter( inputData => inputData.REQ_MESSAGE === tagName);
-            return rtnObj[0].RES_MESSAGE;
+            if( rtnObj != null ) {
+                return rtnObj[0].RES_MESSAGE;
+            }
+            else {
+                return null;
+            }
         }
         else { return this.errorSuccess;}
     }
 
     public getKeyboardResponse(content: string, callback: any): void {
         var re;
-        this.Q.all([this.kakaoDb.dbSelectScenario(content)]).then(function(results){
+        var Q = require('q');
+        Q.all([this.kakaoDb.dbSelectScenario(content)]).then(function(results){
             re = results[0][0][0];
         }).then(function() {
             callback(null, JSON.parse(re.RES_MESSAGE).keyboard);
@@ -144,30 +149,75 @@ export class KakaoSocket {
     }
 
     public getMessageResponseNew(content: string, user_key: string, type: string, callback: any): void {
-// console.log("call KakaoSocket.getMessageResponseNew!");
         var re;
         var kakaoDb = this.kakaoDb;
         var customerInfo = null;
+        var customerHistoryInfo = null;
         var kakaoSocket = this;
+        var Q = require('q');
+
         if(user_key != null && content != null) {
-            this.Q.all([this.kakaoDb.dbLoadCustomer(user_key)]).then(function(results){
+
+            Q.all([this.kakaoDb.dbLoadCustomer(user_key), this.kakaoDb.dbCheckHistory(user_key)]).then(function(results){
                 customerInfo = results[0][0][0];
+                customerHistoryInfo = results[1][0][0];
                 console.log("getMessageResponseNew:customerInfo:" + JSON.stringify(customerInfo));
-                re = kakaoSocket.checkCustomerInfo(customerInfo);
+                console.log("getMessageResponseNew:customerHistoryInfo:" + JSON.stringify(customerHistoryInfo));
+                // 아래 function은 다음 단계에서 개인정보(가입유무)가 필요한 step에서 처리
+                //re = kakaoSocket.checkCustomerInfo(customerInfo);
+                // if(re != null) {
+                //     callback(null, re);
+                // } else {
+                //     this.Q.all([this.kakaoDb.dbSelectScenario(content)]).then(function(results) {
+                //         re = results[0][0][0];
+                //     }).then(function() {
+                //         if(re != null) callback(null, re);
+                //     }).done();
+                // }
             }).then(function() {
-                if(re != null) {
-                    callback(null, re);
-                } else {
-                    this.Q.all([this.kakaoDb.dbSelectScenario(content)]).then(function(results) {
-                        re = results[0][0][0];
+                /*사용자의 입력 이력, 사용자 정보가 없는 경우 입력된 'content'가 등록된것 이면 해당 시나리오를 출력 아니면 오류 처리*/
+                if(customerHistoryInfo == null || customerInfo == null ) {
+                    Q.all([kakaoDb.dbSelectScenario(content)]).then(function(results) {
+                        if( results[0][0][0] != null ) {
+                            console.log(JSON.stringify(results[0][0][0]));
+                            re = results[0][0][0];
+                            re = re.RES_MESSAGE;
+                        }
                     }).then(function() {
-                        if(re != null) callback(null, re);
+                        re = kakaoSocket.findScenario("INPUT_ERR");
+                        // if( re != null ) {
+                        //     re = kakaoSocket.setStartButton(re);
+                        // }
+                        // else {
+                        //     re = kakaoSocket.findScenario("keyboard");
+                        // }
+                    }).then(function() {
+                        callback(null, re);
                     }).done();
                 }
+            }).then(function() {
+                /*사용자 히스토리가 있는 경우 blah....*/
+                console.log("나 여기야!");
+
+            }).then(function() {
+                Q.all([kakaoDb.dbSaveHistory(content, user_key, re)]).then(function(results) {
+                        console.log(JSON.stringify(results));
+                    }).done();
             }).done();            
         } else {
             callback("user Key 또는 입력 정보가 NULL 입니다.", this.findScenario("SYS_ERR"));
         }
+    }
+
+    public setStartButton(res_message: any): any {
+        var re;
+        
+        var msg = res_message;
+        if ( msg.keyboard.buttons != null && msg.keyboard.buttons.length > 0 ) {
+            msg.keyboard.buttons.push("처음으로");
+            re = JSON.stringify(msg);
+        }
+        return re;
     }
 
     public checkCustomerInfo(rtnStr: any): any {
