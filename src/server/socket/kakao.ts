@@ -221,6 +221,34 @@ export class KakaoSocket {
                         //callback(null, re);
                         kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
                     }).done();
+                } else if(customerHistoryInfo != null && customerInfo == null ) {
+                    /* 사용자의 히스토리, 사용자 인증정보가 있을 경우 */
+                    if(content == "#" || content == "처음으로") content = "keyboard";
+                    Q.all([kakaoDb.dbSelectScenario(content)]).then(function(results) {
+                        if( results[0][0][0] != null ) {
+                            console.log(JSON.stringify(results[0][0][0]));
+                            // re = results[0][0][0];
+                            // re = re.RES_MESSAGE;
+                            re = kakaoSocket.setStartButton(results[0][0][0].RES_MESSAGE, results[0][0][0].STEP);
+                        }
+                    }).then(function() {
+                        if(re == null) {
+                            /* 1. 가장 최근 히스토리가 유효한 세션 범위 (5분) 인지?  
+                               2. 입력된 정보가 해당 상황에 맞는 값인지 valid 확인?
+                            */
+                            re = kakaoSocket.findScenario("INPUT_ERR");
+                            /* 3. 해당 정보를 DB에 저장 -> 다음 입력값이 있어야 하는지?
+                                  있다면 요청 정보를 리턴
+                                  없고 연동처리를 요한다면 연동 처리 결과를 리턴
+                            */
+                        }
+                        else {
+                            /* 시나리오에 등록은 되어 있지만 외부연동이 필요한지 판단해서 연동 처리를 결과를 리턴해주어야 한다.*/
+                        }
+                    }).then(function() {
+                        //callback(null, re);
+                        kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
+                    }).done();
                 } else {
                     Q.all([kakaoDb.dbSelectScenario("keyboard")]).then(function(results) {
                         if( results[0][0][0] != null ) {
