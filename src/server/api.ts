@@ -121,12 +121,12 @@ class ApiServer {
             try {
                 this.kakaoSocket.getMessageResponseNew(content, user_key, type, function(err, data) {
                     if(err) {
-                        console.log('message:응답 에러:'+err);
+                        // console.log('message:응답 에러:'+err);
                         re = data;
                         result.status(200).send(re);
                     } else {
                         re = data;
-                        console.log("response:" + JSON.stringify(re));
+                        // console.log("response:" + JSON.stringify(re));
                         result.status(200).send(re);
                         console.log('message:응답 성공');
                     }
