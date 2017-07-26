@@ -102,6 +102,12 @@ npm install -g gulpjs/gulp-cli#4.0
 npm install -g webpack
 ```
 
+#### C
+```
+gcc -o shorturl shorturl.c
+gcc -o sha256 KISA_SHA_256.c -I./
+```
+
 #### MongoDB
 
 When MongoDB is installed, you should create (or ensure) that you have `C:\Data` -directory created:
