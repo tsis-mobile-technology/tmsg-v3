@@ -14,3 +14,4 @@ Thumbs.db
 .env
 npm-debug.log
 shorturl
+sha256
