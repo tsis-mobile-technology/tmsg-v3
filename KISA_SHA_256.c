@@ -116,11 +116,14 @@ void SHA256_Transform(ULONG_PTR Message, ULONG_PTR ChainVar)
 	ChainVar[7] += h;
 }
 
-//*********************************************************************************************************************************
-// o SHA256_Init()		: ¿¬¼âº¯¼ö¿Í ±æÀÌº¯¼ö¸¦ ÃÊ±âÈ­ÇÏ´Â ÇÔ¼ö
-// o ÀÔ·Â				: Info		-  SHA-256 ±¸Á¶Ã¼ÀÇ Æ÷ÀÎÅÍ º¯¼ö
-// o Ãâ·Â				: 
-//*********************************************************************************************************************************
+/*
+연쇄 변수와 길이 변수를 초기화 하는 함수
+매개변수 :
+	Info SHA256_Process 호출 시 사용되는 구조체
+참 고 :
+	1. IN 사용자가 입력해야 할 매개변수를 의미 한다. 
+	2. OUT 함수 호출 후 값이 채워지는 매개변수를 의미 한다
+*/
 void SHA256_Init( OUT SHA256_INFO *Info )
 {
 	Info->uChainVar[0] = 0x6a09e667;
@@ -135,13 +138,13 @@ void SHA256_Init( OUT SHA256_INFO *Info )
 	Info->uHighLength = Info->uLowLength = 0;
 }
 
-//*********************************************************************************************************************************
-// o SHA256_Process()	: ÀÓÀÇÀÇ ±æÀÌ¸¦ °¡Áö´Â ÀÔ·Â ¸Þ½ÃÁö¸¦ 512 ºñÆ® ºí·Ï ´ÜÀ§·Î ³ª´©¾î ¾ÐÃàÇÔ¼ö¸¦ È£ÃâÇÏ´Â ÇÔ¼ö
-// o ÀÔ·Â				: Info		 - SHA-256 ±¸Á¶Ã¼ÀÇ Æ÷ÀÎÅÍ º¯¼ö
-//						  pszMessage - ÀÔ·Â ¸Þ½ÃÁöÀÇ Æ÷ÀÎÅÍ º¯¼ö
-//						  uDataLen	 - ÀÔ·Â ¸Þ½ÃÁöÀÇ ¹ÙÀÌÆ® ±æÀÌ
-// o Ãâ·Â				: 
-//*********************************************************************************************************************************
+/*
+임의의 길이를 가지는 입력 메시지를 512비트 블록단위로 나누어 압축 함수를 호출하는 함수
+매개변수 :
+	Info SHA-256 구조체의 포인터 변수
+	pszMessage 입력 메시지의 포인터변수
+	uDataLen 입력 메시지의 바이트 길이
+*/
 void SHA256_Process( OUT SHA256_INFO *Info, IN const BYTE *pszMessage, IN UINT uDataLen )
 {
 	if ((Info->uLowLength += (uDataLen << 3)) < 0)
@@ -160,12 +163,12 @@ void SHA256_Process( OUT SHA256_INFO *Info, IN const BYTE *pszMessage, IN UINT u
 	memcpy((UCHAR_PTR)Info->szBuffer, pszMessage, uDataLen);
 }
 
-//*********************************************************************************************************************************
-// o SHA256_Close()		: ¸Þ½ÃÁö µ¡ºÙÀÌ±â¿Í ±æÀÌ µ¡ºÙÀÌ±â¸¦ ¼öÇàÇÑ ÈÄ ¸¶Áö¸· ¸Þ½ÃÁö ºí·ÏÀ» °¡Áö°í ¾ÐÃàÇÔ¼ö¸¦ È£ÃâÇÏ´Â ÇÔ¼ö
-// o ÀÔ·Â				: Info	    - SHA-256 ±¸Á¶Ã¼ÀÇ Æ÷ÀÎÅÍ º¯¼ö
-//						  pszDigest	- SHA-256 ÇØ½¬°ªÀ» ÀúÀåÇÒ Æ÷ÀÎÅÍ º¯¼ö
-// o Ãâ·Â				:
-//*********************************************************************************************************************************
+/*
+메시지 덧붙이기와 길이 덧붙이기를 수행한 후 마지막 메시지 블록을 가지고 압축 함수를 호출하는 함수
+매개변수 :
+	Info SHA-256 구조체의 포인터 변수
+	pszDigest SHA-256 해시값을 저장할 포인터 변수
+*/
 void SHA256_Close( OUT SHA256_INFO *Info, IN BYTE *pszDigest )
 {
 	ULONG i, Index;
@@ -195,8 +198,18 @@ void SHA256_Close( OUT SHA256_INFO *Info, IN BYTE *pszDigest )
 	for (i = 0; i < SHA256_DIGEST_VALUELEN; i += 4)
 		BIG_D2B((Info->uChainVar)[i / 4], &(pszDigest[i]));
 }
+/*
+SHA256_Init, SHA256_Process, SHA256_Close 함수를 내부적으로 모두 호출하여 간편한 인터페이스를제공하기 위한 함수
+매개변수 :
+	pszMessage 입력 메시지의 포인터변수
+	uPlainTextLen 입력 메시지의 바이트 길이
+	pszDigest SHA-256 해시 값을 저장할 포인터 변수
+참 고 :
+	1. IN 사용자가 입력해야 할 매개변수를 의미 한다. 
+	2. OUT 함수 호출 후 값이 채워지는 매개변수를 의미 한다.
+*/
 
-void SHA256_Encrpyt( IN const BYTE *pszMessage, IN UINT uPlainTextLen, OUT BYTE *pszDigest )
+void SHA256_Encrypt( IN const BYTE *pszMessage, IN UINT uPlainTextLen, OUT BYTE *pszDigest )
 {
 	SHA256_INFO info;
 
@@ -228,8 +241,8 @@ int main (int argc, const char * argv[])
 
     scanf("%s", plain);
     plain_leng = strlen((char *)plain);
-
-    SHA256_Encrpyt(plain, plain_leng, encrypt);
+printf("plain:%32s, length:%d\n", (char *)plain, plain_leng);
+    SHA256_Encrypt(plain, plain_leng, encrypt);
 
     for(i = 0; i < 32; i++) {
         // fprintf(fp, "%02X", encrypt[i]);

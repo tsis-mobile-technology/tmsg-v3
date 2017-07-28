@@ -65,34 +65,17 @@ typedef struct{
 	BYTE szBuffer[SHA256_DIGEST_BLOCKLEN];
 } SHA256_INFO;
 
-/**
-@brief ¿¬¼âº¯¼ö¿Í ±æÀÌº¯¼ö¸¦ ÃÊ±âÈ­ÇÏ´Â ÇÔ¼ö
-@param Info : SHA256_Process È£Ãâ ½Ã »ç¿ëµÇ´Â ±¸Á¶Ã¼
-*/
+
 void SHA256_Init( OUT SHA256_INFO *Info );
 
-/**
-@brief ¿¬¼âº¯¼ö¿Í ±æÀÌº¯¼ö¸¦ ÃÊ±âÈ­ÇÏ´Â ÇÔ¼ö
-@param Info : SHA256_Init È£ÃâÇÏ¿© ÃÊ±âÈ­µÈ ±¸Á¶Ã¼(³»ºÎÀûÀ¸·Î »ç¿ëµÈ´Ù.)
-@param pszMessage : »ç¿ëÀÚ ÀÔ·Â Æò¹®
-@param inLen : »ç¿ëÀÚ ÀÔ·Â Æò¹® ±æÀÌ
-*/
+
 void SHA256_Process( OUT SHA256_INFO *Info, IN const BYTE *pszMessage, IN UINT uDataLen );
 
-/**
-@brief ¸Þ½ÃÁö µ¡ºÙÀÌ±â¿Í ±æÀÌ µ¡ºÙÀÌ±â¸¦ ¼öÇàÇÑ ÈÄ ¸¶Áö¸· ¸Þ½ÃÁö ºí·ÏÀ» °¡Áö°í ¾ÐÃàÇÔ¼ö¸¦ È£ÃâÇÏ´Â ÇÔ¼ö
-@param Info : SHA256_Init È£ÃâÇÏ¿© ÃÊ±âÈ­µÈ ±¸Á¶Ã¼(³»ºÎÀûÀ¸·Î »ç¿ëµÈ´Ù.)
-@param pszDigest : ¾ÏÈ£¹®
-*/
+
 void SHA256_Close( OUT SHA256_INFO *Info, OUT BYTE *pszDigest );
 
-/**
-@brief »ç¿ëÀÚ ÀÔ·Â Æò¹®À» ÇÑ¹ø¿¡ Ã³¸®
-@param pszMessage : »ç¿ëÀÚ ÀÔ·Â Æò¹®
-@param pszDigest : ¾ÏÈ£¹®
-@remarks ³»ºÎÀûÀ¸·Î SHA256_Init, SHA256_Process, SHA256_Close¸¦ È£ÃâÇÑ´Ù.
-*/
-void SHA256_Encrpyt( IN const BYTE *pszMessage, IN UINT uPlainTextLen, OUT BYTE *pszDigest );
+
+void SHA256_Encrypt( IN const BYTE *pszMessage, IN UINT uPlainTextLen, OUT BYTE *pszDigest );
 
 #ifdef  __cplusplus
 }
