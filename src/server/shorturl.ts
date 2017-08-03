@@ -107,13 +107,14 @@ class ShorturlServer {
 
         // Short URL 생성
         this.shorturl_app.get('/create', (request: express.Request, result: express.Response, next: express.NextFunction) => {
+//console.log('request:' + JSON.stringify(request.query));
             var long_url = request.query.long_url;
             var re;
             var agent = useragent.parse(request.headers['user-agent']);
             var agent_os = agent.os.toString();
             var agent_device = agent.device.toString();
 
-            if ( long_url != null && long_url == '') {
+            if ( long_url != null && long_url != '') {
                 try {
                     this.getShortURL(long_url, agent_os, agent_device, function(err, data) {
                         if(err) {
