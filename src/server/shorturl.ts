@@ -170,7 +170,8 @@ class ShorturlServer {
             }).then(function() {
                 if (rtnStr != null && rtnStr != '') {
                     const spawn = require('child_process').spawn;
-                    const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl', [rtnStr]);
+                    //const ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl', [rtnStr]);
+                    const ls = spawn('/home/icr/tmsg-v3/shorturl', [rtnStr]);
 
                     ls.stdout.on('data', (data) => {
                         console.log(`stdout: ${data}`);
