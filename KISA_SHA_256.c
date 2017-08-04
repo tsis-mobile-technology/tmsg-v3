@@ -237,11 +237,13 @@ int main (int argc, const char * argv[])
 
     // fp = fopen("SHA-256 Encrypted.txt", "w");
 
+/*
     printf("평문 : ");
-
     scanf("%s", plain);
+*/
+    strcpy((char *)plain, argv[1]);
     plain_leng = strlen((char *)plain);
-printf("plain:%32s, length:%d\n", (char *)plain, plain_leng);
+//printf("plain:%32s, length:%d\n", (char *)plain, plain_leng);
     SHA256_Encrypt(plain, plain_leng, encrypt);
 
     for(i = 0; i < 32; i++) {
