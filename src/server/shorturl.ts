@@ -14,6 +14,12 @@ var useragent  = require('useragent');
 //[useragent]   - yamlparser (npm install yamlparser --save)
 //[useragent] To your own package.json
 
+// 테이블 정보
+// TB_SHORTURL.LINK_AUTH : 인증 정보(ex:생년월일)
+// TB_SHORTURL.LINK_LIMIT : 발송 기준 접근 기한(ex:5[days])
+// TB_SHORTURL.LINK_CNT :  접근제한 수(ex:1, 0인 경우 무제한)
+
+
 var pool = mysql.createPool({
     connectionLimit: 10, //important
     host     : '14.63.213.246',
