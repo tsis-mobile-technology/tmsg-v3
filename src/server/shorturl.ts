@@ -15,16 +15,25 @@ var cookieParser = require('cookie-parser');
 //[useragent]   - yamlparser (npm install yamlparser --save)
 //[useragent] To your own package.json
 
+//var pool = mysql.createPool({
+//    connectionLimit: 10, //important
+//    host     : '14.63.213.246',
+//    user     : 'smarttest',
+//    password : 'test1234',
+//    port     : 10003,
+//    database : 'SMART_MESSAGE_VERTWO',
+//    debug: false
+//});
+
 var pool = mysql.createPool({
-    connectionLimit: 10, //important
-    host     : '14.63.213.246',
+    connectionLimit: 2, //important
+    host     : '172.27.0.214',
     user     : 'smarttest',
     password : 'test1234',
-    port     : 10003,
+    port     : 3306,
     database : 'SMART_MESSAGE_VERTWO',
     debug: false
 });
-
 var bodyParser = require('body-parser');
 
 var auth_html = '<!DOCTYPE html>' +
@@ -39,7 +48,7 @@ var auth_html = '<!DOCTYPE html>' +
 '</head>' +
 '<body>' +
 '<div class="loginbox">' +
-'    <form action="http://localhost:2582/auth/" method="post">' +
+'    <form action="http://14.63.213.246:2582/auth/" method="post">' +
 '        <h1>스마트메시징</h1>' +
 '        <p>생년월일 (ex: 19801230)</p>' +
 '        <div class="formbox">' +
@@ -220,7 +229,7 @@ console.log("short_url:" + short_url);
                             pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ?', short_url);
                         }
                         else {
-                            result.redirect("http://localhost:2582/errorpage");
+                            result.redirect("http://14.63.213.246:2582/errorpage");
                         }
                         result.end();
                     }
@@ -228,7 +237,7 @@ console.log("short_url:" + short_url);
                 })
                 .done();
             } else {
-                result.redirect("http://localhost:2582/errorpage");
+                result.redirect("http://14.63.213.246:2582/errorpage");
             }
         });
 
@@ -268,7 +277,7 @@ console.log("short_url:" + short_url);
                     else bRedirect = false;
                 }).then(function() {
                     if(link_auth != null && link_auth.length > 0 ) {
-                        //result.redirect("http://localhost:2582/auth?short_url=" + short_url);
+                        //result.redirect("http://14.63.213.246:2582/auth?short_url=" + short_url);
                         result.header("Access-Control-Allow-Origin", "*"); 
                         result.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
                         result.setHeader("Content-Type", "text/html");
@@ -284,7 +293,7 @@ console.log("short_url:" + short_url);
                             pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ?', short_url);
                         }
                         else {
-                            result.redirect("http://localhost:2582/errorpage");
+                            result.redirect("http://14.63.213.246:2582/errorpage");
                         }
                         result.end();
                     }
@@ -366,7 +375,7 @@ console.log("short_url:" + short_url);
 
         //start listening on port
         this.shorturl_server.on("listening", () => {
-            console.log('==> Listening on port %s. Open up http://localhost:%s/ in your browser.', this.shorturl_port, this.shorturl_port);            
+            console.log('==> Listening on port %s. Open up http://14.63.213.246:%s/ in your browser.', this.shorturl_port, this.shorturl_port);            
         });
     }
 
