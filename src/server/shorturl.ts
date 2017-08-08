@@ -226,7 +226,7 @@ console.log("short_url:" + short_url);
                         console.log("Redirect URL:" + long_url);
                         if(bRedirect == true) {
                             result.redirect(long_url);
-                            pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ?', short_url);
+                            pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ? AND ETC1 is null', short_url);
                         }
                         else {
                             result.redirect("http://14.63.213.246:2582/errorpage");
@@ -290,7 +290,7 @@ console.log("short_url:" + short_url);
                         console.log("Redirect URL:" + long_url);
                         if(bRedirect == true) {
                             result.redirect(long_url);
-                            pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ?', short_url);
+                            pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ? AND ETC1 is null', short_url);
                         }
                         else {
                             result.redirect("http://14.63.213.246:2582/errorpage");
@@ -329,7 +329,7 @@ console.log("short_url:" + short_url);
                         systemCallRtn = `${data}`;
                         if( systemCallRtn != null ) {
                             console.log("response in:" + JSON.stringify(systemCallRtn));
-                            pool.query('UPDATE TB_SHORTURL set SHORT_URL = ? WHERE SEQ = ? ', [systemCallRtn, rtnStr], function(err, rows, fields) {
+                            pool.query('UPDATE TB_SHORTURL set SHORT_URL = ? WHERE SEQ = ?  AND ETC1 is null', [systemCallRtn, rtnStr], function(err, rows, fields) {
                                 console.log("rtnStr in:" + rtnStr);
                                 if(err) console.log("Query Error:", err);
                             });
@@ -393,13 +393,13 @@ console.log("short_url:" + short_url);
 
     private dbGetRow(short_url: string): void {
         var defered = Q.defer();
-        pool.query('SELECT * FROM TB_SHORTURL WHERE SHORT_URL = ?', short_url, defered.makeNodeResolver());
+        pool.query('SELECT * FROM TB_SHORTURL WHERE SHORT_URL = ? AND ETC1 is null', short_url, defered.makeNodeResolver());
         return defered.promise;
     }
 
     private dbUpdateCallCnt(short_url: string): void {
         var defered = Q.defer();
-        pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ?', short_url, defered.makeNodeResolver());
+        pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ? AND ETC1 is null', short_url, defered.makeNodeResolver());
         return defered.promise;
     }
 }
