@@ -9,16 +9,11 @@ declare var process, __dirname;
 var Q          = require("q");
 var mysql      = require('mysql');
 var useragent  = require('useragent');
+var cookieParser = require('cookie-parser');
 //[useragent] If you want to use automatic updating, please add:
 //[useragent]   - request (npm install request --save)
 //[useragent]   - yamlparser (npm install yamlparser --save)
 //[useragent] To your own package.json
-
-// 테이블 정보
-// TB_SHORTURL.LINK_AUTH : 인증 정보(ex:생년월일)
-// TB_SHORTURL.LINK_LIMIT : 발송 기준 접근 기한(ex:5[days])
-// TB_SHORTURL.LINK_CNT :  접근제한 수(ex:1, 0인 경우 무제한)
-
 
 var pool = mysql.createPool({
     connectionLimit: 10, //important
@@ -26,11 +21,35 @@ var pool = mysql.createPool({
     user     : 'smarttest',
     password : 'test1234',
     port     : 10003,
-    database : 'smart_message_client',
+    database : 'SMART_MESSAGE_VERTWO',
     debug: false
 });
 
 var bodyParser = require('body-parser');
+
+var auth_html = '<!DOCTYPE html>' +
+'<html lang="ko">' +
+'<head>' +
+'    <meta charset="utf-8">' +
+'    <meta http-equiv="X-UA-Compatible" content="IE=Edge">' +
+'    <title>스마트메시징</title>' +
+'    <style>' +
+'        .loginbox { position: absolute; top: 200px; left: 50%; margin-left: -85px; }' +
+'    </style>' +
+'</head>' +
+'<body>' +
+'<div class="loginbox">' +
+'    <form action="http://localhost:2582/auth/" method="post">' +
+'        <h1>스마트메시징</h1>' +
+'        <p>생년월일 (ex: 19801230)</p>' +
+'        <div class="formbox">' +
+'            <input type="number" id="inputBth" name="inputBth" maxlength="8" class="input_txt" placeholder="생년월일 입력">' +
+'            <button type="submit" class="btn btn_send">전송</button>' +
+'        </div>' +
+'    </form>' +
+'</div>' +
+'</body>' +
+'</html>';
 
 class ShorturlServer {
     public shorturl_app: any;
@@ -93,6 +112,7 @@ class ShorturlServer {
 
         this.shorturl_app.use(bodyParser.json());
         this.shorturl_app.use(bodyParser.urlencoded({extended:true}));
+        this.shorturl_app.use(cookieParser());
         
         this.shorturl_app.get( '/', function(req, res) {
             var agent = useragent.parse(req.headers['user-agent'])
@@ -140,18 +160,134 @@ class ShorturlServer {
             }
         });
 
+        this.shorturl_app.get('/errorpage', (request: express.Request, result: express.Response, next: express.NextFunction) => {
+            var long_url = request.query.long_url;
+            var short_url = request.query.short_url;
+            var re;
+            var agent = useragent.parse(request.headers['user-agent']);
+            var agent_os = agent.os.toString();
+            var agent_device = agent.device.toString();
+
+            result.status(200).send("sorry!!!!");
+        });
+
+        this.shorturl_app.post('/auth', (request: express.Request, result: express.Response, next: express.NextFunction) => {
+            var inputBth = request.body.inputBth;
+            var short_url = request.cookies.short_url;
+console.log('request:' + JSON.stringify(request.body));            
+console.log('Cookies: ', request.cookies);
+console.log("inputBth:" + inputBth);
+console.log("short_url:" + short_url);
+            // result.setHeader("Content-Type", "text/html");
+            // result.send(auth_html);
+            // result.end();
+            // result.status(200).send();
+            var bRedirect = false;
+            var long_url = '';
+            var call_cnt = '';
+            var write_date = '';
+            var link_auth = ''; // TB_SHORTURL.LINK_AUTH : 인증 정보(ex:생년월일)
+            var link_limit = ''; // TB_SHORTURL.LINK_LIMIT : 발송 기준 접근 기한(ex:5[days])
+            var link_cnt = ''; // TB_SHORTURL.LINK_CNT :  접근제한 수(ex:1, 0인 경우 무제한)
+            var now_date = new Date();
+            if ( short_url != null && short_url.length > 0 && short_url != "favicon.ico" ) {
+                //Q.all([this.dbGetLongUrl(short_url)]).then(function(results) {
+                Q.all([this.dbGetRow(short_url)]).then(function(results) {
+                    if(results != null) {
+                        long_url = results[0][0][0].LONG_URL;
+                        call_cnt = results[0][0][0].CALL_CNT;
+                        write_date = results[0][0][0].WRTDATE;
+                        link_auth = results[0][0][0].LINK_AUTH;
+                        link_limit = results[0][0][0].LINK_LIMIT;
+                        link_cnt = results[0][0][0].LINK_CNT;
+                    }
+                }).then(function() {
+                    if(link_cnt != '0' && link_cnt < call_cnt) 
+                        bRedirect = true;
+                    else bRedirect = false;
+                }).then(function() {
+                    var old_date = new Date(write_date);
+                    var limit_date = new Date(old_date.getFullYear(),old_date.getMonth(),old_date.getDate() + Number(link_limit));
+
+                    if(write_date != null && limit_date.valueOf() > now_date.valueOf() ) 
+                        bRedirect = true;
+                    else bRedirect = false;
+                }).then(function() {
+                    if(link_auth != null && link_auth.length > 0 && link_auth == inputBth ) {
+                        console.log("Redirect URL:" + long_url);
+                        if(bRedirect == true) {
+                            result.redirect(long_url);
+                            pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ?', short_url);
+                        }
+                        else {
+                            result.redirect("http://localhost:2582/errorpage");
+                        }
+                        result.end();
+                    }
+                    // res.send("{type: '" + long_url + "'}");
+                })
+                .done();
+            } else {
+                result.redirect("http://localhost:2582/errorpage");
+            }
+        });
+
         this.shorturl_app.get('*', (request: express.Request, result: express.Response, next: express.NextFunction) =>  {
 
             var short_url = request.url.substring(1);
+            var bRedirect = false;
             var long_url = '';
-            console.log(">" + short_url + "<");
+            var call_cnt = '';
+            var write_date = '';
+            var link_auth = ''; // TB_SHORTURL.LINK_AUTH : 인증 정보(ex:생년월일)
+            var link_limit = ''; // TB_SHORTURL.LINK_LIMIT : 발송 기준 접근 기한(ex:5[days])
+            var link_cnt = ''; // TB_SHORTURL.LINK_CNT :  접근제한 수(ex:1, 0인 경우 무제한)
+            var now_date = new Date();
+
             if ( short_url != null && short_url.length > 0 && short_url != "favicon.ico" ) {
-                Q.all([this.dbGetLongUrl(short_url)]).then(function(results) {
-                    long_url = results[0][0][0].LONG_URL;
+                //Q.all([this.dbGetLongUrl(short_url)]).then(function(results) {
+                Q.all([this.dbGetRow(short_url)]).then(function(results) {
+                    if(results != null) {
+                        long_url = results[0][0][0].LONG_URL;
+                        call_cnt = results[0][0][0].CALL_CNT;
+                        write_date = results[0][0][0].WRTDATE;
+                        link_auth = results[0][0][0].LINK_AUTH;
+                        link_limit = results[0][0][0].LINK_LIMIT;
+                        link_cnt = results[0][0][0].LINK_CNT;
+                    }
                 }).then(function() {
-                    console.log("Redirect URL:" + long_url);
-                    result.redirect(long_url);
-                    result.end();
+                    if(link_cnt != '0' && link_cnt < call_cnt) 
+                        bRedirect = true;
+                    else bRedirect = false;
+                }).then(function() {
+                    var old_date = new Date(write_date);
+                    var limit_date = new Date(old_date.getFullYear(),old_date.getMonth(),old_date.getDate() + Number(link_limit));
+
+                    if(write_date != null && limit_date.valueOf() > now_date.valueOf() ) 
+                        bRedirect = true;
+                    else bRedirect = false;
+                }).then(function() {
+                    if(link_auth != null && link_auth.length > 0 ) {
+                        //result.redirect("http://localhost:2582/auth?short_url=" + short_url);
+                        result.header("Access-Control-Allow-Origin", "*"); 
+                        result.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
+                        result.setHeader("Content-Type", "text/html");
+                        result.cookie('short_url', short_url, { maxAge: 30000 });
+                        result.send(auth_html);
+                        //result.send("<HTML><body><H1>a</H1></body></HTML>");
+                        result.end();
+                    }
+                    else {
+                        console.log("Redirect URL:" + long_url);
+                        if(bRedirect == true) {
+                            result.redirect(long_url);
+                            pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ?', short_url);
+                        }
+                        else {
+                            result.redirect("http://localhost:2582/errorpage");
+                        }
+                        result.end();
+                    }
                     // res.send("{type: '" + long_url + "'}");
                 })
                 .done();
@@ -243,6 +379,18 @@ class ShorturlServer {
     private dbGetLongUrl(short_url: string): void { // 추후에 수정 필요 
         var defered = Q.defer();
         pool.query('SELECT sp_select_longurl( ? ) AS LONG_URL ', [short_url], defered.makeNodeResolver());
+        return defered.promise;
+    }
+
+    private dbGetRow(short_url: string): void {
+        var defered = Q.defer();
+        pool.query('SELECT * FROM TB_SHORTURL WHERE SHORT_URL = ?', short_url, defered.makeNodeResolver());
+        return defered.promise;
+    }
+
+    private dbUpdateCallCnt(short_url: string): void {
+        var defered = Q.defer();
+        pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ?', short_url, defered.makeNodeResolver());
         return defered.promise;
     }
 }
