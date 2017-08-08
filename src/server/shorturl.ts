@@ -202,7 +202,7 @@ console.log("short_url:" + short_url);
             if ( short_url != null && short_url.length > 0 && short_url != "favicon.ico" ) {
                 //Q.all([this.dbGetLongUrl(short_url)]).then(function(results) {
                 Q.all([this.dbGetRow(short_url)]).then(function(results) {
-                    if(results != null) {
+                    if(results[0][0][0] != null) {
                         long_url = results[0][0][0].LONG_URL;
                         call_cnt = results[0][0][0].CALL_CNT;
                         write_date = results[0][0][0].WRTDATE;
@@ -256,7 +256,7 @@ console.log("short_url:" + short_url);
             if ( short_url != null && short_url.length > 0 && short_url != "favicon.ico" ) {
                 //Q.all([this.dbGetLongUrl(short_url)]).then(function(results) {
                 Q.all([this.dbGetRow(short_url)]).then(function(results) {
-                    if(results != null) {
+                    if(results[0][0][0] != null) {
                         long_url = results[0][0][0].LONG_URL;
                         call_cnt = results[0][0][0].CALL_CNT;
                         write_date = results[0][0][0].WRTDATE;
