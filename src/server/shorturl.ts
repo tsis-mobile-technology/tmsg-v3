@@ -15,27 +15,28 @@ var cookieParser = require('cookie-parser');
 //[useragent]   - yamlparser (npm install yamlparser --save)
 //[useragent] To your own package.json
 
-//var pool = mysql.createPool({
-//    connectionLimit: 10, //important
-//    host     : '14.63.213.246',
-//    user     : 'smarttest',
-//    password : 'test1234',
-//    port     : 10003,
-//    database : 'SMART_MESSAGE_VERTWO',
-//    debug: false
-//});
-
 var pool = mysql.createPool({
-    connectionLimit: 2, //important
-    host     : '172.27.0.214',
+    connectionLimit: 10, //important
+    host     : '14.63.213.246',
     user     : 'smarttest',
     password : 'test1234',
-    port     : 3306,
+    port     : 10003,
     database : 'SMART_MESSAGE_VERTWO',
     debug: false
 });
+
+//var pool = mysql.createPool({
+//    connectionLimit: 2, //important
+//    host     : '172.27.0.214',
+//    user     : 'smarttest',
+//    password : 'test1234',
+//    port     : 3306,
+//    database : 'SMART_MESSAGE_VERTWO',
+//    debug: false
+//});
 var bodyParser = require('body-parser');
 
+//'    <form action="http://14.63.213.246:2582/auth/" method="post">' +
 var auth_html = '<!DOCTYPE html>' +
 '<html lang="ko">' +
 '<head>' +
@@ -48,7 +49,7 @@ var auth_html = '<!DOCTYPE html>' +
 '</head>' +
 '<body>' +
 '<div class="loginbox">' +
-'    <form action="http://14.63.213.246:2582/auth/" method="post">' +
+'    <form action="/auth" method="post">' +
 '        <h1>스마트메시징</h1>' +
 '        <p>생년월일 (ex: 19801230)</p>' +
 '        <div class="formbox">' +
@@ -56,6 +57,24 @@ var auth_html = '<!DOCTYPE html>' +
 '            <button type="submit" class="btn btn_send">전송</button>' +
 '        </div>' +
 '    </form>' +
+'</div>' +
+'</body>' +
+'</html>';
+
+var error_html = '<!DOCTYPE html>' +
+'<html lang="ko">' +
+'<head>' +
+'    <meta charset="utf-8">' +
+'    <meta http-equiv="X-UA-Compatible" content="IE=Edge">' +
+'    <title>스마트메시징</title>' +
+'    <style>' +
+'        .errorbox { position: absolute; top: 200px; left: 50%; margin-left: -85px; }' +
+'    </style>' +
+'</head>' +
+'<body>' +
+'<div class="errorbox">' +
+'    <h1>스마트메시징</h1>' +
+'    <h2>사용이 제한되었거나 인증정보가 올바르지 않습니다 !</h2>' +
 '</div>' +
 '</body>' +
 '</html>';
@@ -170,23 +189,19 @@ class ShorturlServer {
         });
 
         this.shorturl_app.get('/errorpage', (request: express.Request, result: express.Response, next: express.NextFunction) => {
-            var long_url = request.query.long_url;
-            var short_url = request.query.short_url;
-            var re;
-            var agent = useragent.parse(request.headers['user-agent']);
-            var agent_os = agent.os.toString();
-            var agent_device = agent.device.toString();
-
-            result.status(200).send("sorry!!!!");
+            result.setHeader("Content-Type", "text/html");
+            //result.status(200).send("sorry!!!!");
+            result.send(error_html);
+            result.end();
         });
 
         this.shorturl_app.post('/auth', (request: express.Request, result: express.Response, next: express.NextFunction) => {
             var inputBth = request.body.inputBth;
             var short_url = request.cookies.short_url;
-console.log('request:' + JSON.stringify(request.body));            
-console.log('Cookies: ', request.cookies);
-console.log("inputBth:" + inputBth);
-console.log("short_url:" + short_url);
+// console.log('request:' + JSON.stringify(request.body));            
+// console.log('Cookies: ', request.cookies);
+// console.log("inputBth:" + inputBth);
+// console.log("short_url:" + short_url);
             // result.setHeader("Content-Type", "text/html");
             // result.send(auth_html);
             // result.end();
@@ -200,7 +215,6 @@ console.log("short_url:" + short_url);
             var link_cnt = ''; // TB_SHORTURL.LINK_CNT :  접근제한 수(ex:1, 0인 경우 무제한)
             var now_date = new Date();
             if ( short_url != null && short_url.length > 0 && short_url != "favicon.ico" ) {
-                //Q.all([this.dbGetLongUrl(short_url)]).then(function(results) {
                 Q.all([this.dbGetRow(short_url)]).then(function(results) {
                     if(results[0][0][0] != null) {
                         long_url = results[0][0][0].LONG_URL;
@@ -223,23 +237,26 @@ console.log("short_url:" + short_url);
                     else bRedirect = false;
                 }).then(function() {
                     if(link_auth != null && link_auth.length > 0 && link_auth == inputBth ) {
-                        console.log("Redirect URL:" + long_url);
                         if(bRedirect == true) {
                             result.redirect(long_url);
                             pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ? AND ETC1 is null', short_url);
                         }
                         else {
-                            result.redirect("http://14.63.213.246:2582/errorpage");
+                            result.setHeader("Content-Type", "text/html");
+                            result.send(error_html);
                         }
                         result.end();
+                    } else {
+                        result.setHeader("Content-Type", "text/html");
+                        result.send(error_html);
                     }
-                    // res.send("{type: '" + long_url + "'}");
                 })
                 .done();
             } else {
-                result.redirect("http://14.63.213.246:2582/errorpage");
+                result.setHeader("Content-Type", "text/html");
+                result.send(error_html);
             }
-        });
+	});
 
         this.shorturl_app.get('*', (request: express.Request, result: express.Response, next: express.NextFunction) =>  {
 
@@ -293,15 +310,17 @@ console.log("short_url:" + short_url);
                             pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ? AND ETC1 is null', short_url);
                         }
                         else {
-                            result.redirect("http://14.63.213.246:2582/errorpage");
+                            result.setHeader("Content-Type", "text/html");
+                            result.send(error_html);
+                            //result.redirect("/errorpage");
                         }
                         result.end();
                     }
-                    // res.send("{type: '" + long_url + "'}");
                 })
                 .done();
             } else {
-                result.send("{type: 'Not Found Url'}");
+                result.setHeader("Content-Type", "text/html");
+                result.send(error_html);
             }
 
         });
