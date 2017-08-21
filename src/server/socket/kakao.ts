@@ -196,7 +196,7 @@ export class KakaoSocket {
                 } else if(customerHistoryInfo != null && customerInfo != null ) {
                     /* 사용자의 히스토리, 사용자 인증정보가 있을 경우 */
                     if(content == "#" || content == "처음으로") content = "keyboard";
-                    Q.all([kakaoDb.dbSelectScenario(content)]).then(function(results) {
+                    Q.all([kakaoDb.dbSelectScenario(content)]).then(function(results) { 
                         if( results[0][0][0] != null ) {
                             console.log(JSON.stringify(results[0][0][0]));
                             // re = results[0][0][0];
@@ -208,14 +208,17 @@ export class KakaoSocket {
                             /* 1. 가장 최근 히스토리가 유효한 세션 범위 (5분) 인지?  
                                2. 입력된 정보가 해당 상황에 맞는 값인지 valid 확인?
                             */
-                            re = kakaoSocket.findScenario("INPUT_ERR");
+                            /* re = kakaoSocket.findScenario("INPUT_ERR");*/
                             /* 3. 해당 정보를 DB에 저장 -> 다음 입력값이 있어야 하는지?
                                   있다면 요청 정보를 리턴
                                   없고 연동처리를 요한다면 연동 처리 결과를 리턴
                             */
                         }
-                        else {
-                            /* 시나리오에 등록은 되어 있지만 외부연동이 필요한지 판단해서 연동 처리를 결과를 리턴해주어야 한다.*/
+                        else { /* 입력된 정보가 등록 시나리오 = 'Y' */
+                            /* 
+                               시나리오에 등록은 되어 있지만 외부연동이 필요한지 판단해서 연동 처리를 결과를 리턴해주어야 한다.
+                               외부 연동이 필요한 시나리오인지를  TB_AUTOCHAT_SCENARIO.ETC3에 "interface" 로 등록되면 처리한다.
+                            */
                         }
                     }).then(function() {
                         //callback(null, re);
@@ -235,6 +238,7 @@ export class KakaoSocket {
                         if(re == null) {
                             /* 1. 가장 최근 히스토리가 유효한 세션 범위 (5분) 인지?  
                                2. 입력된 정보가 해당 상황에 맞는 값인지 valid 확인?
+                                 사용자 인증 단계 
                             */
                             re = kakaoSocket.findScenario("INPUT_ERR");
                             /* 3. 해당 정보를 DB에 저장 -> 다음 입력값이 있어야 하는지?
@@ -264,7 +268,7 @@ export class KakaoSocket {
             }).then(function() {
                 /*사용자 히스토리가 있는 경우 blah....*/
                 console.log("나 여기야!");
-
+                callback(null, re);
             })/*.then(function() {
                 Q.all([kakaoDb.dbSaveHistory(content, user_key, re)]).then(function(results) {
                     console.log(JSON.stringify(results));
@@ -282,7 +286,7 @@ export class KakaoSocket {
             if( msg.keyboard.buttons && msg.keyboard.buttons != null /*&& msg.keyboard.buttons.length > 0*/ ) {
                 msg.keyboard.buttons.push("처음으로");
                 re = JSON.stringify(msg);
-            } else {
+            } else { /* 왜 이걸 했을까? */
                 msg.keyboard.push("{\"buttons\":[\"일반 문의\"]}");
                 re = JSON.stringify(msg);
             }
