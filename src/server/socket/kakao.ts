@@ -67,6 +67,17 @@ export interface IN0002_RESULT {
     code: IN_CODE[];   
 }
 
+export interface TK001_REQUEST {
+    CustName: string;
+    CustPhone: string;
+    UniqueID: string;
+    SendType: string;
+    MsgType: string;
+    MsgContents: string;
+    SendPhone: string;
+    RecvPhone: string;
+}
+
 export class KakaoSocket {
     private mtIP: string;
     private mtURL: string;
@@ -340,6 +351,108 @@ export class KakaoSocket {
         // // defered.resolve(result);
 
         return re;
+    }
+
+    public getMTEventJSONTypeRequest(content:string, user_key:string, pool:any, rtnStr:any): string {
+        var Q      = require("q");
+        var deferred = Q.defer();
+        // local case
+        this.ls = this.spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+        // linux case
+        //this.ls = this.spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
+        // tbroad case
+        // this.ls = this.spawn('/home/icr/tmsg-v3/shorturl');
+        this.ls.stdout.on(
+            'data', (data) => {
+                this.nOTP = data;
+                if( this.nOTP != null ) {
+                    //Header
+                    // 전문길이(10)연동코드(5)전송일시(14)수신일시(14)송수신구분(1)결과코드(6)filler(50)
+                    // 0000000000 + TK001 + 20170822000000 + 000000000000000 + S + 000000 + SPACE(50)
+                    //Body
+                    // DATA(JSON type)
+                    var sendMessage = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>" + this.nOTP + "</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>" + rtnStr.PHONE + "</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1000</IDSO></REQUEST>";
+                    var messageSize = sendMessage.length + "";
+                    while (messageSize.length < 5) messageSize = "0" + messageSize;
+
+                    var sendData = messageSize + sendMessage;
+                    
+                    var client = new this.net.Socket();
+                    client.setTimeout(1000);
+                    client.connect(this.mtPort, this.mtIP, function () {
+                        console.log('CONNECTED TO: ' + this.mtIP + ':' + this.mtPort);
+                        // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
+                        client.write(sendData);
+                    });
+                    // Add a 'data' event handler for the client socket
+                    // data is what the server sent to this socket
+                    client.on('data', function (data) {
+                        console.log("data:" + data);
+                        var str = data;
+                        // Close the client socket completely
+                        var res = new String(str.slice(5));
+                        // res = res.replace(/\\r\\n/g, "");
+                        if (this.fastXmlParser.validate(res) === true) {
+                            var jsonObj = this.fastXmlParser.parse(res, this.options);
+                            var resultObj = JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG;
+                            // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
+                            // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
+                            // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
+                            if (resultObj == "SUCCESS") {
+                                pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", this.nOTP, user_key], function (err, rows, fields) {
+                                    if (err)
+                                        console.log("Query Error:", err);
+                                });
+                                deferred.resolve("success");
+                            }
+                        }
+                        client.destroy();
+                    });
+                    // Add a 'close' event handler for the client socket
+                    client.on('close', function () {
+                        console.log('Connection closed');
+                    });
+
+                    client.on('timeout', function() {
+                        console.log('Socket Timeout'); 
+                        deferred.resolve("timeout");
+                    })
+
+                    client.on('error', function(error) {
+                        console.log('Socket Error:' + error); 
+                        deferred.resolve("socketerr");
+                    })
+                }
+                else {
+                    deferred.resolve("syscallerr");
+                }
+            }
+        );
+
+        this.ls.stderr.on('data', (data) => {
+            console.log(`stderr: ${data}`);
+        // retry ? 
+        });
+
+        this.ls.on('close', (code) => {
+            console.log(`child process exited with code ${code}`);
+        });
+
+        return deferred.promise;
+    }
+
+    private setTK001RequestData(name:string, phone:string, uniqueid:string, otpnum:number): string {
+        var reqJsondata: TK001_REQUEST;
+        reqJsondata.CustName = name;
+        reqJsondata.CustPhone = phone;
+        reqJsondata.UniqueID = uniqueid;
+        reqJsondata.SendType = "SMS";
+        reqJsondata.MsgType = "KAKAO";
+        reqJsondata.MsgContents = "Secure number : " + otpnum;
+        reqJsondata.SendPhone = phone;
+        reqJsondata.RecvPhone = "07081870000";
+        
+        return JSON.stringify(reqJsondata);
     }
 
     public getTest(): void {
