@@ -80,7 +80,7 @@ export interface TK001RequestConstructor {
         ): TK001_REQUEST;
 }
 
-export class TK001 implements TK001_REQUEST {
+export class TK001Request implements TK001_REQUEST {
     // Length: number;        // 10
     // Type: string;          // 5
     // SendDate: string;      // 14
@@ -415,7 +415,8 @@ export class KakaoSocket {
         var Q      = require("q");
         var deferred = Q.defer();
         // local case
-        this.ls = this.spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+        //this.ls = this.spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+        this.ls = this.spawn('/Users/gotaejong/Addondisk/tmsg-v3/shorturl');
         // linux case
         //this.ls = this.spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
         // tbroad case
@@ -429,8 +430,11 @@ export class KakaoSocket {
                     // 0000000000 + TK001 + 20170822000000 + 000000000000000 + S + 000000 + SPACE(50)
                     //Body
                     // DATA(JSON type)
-                    var reqJsondate: TK001RequestConstructor;
-                    var requestBody = this.setTK001RequestData(reqJsondate, name, phone, uniqueid, data);
+                    //var reqJsondata: TK001RequestConstructor;
+                    //var reqJsondata: TK001Request;
+                    //var requestBody;
+                    //requestBody = new TK001Request(name, phone, uniqueid, "SMS", "KAKAO", "인증문자 번호는 " + data + "입니다! 5분이내 입력을 부탁 드립니다.", phone, "07081870000");
+                    var requestBody = this.setTK001RequestData(TK001Request, name, phone, uniqueid, this.nOTP);
                     var sendData = this.setTK001RequestHeader( JSON.stringify(requestBody));
 
 // private setTK001RequestData(reqJsondata: TK001_REQUEST, name:string, phone:string, uniqueid:string, otpnum:number): string ;
@@ -538,7 +542,7 @@ export class KakaoSocket {
             requestBody;
     }
 
-    public setTK001RequestData(reqJsondata: TK001RequestConstructor, name:string, phone:string, uniqueid:string, otpnum:number): TK001_REQUEST {
+    public setTK001RequestData(reqJsondata: TK001RequestConstructor, name:string, phone:string, uniqueid:string, otpnum:number): TK001Request {
         return new reqJsondata(name, phone, uniqueid, "SMS", "KAKAO", "인증문자 번호는 " + otpnum + "입니다! 5분이내 입력을 부탁 드립니다.", phone, "07081870000");
 
     }
