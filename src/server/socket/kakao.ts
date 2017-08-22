@@ -35,31 +35,6 @@ export interface IN0002_CUSTOMER {
     Products: string;
     SumAmtCurInv: string;
     SumAmtCurNonpmt: string;
-    /*
-    <Invoices>    
-        <invoice YyyymmInv="201706" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="0" AmtUnpmt="33600" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170501" CalcEndDay="20170531">     
-            <ProdUseDtls>      
-                <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="0" AmtUnpmt="7700" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
-                <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="0" AmtUnpmt="600" AmtSupply="0" AmtVat="0" AmtTrunc="0" />      
-                <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="0" AmtUnpmt="25300" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />     
-            </ProdUseDtls>    
-        </invoice>    
-        <invoice YyyymmInv="201705" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="33600" AmtUnpmt="0" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170401" CalcEndDay="20170430">     
-            <ProdUseDtls>      
-                <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="7700" AmtUnpmt="0" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
-                <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="25300" AmtUnpmt="0" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />      
-                <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="600" AmtUnpmt="0" AmtSupply="0" AmtVat="0" AmtTrunc="0" />     
-            </ProdUseDtls>    
-        </invoice>    
-        <invoice YyyymmInv="201704" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="33600" AmtUnpmt="0" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170301" CalcEndDay="20170331">     
-            <ProdUseDtls>      
-                <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="7700" AmtUnpmt="0" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
-                <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="25300" AmtUnpmt="0" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />      
-                <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="600" AmtUnpmt="0" AmtSupply="0" AmtVat="0" AmtTrunc="0" />     
-            </ProdUseDtls>    
-        </invoice>   
-    </Invoices>  
-    */
 }
 
 export interface IN0002_RESULT {
@@ -68,6 +43,13 @@ export interface IN0002_RESULT {
 }
 
 export interface TK001_REQUEST {
+    // Length: number;        // 10
+    // Type: string;          // 5
+    // SendDate: string;      // 14
+    // ReSendDate: string;    // 14
+    // Flag: string;          // 1
+    // ResultCode: string;    // 6
+    // filler: string;        // 50
     CustName: string;
     CustPhone: string;
     UniqueID: string;
@@ -76,6 +58,78 @@ export interface TK001_REQUEST {
     MsgContents: string;
     SendPhone: string;
     RecvPhone: string;
+}
+
+export interface TK001RequestConstructor {
+    new (
+        // Length: number,  
+        // Type: string,        
+        // SendDate: string,    
+        // ReSendDate: string,   
+        // Flag: string,         
+        // ResultCode: string,    
+        // filler: string,        
+        CustName: string,
+        CustPhone: string,
+        UniqueID: string,
+        SendType: string,
+        MsgType: string,
+        MsgContents: string,
+        SendPhone: string,
+        RecvPhone: string
+        ): TK001_REQUEST;
+}
+
+export class TK001 implements TK001_REQUEST {
+    // Length: number;        // 10
+    // Type: string;          // 5
+    // SendDate: string;      // 14
+    // ReSendDate: string;    // 14
+    // Flag: string;          // 1
+    // ResultCode: string;    // 6
+    // filler: string;        // 50
+    CustName: string;
+    CustPhone: string;
+    UniqueID: string;
+    SendType: string;
+    MsgType: string;
+    MsgContents: string;
+    SendPhone: string;
+    RecvPhone: string;
+
+    constructor(
+        // Length: number,  
+        // Type: string,        
+        // SendDate: string,    
+        // ReSendDate: string,   
+        // Flag: string,         
+        // ResultCode: string,    
+        // filler: string,        
+        CustName: string,
+        CustPhone: string,
+        UniqueID: string,
+        SendType: string,
+        MsgType: string,
+        MsgContents: string,
+        SendPhone: string,
+        RecvPhone: string) {
+
+        // this.Length     = Length;
+        // this.Type       = Type;             
+        // this.SendDate   = SendDate;
+        // this.ReSendDate = ReSendDate;     
+        // this.Flag       = Flag;       
+        // this.ResultCode = ResultCode;       
+        // this.filler     = filler; 
+        this.CustName   = CustName;
+        this.CustPhone  = CustPhone;
+        this.UniqueID   = UniqueID;
+        this.SendType   = SendType;
+        this.MsgType    = MsgType;
+        this.MsgContents = MsgContents;
+        this.SendPhone  = SendPhone;
+        this.RecvPhone  = RecvPhone;
+    }
 }
 
 export class KakaoSocket {
@@ -108,6 +162,7 @@ export class KakaoSocket {
         this.mtURL = "http://125.132.2.120:30063";
         this.mtIP = "125.132.2.120";
         this.mtPort = 30063;
+
         this.hpURL = "http://172.16.180.224:30034"; //dev
         // this.hpURL = "http://172.16.28.27:30034"; //live
         this.IN0002_URL = "/interface/tbroad/xml_module/CustInvoiceDtlXml";
@@ -259,6 +314,9 @@ export class KakaoSocket {
                         }
                         else {
                             /* 시나리오에 등록은 되어 있지만 외부연동이 필요한지 판단해서 연동 처리를 결과를 리턴해주어야 한다.*/
+                            // test 20170822
+                            // getMTEventJSONTypeRequest(name:string, phone:string, uniqueid:string, pool:any, rtnStr:any):
+                            kakaoSocket.getMTEventJSONTypeRequest("name", "phone", "uniqueid", kakaoSocket.kakaoDb, function(err, data){callback(err, data);});
                         }
                     }).then(function() {
                         //callback(null, re);
@@ -353,7 +411,7 @@ export class KakaoSocket {
         return re;
     }
 
-    public getMTEventJSONTypeRequest(content:string, user_key:string, pool:any, rtnStr:any): string {
+    public getMTEventJSONTypeRequest(name:string, phone:string, uniqueid:string, pool:any, rtnStr:any): string {
         var Q      = require("q");
         var deferred = Q.defer();
         // local case
@@ -363,7 +421,7 @@ export class KakaoSocket {
         // tbroad case
         // this.ls = this.spawn('/home/icr/tmsg-v3/shorturl');
         this.ls.stdout.on(
-            'data', (data) => {
+            'data', (data, name, phone, uniqueid) => {
                 this.nOTP = data;
                 if( this.nOTP != null ) {
                     //Header
@@ -371,11 +429,14 @@ export class KakaoSocket {
                     // 0000000000 + TK001 + 20170822000000 + 000000000000000 + S + 000000 + SPACE(50)
                     //Body
                     // DATA(JSON type)
-                    var sendMessage = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>" + this.nOTP + "</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>" + rtnStr.PHONE + "</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1000</IDSO></REQUEST>";
-                    var messageSize = sendMessage.length + "";
-                    while (messageSize.length < 5) messageSize = "0" + messageSize;
+                    var reqJsondate: TK001RequestConstructor;
+                    var requestBody = this.setTK001RequestData(reqJsondate, name, phone, uniqueid, data);
+                    var sendData = this.setTK001RequestHeader( JSON.stringify(requestBody));
 
-                    var sendData = messageSize + sendMessage;
+// private setTK001RequestData(reqJsondata: TK001_REQUEST, name:string, phone:string, uniqueid:string, otpnum:number): string ;
+// private setTK001RequestHeader(reqJsondata: TK001_REQUEST, requestBody: string ): string {
+
+                    // var sendData = messageSize + sendMessage;
                     
                     var client = new this.net.Socket();
                     client.setTimeout(1000);
@@ -389,6 +450,9 @@ export class KakaoSocket {
                     client.on('data', function (data) {
                         console.log("data:" + data);
                         var str = data;
+                        //test
+                        deferred.resolve("success");
+/*
                         // Close the client socket completely
                         var res = new String(str.slice(5));
                         // res = res.replace(/\\r\\n/g, "");
@@ -406,6 +470,7 @@ export class KakaoSocket {
                                 deferred.resolve("success");
                             }
                         }
+*/
                         client.destroy();
                     });
                     // Add a 'close' event handler for the client socket
@@ -441,18 +506,53 @@ export class KakaoSocket {
         return deferred.promise;
     }
 
-    private setTK001RequestData(name:string, phone:string, uniqueid:string, otpnum:number): string {
-        var reqJsondata: TK001_REQUEST;
-        reqJsondata.CustName = name;
-        reqJsondata.CustPhone = phone;
-        reqJsondata.UniqueID = uniqueid;
-        reqJsondata.SendType = "SMS";
-        reqJsondata.MsgType = "KAKAO";
-        reqJsondata.MsgContents = "Secure number : " + otpnum;
-        reqJsondata.SendPhone = phone;
-        reqJsondata.RecvPhone = "07081870000";
-        
-        return JSON.stringify(reqJsondata);
+    private getNowyyyymmddhhmmss(): string {
+        var now = new Date();
+        var yyyy = now.getFullYear();
+        var mm = now.getMonth() < 9 ? "0" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based
+        var dd  = now.getDate() < 10 ? "0" + now.getDate() : now.getDate();
+        var hh = now.getHours() < 10 ? "0" + now.getHours() : now.getHours();
+        var min = now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes();
+        var ss = now.getSeconds() < 10 ? "0" + now.getSeconds() : now.getSeconds();
+        return "".concat("" + yyyy).concat("" + mm).concat("" + dd).concat("" + hh).concat("" + min).concat("" + ss);
+    }
+
+
+    public setTK001RequestHeader(requestBody: string ): string {
+        //
+        var Length = 10 + requestBody.length;
+        var Type = "TK001";
+        var SendDate = this.getNowyyyymmddhhmmss();
+        var ReSendDate = this.getNowyyyymmddhhmmss();
+        var Flag = "S";
+        var ResultCode = "E00000";
+        var filler = " ";
+
+        return this.lpad(Length, 10) +
+            Type + 
+            SendDate +
+            ReSendDate +
+            Flag +
+            ResultCode +
+            this.lpadBlank(filler, 50) +
+            requestBody;
+    }
+
+    public setTK001RequestData(reqJsondata: TK001RequestConstructor, name:string, phone:string, uniqueid:string, otpnum:number): TK001_REQUEST {
+        return new reqJsondata(name, phone, uniqueid, "SMS", "KAKAO", "인증문자 번호는 " + otpnum + "입니다! 5분이내 입력을 부탁 드립니다.", phone, "07081870000");
+
+    }
+
+    public lpad(num:number, size:number): string {
+        var s = num+"";
+        while (s.length < size) s = "0" + s;
+        return s;
+    }
+
+    public lpadBlank(char:string, size:number): string {
+        var s = char+"";
+        while (s.length < size) s = " " + s;
+        return s;
     }
 
     public getTest(): void {

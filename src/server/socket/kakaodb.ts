@@ -43,7 +43,7 @@ export class KakaoDb {
 
   public dbLoadCustomer(user_key: string): any {
     var defered = this.Q.defer();
-    this.pool.query('SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
+    this.pool.query("SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ? AND (YN_AUTH = 'Y' OR WRTDATE > DATE_ADD(now(), INTERVAL - 5 MINUTE))", user_key, defered.makeNodeResolver());
     return defered.promise;
   }
 
