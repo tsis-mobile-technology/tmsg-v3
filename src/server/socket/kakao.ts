@@ -403,8 +403,10 @@ export class KakaoSocket {
                                     console.log("responseBody:" + JSON.stringify(responseBody));
 
                                     var printString = 
-                                    "티브로드 ${responseBody.list.customer.Invoices.invoice[0].YyyymmInv}월 M청구서 " +
-                                    "고객번호 : ${responseBody.list.customer.Id} ";
+                                    "티브로드 ${responseBody.list.customer.Invoices.invoice[0].YyyymmInv}월 M청구서 \r\n" +
+                                    "고객번호 : ${responseBody.list.customer.Id} \r\n" +
+                                    "고객명: ${responseBody.list.customer.Name} \r\n\r\n" +
+                                    "이번달 납부하실 총금액은 ${responseBody.list.customer.SumAmtCurInv}원 입니다.\r\n\r\n";
                                     re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
                                 }
                             }).then(function() {
