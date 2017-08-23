@@ -1,47 +1,4 @@
 
-export interface TB_AUTOCHAT_SCENARIO {
-    SEQ: number;
-    STEP: number;
-    TRUN: number;
-    REQ_MESSAGE: string;
-    RES_MESSAGE: string;
-    WRTDATA: string;
-    ETC1: string;
-    ETC2: string;
-    ETC3: string;
-}
-
-export interface IN_CODE {
-    Code: string; //<Code>0000</Code>  
-}
-
-export interface IN0002_CUSTOMER {
-    Name: string;
-    Id: string;
-    IdSo: string;
-    Address: string;
-    Phone: string;
-    HandPhone: string;
-    Email: string;
-    AccountName: string;
-    AccountId: string;
-    IssueDate: string;
-    PayMethod: string;
-    Media: string;
-    FinancialName: string;
-    Account: string;
-    Status: string;
-    Social: string;
-    Products: string;
-    SumAmtCurInv: string;
-    SumAmtCurNonpmt: string;
-}
-
-export interface IN0002_RESULT {
-    customer: IN0002_CUSTOMER[]; 
-    code: IN_CODE[];   
-}
-
 export interface TK001_REQUEST {
     // Length: number;        // 10
     // Type: string;          // 5
@@ -156,6 +113,95 @@ export class TK002Request implements TK002_REQUEST {
     }
 }
 
+export interface TK002_RESPONSE_invoice {
+    YyyymmInv: number;
+    Service: string;
+    Name: string;
+    AmtUse: number;
+    AmtDc: number;
+    AmtCurInv: number;
+    AmtPmt: number;
+    AmtUnpmt: number;
+    AmtSupply: number;
+    AmtVat: number;
+    AmtTrunc: number;
+    CalcStartDay: number;
+    CalcEndDay: number;
+    ProdUseDtls: TK002_RESPONSE_produsedtls;
+}
+
+export interface TK002_RESPONSE_invoices {
+    invoice: TK002_RESPONSE_invoice[];
+}
+
+export interface TK002_RESPONSE_produsedtl {
+    ChrgItmGrp: string;
+    ChrgItm: string;
+    AmtUse: number;
+    AmtDc: number;
+    AmtCurInv: number;
+    AmtPmt: number;
+    AmtUnpmt: number;
+    AmtSupply: number;
+    AmtVat: number;
+    AmtTrunc: number;
+}
+
+export interface TK002_RESPONSE_produsedtls {
+    produsedtl: TK002_RESPONSE_produsedtl[];
+}
+
+export interface TK002_RESPONSE_customer {
+    Name: string;
+    Id: number;
+    IdSo: number;
+    Address: string;
+    Phone: string;
+    HandPhone: string;
+    Email: string;
+    AccountName: string;
+    AccountId: number;
+    IssueDate: number;
+    PayMethod: string;
+    Media: string;
+    FinancialName: string;
+    Account: number;
+    Status: number;
+    Social: number;
+    Products: string;
+    SumAmtCurInv: number;
+    SumAmtCurNonpmt: number;
+    Invoices: TK002_RESPONSE_invoices;
+}
+
+export interface TK002_RESPONSE_code {
+    Code: string;
+}
+
+export interface TK002_RESPONSE_list {
+    customer: TK002_RESPONSE_customer;
+    code: TK002_RESPONSE_code;
+}
+
+export interface TK002_RESPONSE {
+    list: TK002_RESPONSE_list;
+}
+
+export interface TK002ResponseConstructor {
+    new (     
+        list: TK002_RESPONSE_list
+        ): TK002_RESPONSE;
+}
+
+export class TK002Response implements TK002_RESPONSE {
+    list: TK002_RESPONSE_list;
+
+    constructor(
+        list: TK002_RESPONSE_list) {
+        this.list   = list;
+    }
+}
+
 export class KakaoSocket {
     private mtIP: string;
     private mtURL: string;
@@ -184,7 +230,9 @@ export class KakaoSocket {
         this.inputDatas = io;
         this.kakaoDb = db;
         this.mtURL = "http://125.132.2.120:30063";
-        this.mtIP = "125.132.2.120";
+        // this.mtIP = "125.132.2.120";
+        // this.mtPort = 30063;
+        this.mtIP = "125.132.2.111";
         this.mtPort = 30063;
 
         this.hpURL = "http://172.16.180.224:30034"; //dev
@@ -296,6 +344,7 @@ export class KakaoSocket {
                             } else if( customerAuthIngInfo.PHONE != null && customerAuthIngInfo.NAME == null ) {
                                 Q.all([kakaoSocket.kakaoDb.dbSaveCustomer("Name", content, user_key)]).then(function(results) {
                                     console.log("dbSaveCustomer call!");
+                                    customerAuthIngInfo.NAME = content;
                                 }).then(function() {
                                     // OTP && 기간계 연동 코드 추가
                                     Q.all([kakaoSocket.getMTEventJSONTypeTK001Request(customerAuthIngInfo.NAME, customerAuthIngInfo.PHONE, user_key, kakaoSocket.kakaoDb, null)]).then(function(results) {
@@ -349,12 +398,19 @@ export class KakaoSocket {
                         if( etc3 == "interface" && customerAuthOkInfo != null ) {
                             Q.all([kakaoSocket.getMTEventJSONTypeTK002Request( user_key, kakaoSocket.kakaoDb, null)]).then(function(results) {
                                 if( results != null ) {
-                                    re = results;
-                                    console.log("rtnStr:" + re);
+                                    console.log("rtnStr:" + results);
+                                    var responseBody = this.setTK002ResponseData(TK002Response, results);
+                                    console.log("responseBody:" + JSON.stringify(responseBody));
+
+                                    var printString = 
+                                    "티브로드 ${responseBody.list.customer.Invoices.invoice[0].YyyymmInv}월 M청구서 " +
+                                    "고객번호 : ${responseBody.list.customer.Id} ";
+                                    re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
                                 }
                             }).then(function() {
                                 // callback(null, re);
-                                
+                                if( re != null )
+                                    kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
                             }).done(); 
                         } else if( etc3 == "interface" && customerAuthOkInfo == null ) {
                             re = kakaoSocket.findScenario("PHONE");
@@ -581,11 +637,14 @@ export class KakaoSocket {
         // data is what the server sent to this socket
         client.on('data', function (data) {
             console.log("data:" + data);
-            var str = data;
+            var str = new String(data);
             //test 0000000102TK00120170823230327201708232303281E99999
-            var returnCode = str.substring(44, 6);
-            if( returnCode == "E00000")
-                deferred.resolve("success");
+            var returnCode = str.substring(44).substring(0, 6);
+            console.log("returnCode:" + returnCode);
+            if( returnCode == "E00000") {
+                var returnJSON = str.substring(100).substring(0);
+                deferred.resolve(returnJSON);
+            }
             else
                 deferred.resolve(returnCode);
 /*
@@ -688,6 +747,10 @@ export class KakaoSocket {
     public setTK002RequestData(reqJsondata: TK002RequestConstructor, uniqueid:string, monthcnt:number): TK002Request {
         return new reqJsondata(uniqueid,monthcnt);
 
+    }
+
+    public setTK002ResponseData(reqJsondata: TK002ResponseConstructor, list:TK002_RESPONSE_list): TK002Response {
+        return new reqJsondata(list);
     }
 
     public lpad(num:number, size:number): string {
@@ -1042,6 +1105,50 @@ export class KakaoSocket {
 deferred.resolve(re);
                             return deferred.promise;
     }
+}
+
+
+export interface TB_AUTOCHAT_SCENARIO {
+    SEQ: number;
+    STEP: number;
+    TRUN: number;
+    REQ_MESSAGE: string;
+    RES_MESSAGE: string;
+    WRTDATA: string;
+    ETC1: string;
+    ETC2: string;
+    ETC3: string;
+}
+
+export interface IN_CODE {
+    Code: string; //<Code>0000</Code>  
+}
+
+export interface IN0002_CUSTOMER {
+    Name: string;
+    Id: string;
+    IdSo: string;
+    Address: string;
+    Phone: string;
+    HandPhone: string;
+    Email: string;
+    AccountName: string;
+    AccountId: string;
+    IssueDate: string;
+    PayMethod: string;
+    Media: string;
+    FinancialName: string;
+    Account: string;
+    Status: string;
+    Social: string;
+    Products: string;
+    SumAmtCurInv: string;
+    SumAmtCurNonpmt: string;
+}
+
+export interface IN0002_RESULT {
+    customer: IN0002_CUSTOMER[]; 
+    code: IN_CODE[];   
 }
 
 /* IN0002 result XML
