@@ -41,9 +41,15 @@ export class KakaoDb {
 		return defered.promise;
 	}
 
-  public dbLoadCustomer(user_key: string): any {
+  public dbLoadAuthOkCustomer(user_key: string): any {
     var defered = this.Q.defer();
-    this.pool.query("SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ? AND (YN_AUTH = 'Y' OR WRTDATE > DATE_ADD(now(), INTERVAL - 5 MINUTE))", user_key, defered.makeNodeResolver());
+    this.pool.query("SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ? AND YN_AUTH = 'Y' ", user_key, defered.makeNodeResolver());
+    return defered.promise;
+  }
+
+  public dbLoadAuthIngCustomer(user_key: string): any {
+    var defered = this.Q.defer();
+    this.pool.query("SELECT * FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ? AND WRTDATE > DATE_ADD(now(), INTERVAL - 5 MINUTE)", user_key, defered.makeNodeResolver());
     return defered.promise;
   }
 
@@ -80,19 +86,31 @@ export class KakaoDb {
 
   private dbSaveCustomer(updateType: string, content: string, user_key: string): any {
 
-    var post = {UNIQUE_ID:user_key, NAME:content};
+    //var post = {UNIQUE_ID:user_key, NAME:content};
+    var post = {UNIQUE_ID:user_key};
     console.log("db values:" + JSON.stringify(post));
 
-    if( updateType == "Name" ) {
+    if( updateType == "Init" ) {
       this.pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
         if(err) console.log("Query Error:", err);
       });
+    } else if( updateType == "Name" ) {
+      // this.pool.query('INSERT INTO TB_AUTOCHAT_CUSTOMER SET ?', post, function(err, rows, fields) {
+      //   if(err) console.log("Query Error:", err);
+      // });
+      this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, WRTDATE = now() WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+        if(err) console.log("Query Error:", err);
+      });
     } else if( updateType == "Phone" ) {
-      this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ? WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
+      this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET PHONE = ?, WRTDATE = now() WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
         if(err) console.log("Query Error:", err);
       });
     } else if( updateType == "Auth") {
-      this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+      this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ?, PHONE = null, NAME = null, ETC1 = null, WRTDATE = now() WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+        if(err) console.log("Query Error:", err);
+      });
+    } else if( updateType == "Otp") {
+      this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET ETC1 = ?, WRTDATE = now() WHERE UNIQUE_ID = ?', [content, user_key], function(err, rows, fields) {
         if(err) console.log("Query Error:", err);
       });
     }
