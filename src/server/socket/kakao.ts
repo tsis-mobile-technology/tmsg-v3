@@ -702,15 +702,17 @@ export class KakaoSocket {
 
 
     public setTK001RequestHeader(requestBody: string ): string {
-        //
-        var Length = 100 + requestBody.length;
+        var bytes = require('utf8-length');
+
+        // var Length = 100 + requestBody.length;
+        var Length = 100 + bytes(requestBody);
         var Type = "TK001";
         var SendDate = this.getNowyyyymmddhhmmss();
         var ReSendDate = this.getNowyyyymmddhhmmss();
         var Flag = "S";
         var ResultCode = "E00000";
         var filler = " ";
-
+console.log("Length:" + Length + "(" + (100 + requestBody.length) + ")");
         return this.lpad(Length, 10) +
             Type + 
             SendDate +
@@ -727,15 +729,17 @@ export class KakaoSocket {
     }
 
     public setTK002RequestHeader(requestBody: string ): string {
-        //
-        var Length = 100 + requestBody.length;
+        var bytes = require('utf8-length');
+
+        // var Length = 100 + requestBody.length;
+        var Length = 100 + bytes(requestBody);
         var Type = "TK002";
         var SendDate = this.getNowyyyymmddhhmmss();
         var ReSendDate = this.getNowyyyymmddhhmmss();
         var Flag = "S";
         var ResultCode = "E00000";
         var filler = " ";
-
+console.log("Length:" + Length + "(" + (100 + requestBody.length) + ")");
         return this.lpad(Length, 10) +
             Type + 
             SendDate +
