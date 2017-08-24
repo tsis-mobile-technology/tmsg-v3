@@ -365,6 +365,10 @@ export class KakaoSocket {
                                     }).then(function() {
                                         // callback(null, re);
                                         re = kakaoSocket.findScenario("AUTH");
+                                        //20170824
+                                        if( re != null ) {
+                                            kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
+                                        }
                                     }).done();
                                 }).then(function() {
                                     if( re != null ) {
