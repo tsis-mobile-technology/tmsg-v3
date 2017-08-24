@@ -375,7 +375,7 @@ export class KakaoSocket {
                                         kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
                                     }
                                 }).done();
-                            } else if( customerAuthIngInfo.PHONE != null && customerAuthIngInfo.NAME == null && customerAuthIngInfo.ETC1 != null ) {
+                            } else if( customerAuthIngInfo.PHONE != null && customerAuthIngInfo.NAME != null && customerAuthIngInfo.ETC1 != null ) {
                                 if( customerAuthIngInfo.ETC1 == content ) {
                                     Q.all([kakaoSocket.kakaoDb.dbSaveCustomer("Auth", null, user_key)]).then(function(results) {
                                         console.log("dbSaveCustomer call!");

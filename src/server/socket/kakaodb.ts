@@ -5,15 +5,15 @@ export class KakaoDb {
 	private pool   = null;
 
   constructor() {  
- this.pool = this.mysql.createPool({
-   connectionLimit: 2,
-   host: '14.63.213.246',
-   user: 'smarttest',
-   password: 'test1234',
-   port: 10003,
-   database: 'SMART_MESSAGE_VERTWO',
-   debug: false
- });
+ // this.pool = this.mysql.createPool({
+ //   connectionLimit: 2,
+ //   host: '14.63.213.246',
+ //   user: 'smarttest',
+ //   password: 'test1234',
+ //   port: 10003,
+ //   database: 'SMART_MESSAGE_VERTWO',
+ //   debug: false
+ // });
  //this.pool = this.mysql.createPool({
  //  connectionLimit: 10, //important
  //  host     : 'localhost',
@@ -24,15 +24,15 @@ export class KakaoDb {
  //  debug: false
  //});
   // console.log("KakaoDB constructor()");
-  // this.pool = this.mysql.createPool({
-  //   connectionLimit: 20,
-  //   host: '125.132.2.20 ',
-  //   user: 'icr',
-  //   password: '1q2w3e4r5t^Y',
-  //   port: 3306,
-  //   database: 'SMART_MESSAGE_VERTWO',
-  //   debug: false
-  // });
+  this.pool = this.mysql.createPool({
+    connectionLimit: 20,
+    host: '125.132.2.20',
+    user: 'icr',
+    password: '1q2w3e4r5t^Y',
+    port: 3306,
+    database: 'SMART_MESSAGE_VERTWO',
+    debug: false
+  });
   }
 
 	public dbCheckHistory(user_key: string): any {
@@ -106,7 +106,7 @@ export class KakaoDb {
         if(err) console.log("Query Error:", err);
       });
     } else if( updateType == "Auth") {
-      this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET AUTH = ?, PHONE = null, NAME = null, ETC1 = null, WRTDATE = now() WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
+      this.pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ?, PHONE = null, NAME = null, ETC1 = null, WRTDATE = now() WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
         if(err) console.log("Query Error:", err);
       });
     } else if( updateType == "Otp") {
