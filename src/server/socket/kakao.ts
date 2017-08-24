@@ -91,23 +91,23 @@ export class TK001Request implements TK001_REQUEST {
 
 export interface TK002_REQUEST {
     UniqueID: string;
-    MonthCnt: number;
+    MonthCnt: string;
 }
 
 export interface TK002RequestConstructor {
     new (     
         UniqueID: string,
-        MonthCnt: number
+        MonthCnt: string
         ): TK002_REQUEST;
 }
 
 export class TK002Request implements TK002_REQUEST {
     UniqueID: string;
-    MonthCnt: number;
+    MonthCnt: string;
 
     constructor(
         UniqueID: string,
-        MonthCnt: number) {
+        MonthCnt: string) {
         this.UniqueID   = UniqueID;
         this.MonthCnt   = MonthCnt;
     }
@@ -408,7 +408,7 @@ export class KakaoSocket {
                                     if( results == "E99999" ) {
                                           re = kakaoSocket.findScenario("SYS_ERR");
                                     } else {
-                                        var responseBody = this.setTK002ResponseData(TK002Response, results);
+                                        var responseBody = kakaoSocket.setTK002ResponseData(TK002Response, results);
                                         console.log("responseBody:" + JSON.stringify(responseBody));
 
                                         var printString = 
@@ -631,7 +631,7 @@ export class KakaoSocket {
         var mtIP = this.mtIP;
         var mtPort = this.mtPort;
 
-        var requestBody = this.setTK002RequestData(TK002Request, uniqueid, 0);
+        var requestBody = this.setTK002RequestData(TK002Request, uniqueid, "0");
         var sendData = this.setTK002RequestHeader( JSON.stringify(requestBody));
 
 // private setTK001RequestData(reqJsondata: TK001_REQUEST, name:string, phone:string, uniqueid:string, otpnum:number): string ;
@@ -760,7 +760,7 @@ console.log("Length:" + Length + "(" + (100 + requestBody.length) + ")");
             requestBody;
     }
 
-    public setTK002RequestData(reqJsondata: TK002RequestConstructor, uniqueid:string, monthcnt:number): TK002Request {
+    public setTK002RequestData(reqJsondata: TK002RequestConstructor, uniqueid:string, monthcnt:string): TK002Request {
         return new reqJsondata(uniqueid,monthcnt);
 
     }
