@@ -433,14 +433,14 @@ export class KakaoSocket {
 // console.log("responseBody.code.Code:" + responseBody.code.Code);
 // console.log("responseBody.customer[0].Name:" + responseBody.customer[0].Name);
                                         var printString = 
-                                        "티브로드 " + responseBody.customer[0].Invoices.invoice.YyyymmInv + "월 M청구서 \r\n" +
-                                        "납부일 : " + responseBody.customer[0].IssueDate + "\r\n" + 
-                                        "청구매체 : " + responseBody.customer[0].Media + "\r\n" + 
-                                        "계좌/카드번호 : " + responseBody.customer[0].Account + "\r\n" + 
-                                        "납부매체 : " + responseBody.customer[0].FinancialName + "\r\n" + 
-                                        "고객명 : " + responseBody.customer[0].Name + "\r\n" + 
-                                        "고객상태 : " + responseBody.customer[0].Status + "\r\n" + 
-                                        "고객번호 : " + responseBody.customer[0].AccountId + "\r\n";
+                                        "티브로드 " + responseBody.customer.Invoices.invoice.YyyymmInv + "월 M청구서 \r\n" +
+                                        "납부일 : " + responseBody.customer.IssueDate + "\r\n" + 
+                                        "청구매체 : " + responseBody.customer.Media + "\r\n" + 
+                                        "계좌/카드번호 : " + responseBody.customer.Account + "\r\n" + 
+                                        "납부매체 : " + responseBody.customer.FinancialName + "\r\n" + 
+                                        "고객명 : " + responseBody.customer.Name + "\r\n" + 
+                                        "고객상태 : " + responseBody.customer.Status + "\r\n" + 
+                                        "고객번호 : " + responseBody.customer.AccountId + "\r\n";
                                         re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
                                     }
                                 }
