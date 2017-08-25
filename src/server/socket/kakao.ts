@@ -183,24 +183,43 @@ export interface TK002_RESPONSE_list {
     code: TK002_RESPONSE_code;
 }
 
-export interface TK002_RESPONSE {
-    list: TK002_RESPONSE_list;
-}
-
 export interface TK002ResponseConstructor {
     new (     
-        list: TK002_RESPONSE_list
-        ): TK002_RESPONSE;
+        customer: TK002_RESPONSE_customer,
+        code: TK002_RESPONSE_code
+        ): TK002_RESPONSE_list;
 }
 
-export class TK002Response implements TK002_RESPONSE {
-    list: TK002_RESPONSE_list;
+export class TK002Response implements TK002_RESPONSE_list {
+    customer: TK002_RESPONSE_customer;
+    code: TK002_RESPONSE_code;
 
     constructor(
-        list: TK002_RESPONSE_list) {
-        this.list   = list;
+        customer: TK002_RESPONSE_customer,
+        code: TK002_RESPONSE_code) {
+        this.customer   = customer;
+        this.code       = code;
     }
 }
+
+// export interface TK002_RESPONSE {
+//     list: TK002_RESPONSE_list;
+// }
+
+// export interface TK002ResponseConstructor {
+//     new (     
+//         list: TK002_RESPONSE_list
+//         ): TK002_RESPONSE;
+// }
+
+// export class TK002Response implements TK002_RESPONSE {
+//     list: TK002_RESPONSE_list;
+
+//     constructor(
+//         list: TK002_RESPONSE_list) {
+//         this.list   = list;
+//     }
+// }
 
 export class KakaoSocket {
     private mtIP: string;
@@ -408,7 +427,7 @@ export class KakaoSocket {
                                     if( results == "E99999" ) {
                                           re = kakaoSocket.findScenario("SYS_ERR");
                                     } else {
-                                        var responseBody = kakaoSocket.setTK002ResponseData(TK002Response, results);
+                                        var responseBody = kakaoSocket.setTK002ResponseData(TK002Response, results.list.code, results.list.customer);
                                         console.log("responseBody:" + JSON.stringify(responseBody));
 
                                         var printString = 
@@ -627,6 +646,8 @@ export class KakaoSocket {
     public getMTEventJSONTypeTK002Request(uniqueid:string, pool:any, rtnStr:any): string {
         var Q      = require("q");
         var deferred = Q.defer();
+        var readBuffer:string;
+        var bytes = require('utf8-length');
 
         var mtIP = this.mtIP;
         var mtPort = this.mtPort;
@@ -639,26 +660,23 @@ export class KakaoSocket {
 
         // var sendData = messageSize + sendMessage;
         console.log('CONNECTED TO: ' + mtIP + ':' + mtPort + "," + sendData);
+        readBuffer = "";
         var client = new this.net.Socket();
-        client.setTimeout(10000);
+        client.setTimeout(5000);
+        client.setEncoding('utf8');
+        client.setNoDelay(true);
+        // client.setKeepAlive(true,5000);
         client.connect(mtPort, mtIP, function () {
             // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
             client.write(sendData);
         });
+
         // Add a 'data' event handler for the client socket
         // data is what the server sent to this socket
         client.on('data', function (data) {
-            console.log("data:" + data);
-            var str = new String(data);
-            //test 0000000102TK00120170823230327201708232303281E99999
-            var returnCode = str.substring(44).substring(0, 6);
-            console.log("returnCode:" + returnCode);
-            if( returnCode == "E00000") {
-                var returnJSON = str.substring(100).substring(0);
-                deferred.resolve(returnJSON);
-            }
-            else
-                deferred.resolve(returnCode);
+            
+            readBuffer = readBuffer + data;
+
 /*
             // Close the client socket completely
             var res = new String(str.slice(5));
@@ -678,8 +696,8 @@ export class KakaoSocket {
                 }
             }
 */
-            client.destroy();
-        });
+            //client.destroy();
+        });//.resume().on('data', function (data) {console.log("2nd data:" + data.toString());});
         // Add a 'close' event handler for the client socket
         client.on('close', function () {
             console.log('Connection closed');
@@ -688,13 +706,36 @@ export class KakaoSocket {
 
         client.on('timeout', function() {
             console.log('Socket Timeout'); 
-            deferred.resolve("timeout");
-        })
+            // deferred.resolve("timeout");
+// console.log("this.readBuffer:" + readBuffer, +"," + bytes(readBuffer)); 
+// console.log("str:" + readBuffer);
+            var returnCode = readBuffer.substring(44).substring(0, 6);
+            console.log("returnCode:" + returnCode);
+            if( returnCode == "E00000") {
+                var returnJSON = readBuffer.substring(100).substring(0);
+                deferred.resolve(returnJSON);
+            }
+            else
+                deferred.resolve(returnCode);
+        });
 
         client.on('error', function(error) {
             console.log('Socket Error:' + error); 
             deferred.resolve("socketerr");
-        })
+        });
+
+//         client.on('end', function() {
+// console.log("this.readBuffer:" + readBuffer, +"," + bytes(readBuffer)); 
+// console.log("str:" + readBuffer);
+//             var returnCode = readBuffer.substring(44).substring(0, 6);
+//             console.log("returnCode:" + returnCode);
+//             if( returnCode == "E00000") {
+//                 var returnJSON = readBuffer.substring(100).substring(0);
+//                 deferred.resolve(returnJSON);
+//             }
+//             else
+//                 deferred.resolve(returnCode);
+//         });
 
         return deferred.promise;
     }
@@ -765,9 +806,13 @@ console.log("Length:" + Length + "(" + (100 + requestBody.length) + ")");
 
     }
 
-    public setTK002ResponseData(reqJsondata: TK002ResponseConstructor, list:TK002_RESPONSE_list): TK002Response {
-        return new reqJsondata(list);
+    public setTK002ResponseData(reqJsondata: TK002ResponseConstructor, customer: TK002_RESPONSE_customer, code: TK002_RESPONSE_code ): TK002Response {
+        return new reqJsondata(customer, code);
     }
+
+    // public setTK002ResponseData(reqJsondata: TK002ResponseConstructor, list:TK002_RESPONSE_list): TK002Response {
+    //     return new reqJsondata(list);
+    // }
 
     public lpad(num:number, size:number): string {
         var s = num+"";
