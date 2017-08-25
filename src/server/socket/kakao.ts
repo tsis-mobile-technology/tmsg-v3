@@ -423,18 +423,24 @@ export class KakaoSocket {
                             re = null;
                             Q.all([kakaoSocket.getMTEventJSONTypeTK002Request( user_key, kakaoSocket.kakaoDb, null)]).then(function(results) {
                                 if( results != null ) {
-                                    console.log("rtnStr:" + results);
+                                    // console.log("rtnStr:" + results);
                                     if( results == "E99999" ) {
                                           re = kakaoSocket.findScenario("SYS_ERR");
                                     } else {
-                                        var responseBody = kakaoSocket.setTK002ResponseData(TK002Response, results.list.code, results.list.customer);
+                                        var jsonData = JSON.parse(results);
+                                        var responseBody = kakaoSocket.setTK002ResponseData(TK002Response, jsonData.list.customer, jsonData.list.code);
                                         console.log("responseBody:" + JSON.stringify(responseBody));
-
+// console.log("responseBody.code.Code:" + responseBody.code.Code);
+// console.log("responseBody.customer[0].Name:" + responseBody.customer[0].Name);
                                         var printString = 
-                                        "티브로드 ${responseBody.list.customer.Invoices.invoice[0].YyyymmInv}월 M청구서 \r\n" +
-                                        "고객번호 : ${responseBody.list.customer.Id} \r\n" +
-                                        "고객명: ${responseBody.list.customer.Name} \r\n\r\n" +
-                                        "이번달 납부하실 총금액은 ${responseBody.list.customer.SumAmtCurInv}원 입니다.\r\n\r\n";
+                                        "티브로드 " + responseBody.customer[0].Invoices.invoice.YyyymmInv + "월 M청구서 \r\n" +
+                                        "납부일 : " + responseBody.customer[0].IssueDate + "\r\n" + 
+                                        "청구매체 : " + responseBody.customer[0].Media + "\r\n" + 
+                                        "계좌/카드번호 : " + responseBody.customer[0].Account + "\r\n" + 
+                                        "납부매체 : " + responseBody.customer[0].FinancialName + "\r\n" + 
+                                        "고객명 : " + responseBody.customer[0].Name + "\r\n" + 
+                                        "고객상태 : " + responseBody.customer[0].Status + "\r\n" + 
+                                        "고객번호 : " + responseBody.customer[0].AccountId + "\r\n";
                                         re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
                                     }
                                 }
