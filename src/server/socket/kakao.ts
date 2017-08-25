@@ -282,8 +282,9 @@ export class KakaoSocket {
     // Add signal
     public findScenario(tagName: string): string {
         if( this.inputDatas != null ) {
+
         // this.inputData.filter(function (item) { console.log(item.REQ_MESSAGE); return item.REQ_MESSAGE === tagName; });
-            var rtnObj: TB_AUTOCHAT_SCENARIO[] = this.inputDatas.filter( inputData => inputData.REQ_MESSAGE === tagName);
+            var rtnObj: TB_AUTOCHAT_SCENARIO[] = this.inputDatas.filter( inputData => inputData.REQ_MESSAGE === ""+tagName);
             if( rtnObj != null ) {
                 return rtnObj[0].RES_MESSAGE;
             }
@@ -424,22 +425,48 @@ export class KakaoSocket {
                             Q.all([kakaoSocket.getMTEventJSONTypeTK002Request( user_key, kakaoSocket.kakaoDb, null)]).then(function(results) {
                                 if( results != null ) {
                                     // console.log("rtnStr:" + results);
-                                    if( results == "E99999" ) {
-                                          re = kakaoSocket.findScenario("SYS_ERR");
+                                    if( results == "E99999" || results == "E00001" || results == "E00002" ||
+                                        results == "E00003" || results == "E00004" || results == "E10000" ) {
+                                          re = kakaoSocket.findScenario(results);
                                     } else {
                                         var jsonData = JSON.parse(results);
-                                        var responseBody = kakaoSocket.setTK002ResponseData(TK002Response, jsonData.list.customer, jsonData.list.code);
-                                        console.log("responseBody:" + JSON.stringify(responseBody));
+                                        //var responseBody = kakaoSocket.setTK002ResponseData(TK002Response, jsonData.list.customer, jsonData.list.code);
 // console.log("responseBody.code.Code:" + responseBody.code.Code);
 // console.log("responseBody.customer[0].Name:" + responseBody.customer[0].Name);
-                                        var printString = 
-                                        "납부일 : " + responseBody.customer[0].IssueDate + "\r\n" + 
-                                        "청구매체 : " + responseBody.customer[0].Media + "\r\n" + 
-                                        "계좌/카드번호 : " + responseBody.customer[0].Account + "\r\n" + 
-                                        "납부매체 : " + responseBody.customer[0].FinancialName + "\r\n" + 
-                                        "고객명 : " + responseBody.customer[0].Name + "\r\n" + 
-                                        "고객상태 : " + responseBody.customer[0].Status + "\r\n" + 
-                                        "고객번호 : " + responseBody.customer[0].AccountId + "\r\n";
+                    var responseBody = jsonData.list;
+                                        console.log("responseBody:" + JSON.stringify(responseBody));
+                                        var printString = "\r\n" + "고객명      : " + responseBody.customer.Name + //: "김두수"
+                        "\r\n" + "고객번호     : " + responseBody.customer.Id + //: 1006218626
+                        "\r\n" + "서비스 상태  : " + responseBody.customer.Status + //: "사용중"
+                        "\r\n" + "전화번호(1)  : " + responseBody.customer.Phone + //: "041-549-5938"
+                        "\r\n" + "상품정보     : " + responseBody.customer.Products + //: ""
+                        "\r\n" + "Social    : " + responseBody.customer.Social + //: "N"
+                        "\r\n" + "전화번호(2)  : " + responseBody.customer.HandPhone + //: "010-4417-5938"
+                        "\r\n" + "총 청구금액  : " + responseBody.customer.SumAmtCurInv + //: ""
+                        "\r\n" + "이메일      : " + responseBody.customer.Email + //: "dskim@tbroad.com"
+                        //"\r\n" + "계열사코드   : " + responseBody.customer.IdSo + //: 4200
+                        "\r\n" + "청구매체     : " + responseBody.customer.Media + //: "이메일"
+                        //"\r\n" + "은행/카드번호 : " + responseBody.customer.Account + //: "451842120342****"
+                        "\r\n" + "은행/카드명  : " + responseBody.customer.FinancialName + //: "신한카드"
+                        "\r\n" + "주소       : " + responseBody.customer.Address + //: "충청남도 아산시 신창면 행목로 152 대주아파트 102동 106호"
+                        "\r\n" + "납부방법    : " + responseBody.customer.PayMethod + //: "신용카드"
+                        "\r\n" + "납부자명    : " + responseBody.customer.AccountName + //: "김두수"
+                        "\r\n" + "납부자번호   : " + responseBody.customer.AccountId + //: 1001155633
+                        "\r\n" + "납부예정일   : " + responseBody.customer.IssueDate + //: 15
+                        "\r\n" + "총 미납금액  : " + responseBody.customer.SumAmtCurNonpmt + //: ""
+                        "\r\n" + "과금시작일 :" + responseBody.customer.Invoices.invoice.CalcStartDay + //: 20170701
+                        "\r\n" + "과금종료일 :" + responseBody.customer.Invoices.invoice.CalcEndDay + //: 20170731
+                        "\r\n" + "상품명 :" + responseBody.customer.Invoices.invoice.Name + //: "I-DIGITAL HD_2012"
+                        "\r\n" + "당월청구금액 :" + responseBody.customer.Invoices.invoice.AmtCurInv + //: 6600
+                        "\r\n" + "청구월:" + responseBody.customer.Invoices.invoice.YyyymmInv + //: 201708
+                        "\r\n" + "서비스명:" + responseBody.customer.Invoices.invoice.Service + //: "디지털방송"
+                        "\r\n" + "사용료:" + responseBody.customer.Invoices.invoice.AmtUse + //: 27600
+                        "\r\n" + "할인금액:" + responseBody.customer.Invoices.invoice.AmtDc + //: -21000
+                        "\r\n" + "청구금액:" + responseBody.customer.Invoices.invoice.AmtSupply + //: 6000
+                        "\r\n" + "부가세:" + responseBody.customer.Invoices.invoice.AmtVat + //: 600
+                        "\r\n" + "미납액:" + responseBody.customer.Invoices.invoice.AmtUnpmt + //: 0
+                        "\r\n" + "절삭:" + responseBody.customer.Invoices.invoice.AmtTrunc + //: 0
+                        "\r\n" + "납부금액:" + responseBody.customer.Invoices.invoice.AmtPmt; //: 6600
                                         re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
                                     }
                                 }
@@ -541,12 +568,12 @@ export class KakaoSocket {
         var Q      = require("q");
         var deferred = Q.defer();
         // local case
-        this.ls = this.spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
+        //this.ls = this.spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
         //this.ls = this.spawn('/Users/gotaejong/Addondisk/tmsg-v3/shorturl');
         // linux case
         //this.ls = this.spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
         // tbroad case
-        // this.ls = this.spawn('/home/icr/tmsg-v3/shorturl');
+        this.ls = this.spawn('/home/icr/201708/tmsg-v3/shorturl');
         var mtIP = this.mtIP;
         var mtPort = this.mtPort;
         this.ls.stdout.on(
@@ -667,7 +694,7 @@ export class KakaoSocket {
         console.log('CONNECTED TO: ' + mtIP + ':' + mtPort + "," + sendData);
         readBuffer = "";
         var client = new this.net.Socket();
-        client.setTimeout(5000);
+        client.setTimeout(3000);
         client.setEncoding('utf8');
         client.setNoDelay(true);
         // client.setKeepAlive(true,5000);
@@ -832,49 +859,49 @@ console.log("Length:" + Length + "(" + (100 + requestBody.length) + ")");
     }
 
     public getTest(): void {
-    	var Iconv  = require('iconv').Iconv;
+        var Iconv  = require('iconv').Iconv;
 
-    	var euckr2utf8 = new Iconv('EUC-KR', 'UTF-8');
-    	var utf82euckr = new Iconv('UTF-8', 'EUC-KR');
+        var euckr2utf8 = new Iconv('EUC-KR', 'UTF-8');
+        var utf82euckr = new Iconv('UTF-8', 'EUC-KR');
 
-    	// utf8 안녕하세요
-    	var buff_utf8 = new Buffer(15); 
-    	buff_utf8[0] = 0xec;
-    	buff_utf8[1] = 0x95;
-    	buff_utf8[2] = 0x88;
-    	buff_utf8[3] = 0xeb;
-    	buff_utf8[4] = 0x85;
-    	buff_utf8[5] = 0x95;
-    	buff_utf8[6] = 0xed;
-    	buff_utf8[7] = 0x95;
-    	buff_utf8[8] = 0x98;
-    	buff_utf8[9] = 0xec;
-    	buff_utf8[10] = 0x84;
-    	buff_utf8[11] = 0xb8;
-    	buff_utf8[12] = 0xec;
-    	buff_utf8[13] = 0x9a;
-    	buff_utf8[14] = 0x94;
+        // utf8 안녕하세요
+        var buff_utf8 = new Buffer(15); 
+        buff_utf8[0] = 0xec;
+        buff_utf8[1] = 0x95;
+        buff_utf8[2] = 0x88;
+        buff_utf8[3] = 0xeb;
+        buff_utf8[4] = 0x85;
+        buff_utf8[5] = 0x95;
+        buff_utf8[6] = 0xed;
+        buff_utf8[7] = 0x95;
+        buff_utf8[8] = 0x98;
+        buff_utf8[9] = 0xec;
+        buff_utf8[10] = 0x84;
+        buff_utf8[11] = 0xb8;
+        buff_utf8[12] = 0xec;
+        buff_utf8[13] = 0x9a;
+        buff_utf8[14] = 0x94;
 
-    	// euc-kr 안녕하세요
-    	var buff_euckr = new Buffer(10);
-    	buff_euckr[0] = 0xbe;
-    	buff_euckr[1] = 0xc8;
-    	buff_euckr[2] = 0xb3;
-    	buff_euckr[3] = 0xe7;
-    	buff_euckr[4] = 0xc7;
-    	buff_euckr[5] = 0xcf;
-    	buff_euckr[6] = 0xbc;
-    	buff_euckr[7] = 0xbc;
-    	buff_euckr[8] = 0xbf;
-    	buff_euckr[9] = 0xe4;
+        // euc-kr 안녕하세요
+        var buff_euckr = new Buffer(10);
+        buff_euckr[0] = 0xbe;
+        buff_euckr[1] = 0xc8;
+        buff_euckr[2] = 0xb3;
+        buff_euckr[3] = 0xe7;
+        buff_euckr[4] = 0xc7;
+        buff_euckr[5] = 0xcf;
+        buff_euckr[6] = 0xbc;
+        buff_euckr[7] = 0xbc;
+        buff_euckr[8] = 0xbf;
+        buff_euckr[9] = 0xe4;
 
-    	console.log("---------------------------------------");
-    	console.log("euckr : "+buff_euckr.toString());
-    	console.log("euckr2uf8 : "+euckr2utf8.convert(buff_euckr));
+        console.log("---------------------------------------");
+        console.log("euckr : "+buff_euckr.toString());
+        console.log("euckr2uf8 : "+euckr2utf8.convert(buff_euckr));
 
-    	console.log("\n---------------------------------------");
-    	console.log("utf8 : "+buff_utf8.toString());
-    	console.log("utf82euckr : "+utf82euckr.convert(buff_utf8));
+        console.log("\n---------------------------------------");
+        console.log("utf8 : "+buff_utf8.toString());
+        console.log("utf82euckr : "+utf82euckr.convert(buff_utf8));
     }
 
     public getHomepageRequest(cmd: string): string {
@@ -1089,74 +1116,6 @@ console.log("Length:" + Length + "(" + (100 + requestBody.length) + ")");
                                     }).then(function() {
                                         return re;
                                     }).done();
-
-/*
-                                    // local case
-                                    //this.ls = spawn('/Users/gotaejong/projects/WorkspacesHTML5/tmsg-v3/shorturl');
-                                    // linux case
-                                    kakaoSocket.ls = spawn('/home/proidea/workspaceHTML5/tmsg-v3/shorturl');
-                                    // tbroad case
-                                    // this.ls = spawn('/home/icr/tmsg-v3/shorturl');
-                                    kakaoSocket.ls.stdout.on('data', (data) => {
-                                        console.log(`stdout: ${data}`);
-                                        nOTP = data;
-                                        if( nOTP != null ) {
-                                            // 1. send SMS customer phone
-                                            // 2. DB Update
-                                            // const client = socketIoClient.connect(mtURL, options);
-
-                                            // var messageSize = mtMessage.length+"";
-                                            var sendMessage = "<?xml version=\"1.0\" encoding=\"EUC-KR\"?><REQUEST><SEND_TYPE>SMS</SEND_TYPE><MSG_TYPE>TEST</MSG_TYPE><MSG_CONTENTS>" + nOTP + "</MSG_CONTENTS><SEND_NUMBER>07081883757</SEND_NUMBER><RECV_NUMBER>" + rtnStr.PHONE + "</RECV_NUMBER><FGSEND>I</FGSEND><IDSO>1000</IDSO></REQUEST>";
-                                            var messageSize = sendMessage.length + "";
-                                            while (messageSize.length < 5) messageSize = "0" + messageSize;
-
-                                            var sendData = messageSize + sendMessage;
-                                            
-                                            var client = new net.Socket();
-                                            client.connect(kakaoSocket.mtPort, kakaoSocket.mtIP, function () {
-                                                console.log('CONNECTED TO: ' + kakaoSocket.mtIP + ':' + kakaoSocket.mtPort);
-                                                // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
-                                                client.write(sendData);
-                                            });
-                                            // Add a 'data' event handler for the client socket
-                                            // data is what the server sent to this socket
-                                            client.on('data', function (data) {
-                                                console.log("data:" + data);
-                                                var str = data;
-                                                // Close the client socket completely
-                                                var res = new String(str.slice(5));
-                                                // res = res.replace(/\\r\\n/g, "");
-                                                if (fastXmlParser.validate(res) === true) {
-                                                    var jsonObj = fastXmlParser.parse(res, options);
-                                                    var resultObj = JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG;
-                                                    // console.log('XMLtoJSON:' + JSON.stringify(jsonObj.REQUEST));
-                                                    // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_CODE);
-                                                    // console.log('XMLtoJSON:' + JSON.parse(JSON.stringify(jsonObj.REQUEST)).RESULT_MSG);
-                                                    if (resultObj == "SUCCESS") {
-                                                        pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET NAME = ?, YN_AUTH = ?, ETC1 = ? WHERE UNIQUE_ID = ?', [content, "N", nOTP, user_key], function (err, rows, fields) {
-                                                            if (err)
-                                                                console.log("Query Error:", err);
-                                                        });
-                                                    }
-                                                }
-                                                client.destroy();
-                                            });
-                                            // Add a 'close' event handler for the client socket
-                                            client.on('close', function () {
-                                                console.log('Connection closed');
-                                            });
-                                        }
-                                    });
-
-                                    kakaoSocket.ls.stderr.on('data', (data) => {
-                                      console.log(`stderr: ${data}`);
-                                      // retry ? 
-                                    });
-
-                                    kakaoSocket.ls.on('close', (code) => {
-                                      console.log(`child process exited with code ${code}`);
-                                    });
-*/
                             } else if( updateType == "AUTH_OK") {
                                 pool.query('UPDATE TB_AUTOCHAT_CUSTOMER SET YN_AUTH = ? WHERE UNIQUE_ID = ?', ["Y", user_key], function(err, rows, fields) {
                                     if(err) console.log("Query Error:", err);
@@ -1168,7 +1127,7 @@ console.log("Length:" + Length + "(" + (100 + requestBody.length) + ")");
                             } else if( updateType == "PHONE_NOK") {
                                 re = this.findScenario("PHONE_NOK");
                             }
-deferred.resolve(re);
+                            deferred.resolve(re);
                             return deferred.promise;
     }
 }
@@ -1216,56 +1175,3 @@ export interface IN0002_RESULT {
     customer: IN0002_CUSTOMER[]; 
     code: IN_CODE[];   
 }
-
-/* IN0002 result XML
-<?xml version="1.0" encoding="euc-kr"?>
-<list>  
-    <customer>   
-        <Name>������</Name>   
-        <Id>4020520882</Id>   
-        <IdSo>3400</IdSo>   
-        <Address>���⵵ �Ȼ��� �ܿ��� �κη�5�� 5  3101ȣ</Address>   
-        <Phone></Phone>   
-        <HandPhone>010-4898-0329</HandPhone>   
-        <Email></Email>   
-        <AccountName>������</AccountName>   
-        <AccountId>4002184313</AccountId>   
-        <IssueDate>20</IssueDate>   
-        <PayMethod>�����ڵ���ü</PayMethod>   
-        <Media>�˸���</Media>   
-        <FinancialName>KEB�ϳ�</FinancialName>   
-        <Account>4029109550****</Account>   
-        <Status>������</Status>   
-        <Social>N</Social>   
-        <Products></Products>   
-        <SumAmtCurInv></SumAmtCurInv>   
-        <SumAmtCurNonpmt></SumAmtCurNonpmt>   
-        <Invoices>    
-            <invoice YyyymmInv="201706" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="0" AmtUnpmt="33600" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170501" CalcEndDay="20170531">     
-                <ProdUseDtls>      
-                    <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="0" AmtUnpmt="7700" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
-                    <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="0" AmtUnpmt="600" AmtSupply="0" AmtVat="0" AmtTrunc="0" />      
-                    <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="0" AmtUnpmt="25300" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />     
-                </ProdUseDtls>    
-            </invoice>    
-            <invoice YyyymmInv="201705" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="33600" AmtUnpmt="0" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170401" CalcEndDay="20170430">     
-                <ProdUseDtls>      
-                    <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="7700" AmtUnpmt="0" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
-                    <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="25300" AmtUnpmt="0" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />      
-                    <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="600" AmtUnpmt="0" AmtSupply="0" AmtVat="0" AmtTrunc="0" />     
-                </ProdUseDtls>    
-            </invoice>    
-            <invoice YyyymmInv="201704" Service="���ջ�ǰ" Name="HD������ �Ⱑ���̺�" AmtUse="77600" AmtDc="-44000" AmtCurInv="33600" AmtPmt="33600" AmtUnpmt="0" AmtSupply="30000" AmtVat="3000" AmtTrunc="0" CalcStartDay="20170301" CalcEndDay="20170331">     
-                <ProdUseDtls>      
-                    <produsedtl ChrgItmGrp="������" ChrgItm="�Ӵ���" AmtUse="15700" AmtDc="-8000" AmtCurInv="7700" AmtPmt="7700" AmtUnpmt="0" AmtSupply="7000" AmtVat="700" AmtTrunc="0" />      
-                    <produsedtl ChrgItmGrp="������" ChrgItm="������" AmtUse="61300" AmtDc="-36000" AmtCurInv="25300" AmtPmt="25300" AmtUnpmt="0" AmtSupply="23000" AmtVat="2300" AmtTrunc="0" />      
-                    <produsedtl ChrgItmGrp="������" ChrgItm="��ü��" AmtUse="600" AmtDc="0" AmtCurInv="600" AmtPmt="600" AmtUnpmt="0" AmtSupply="0" AmtVat="0" AmtTrunc="0" />     
-                </ProdUseDtls>    
-            </invoice>   
-        </Invoices>  
-    </customer>  
-    <code>   
-        <Code>0000</Code>  
-    </code> 
-</list>
-*/
