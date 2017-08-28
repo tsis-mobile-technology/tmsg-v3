@@ -376,8 +376,13 @@ export class KakaoSocket {
                                                 console.log("dbSaveCustomer call!");
                                             }).done();
                                         } else {
+                                            if( results == "E99999" || results == "E00001" || results == "E00002" ||
+                                                results == "E00003" || results == "E00004" || results == "E10000" ) {
+                                                re = kakaoSocket.findScenario(results);
+                                            } else {
+                                                re = kakaoSocket.findScenario("SYS_ERR");
+                                            }
                                             console.log("rtnStr:" + results + "," + kakaoSocket.nOTP);
-                                            re = kakaoSocket.findScenario("SYS_ERR");
                                             if( re != null ) {
                                                 kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
                                             }
