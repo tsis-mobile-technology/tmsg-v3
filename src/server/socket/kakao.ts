@@ -443,8 +443,9 @@ export class KakaoSocket {
                                         }
 
 
-                                        var printString = "고객님 안녕하세요!\r\n" +
-                                        "\r\n[기본 정보]" + 
+                                        var printString = "고객님 안녕하세요!" +
+                                        "\r\n당월 요금내역은 다음과 같습니다" +
+                                        "\r\n\r\n[기본 정보]" + 
                                         "\r\n" + "- 고객명 : " + responseBody.Name + //: "김두수"
                                         "\r\n" + "- 고객번호 : " + responseBody.Id + //: 1006218626
                                         "\r\n" + "- 서비스 상태 : " + responseBody.Status + //: "사용중"
@@ -455,7 +456,7 @@ export class KakaoSocket {
                                         // "\r\n" + "- 총 청구금액 : " + responseBody.SumAmtCurInv + //: ""
                                         "\r\n" + "- 이메일 : " + responseBody.Email + //: "dskim@tbroad.com"
                                         //"\r\n" + "계열사코드   : " + responseBody.IdSo + //: 4200
-                                        "\r\n[청구 정보]" + 
+                                        "\r\n\r\n[청구 정보]" + 
                                         "\r\n" + "- 청구매체 : " + responseBody.Media + //: "이메일"
                                         //"\r\n" + "은행/카드번호 : " + responseBody.Account + //: "451842120342****"
                                         "\r\n" + "- 은행/카드명 : " + responseBody.FinancialName + //: "신한카드"
@@ -468,17 +469,18 @@ export class KakaoSocket {
                                         "\r\n" + "- 과금시작일 :" + responseBody.Invoices.invoice.CalcStartDay + //: 20170701
                                         "\r\n" + "- 과금종료일 :" + responseBody.Invoices.invoice.CalcEndDay + //: 20170731
                                         "\r\n" + "- 상품명 :" + responseBody.Invoices.invoice.Name + //: "I-DIGITAL HD_2012"
-                                        "\r\n[당월 청구 정보]" + 
-                                        "\r\n" + "- 당월청구금액 :" + responseBody.Invoices.invoice.AmtCurInv + //: 6600
+                                        "\r\n\r\n[당월 청구 정보]" + 
+                                        "\r\n" + "- 당월청구금액 :" + responseBody.Invoices.invoice.AmtCurInv.toLocaleString() + //: 6600
                                         "\r\n" + "- 청구월 :" + responseBody.Invoices.invoice.YyyymmInv + //: 201708
                                         "\r\n" + "- 서비스명 :" + responseBody.Invoices.invoice.Service + //: "디지털방송"
                                         "\r\n" + "- 사용료 :" + responseBody.Invoices.invoice.AmtUse + //: 27600
-                                        "\r\n" + "- 할인금액 :" + responseBody.Invoices.invoice.AmtDc + //: -21000
-                                        "\r\n" + "- 청구금액 :" + responseBody.Invoices.invoice.AmtSupply + //: 6000
-                                        "\r\n" + "- 부가세 :" + responseBody.Invoices.invoice.AmtVat + //: 600
-                                        "\r\n" + "- 미납액 :" + responseBody.Invoices.invoice.AmtUnpmt + //: 0
+                                        "\r\n" + "- 할인금액 :" + responseBody.Invoices.invoice.AmtDc.toLocaleString() + //: -21000
+                                        "\r\n" + "- 청구금액 :" + responseBody.Invoices.invoice.AmtSupply.toLocaleString() + //: 6000
+                                        "\r\n" + "- 부가세 :" + responseBody.Invoices.invoice.AmtVat.toLocaleString() + //: 600
+                                        "\r\n" + "- 미납액 :" + responseBody.Invoices.invoice.AmtUnpmt.toLocaleString() + //: 0
                                         "\r\n" + "- 절삭 :" + responseBody.Invoices.invoice.AmtTrunc + //: 0
-                                        "\r\n" + "- 납부금액 :" + responseBody.Invoices.invoice.AmtPmt; //: 6600
+                                        "\r\n" + "- 납부금액 :" + responseBody.Invoices.invoice.AmtPmt.toLocaleString(); //: 6600
+                                        "\r\n\r\n" + "감사합니다."
                                         re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
                                     }
                                 }
@@ -706,7 +708,7 @@ export class KakaoSocket {
         console.log('CONNECTED TO: ' + mtIP + ':' + mtPort + "," + sendData);
         readBuffer = "";
         var client = new this.net.Socket();
-        client.setTimeout(3000);
+        client.setTimeout(1500);
         client.setEncoding('utf8');
         client.setNoDelay(true);
         // client.setKeepAlive(true,5000);
