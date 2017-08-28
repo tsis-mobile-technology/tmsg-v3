@@ -443,39 +443,42 @@ export class KakaoSocket {
                                         }
 
 
-                                        var printString = "" +
-                                        "\r\n" + "고객명      : " + responseBody.Name + //: "김두수"
-                                        "\r\n" + "고객번호     : " + responseBody.Id + //: 1006218626
-                                        "\r\n" + "서비스 상태  : " + responseBody.Status + //: "사용중"
-                                        "\r\n" + "전화번호(1)  : " + responseBody.Phone + //: "041-549-5938"
-                                        "\r\n" + "상품정보     : " + responseBody.Products + //: ""
-                                        "\r\n" + "Social    : " + responseBody.Social + //: "N"
-                                        "\r\n" + "전화번호(2)  : " + responseBody.HandPhone + //: "010-4417-5938"
-                                        "\r\n" + "총 청구금액  : " + responseBody.SumAmtCurInv + //: ""
-                                        "\r\n" + "이메일      : " + responseBody.Email + //: "dskim@tbroad.com"
+                                        var printString = "고객님 안녕하세요!\r\n" +
+                                        "\r\n[기본 정보]" + 
+                                        "\r\n" + "- 고객명 : " + responseBody.Name + //: "김두수"
+                                        "\r\n" + "- 고객번호 : " + responseBody.Id + //: 1006218626
+                                        "\r\n" + "- 서비스 상태 : " + responseBody.Status + //: "사용중"
+                                        "\r\n" + "- 전화번호(1) : " + responseBody.Phone + //: "041-549-5938"
+                                        "\r\n" + "- 상품정보 : " + responseBody.Products + //: ""
+                                        // "\r\n" + "Social    : " + responseBody.Social + //: "N"
+                                        "\r\n" + "- 전화번호(2) : " + responseBody.HandPhone + //: "010-4417-5938"
+                                        // "\r\n" + "- 총 청구금액 : " + responseBody.SumAmtCurInv + //: ""
+                                        "\r\n" + "- 이메일 : " + responseBody.Email + //: "dskim@tbroad.com"
                                         //"\r\n" + "계열사코드   : " + responseBody.IdSo + //: 4200
-                                        "\r\n" + "청구매체     : " + responseBody.Media + //: "이메일"
+                                        "\r\n[청구 정보]" + 
+                                        "\r\n" + "- 청구매체 : " + responseBody.Media + //: "이메일"
                                         //"\r\n" + "은행/카드번호 : " + responseBody.Account + //: "451842120342****"
-                                        "\r\n" + "은행/카드명  : " + responseBody.FinancialName + //: "신한카드"
-                                        "\r\n" + "주소       : " + responseBody.Address + //: "충청남도 아산시 신창면 행목로 152 대주아파트 102동 106호"
-                                        "\r\n" + "납부방법    : " + responseBody.PayMethod + //: "신용카드"
-                                        "\r\n" + "납부자명    : " + responseBody.AccountName + //: "김두수"
-                                        "\r\n" + "납부자번호   : " + responseBody.AccountId + //: 1001155633
-                                        "\r\n" + "납부예정일   : " + responseBody.IssueDate + //: 15
-                                        "\r\n" + "총 미납금액  : " + responseBody.SumAmtCurNonpmt + //: ""
-                                        "\r\n" + "과금시작일 :" + responseBody.Invoices.invoice.CalcStartDay + //: 20170701
-                                        "\r\n" + "과금종료일 :" + responseBody.Invoices.invoice.CalcEndDay + //: 20170731
-                                        "\r\n" + "상품명 :" + responseBody.Invoices.invoice.Name + //: "I-DIGITAL HD_2012"
-                                        "\r\n" + "당월청구금액 :" + responseBody.Invoices.invoice.AmtCurInv + //: 6600
-                                        "\r\n" + "청구월:" + responseBody.Invoices.invoice.YyyymmInv + //: 201708
-                                        "\r\n" + "서비스명:" + responseBody.Invoices.invoice.Service + //: "디지털방송"
-                                        "\r\n" + "사용료:" + responseBody.Invoices.invoice.AmtUse + //: 27600
-                                        "\r\n" + "할인금액:" + responseBody.Invoices.invoice.AmtDc + //: -21000
-                                        "\r\n" + "청구금액:" + responseBody.Invoices.invoice.AmtSupply + //: 6000
-                                        "\r\n" + "부가세:" + responseBody.Invoices.invoice.AmtVat + //: 600
-                                        "\r\n" + "미납액:" + responseBody.Invoices.invoice.AmtUnpmt + //: 0
-                                        "\r\n" + "절삭:" + responseBody.Invoices.invoice.AmtTrunc + //: 0
-                                        "\r\n" + "납부금액:" + responseBody.Invoices.invoice.AmtPmt; //: 6600
+                                        "\r\n" + "- 은행/카드명 : " + responseBody.FinancialName + //: "신한카드"
+                                        "\r\n" + "- 주소 : " + responseBody.Address + //: "충청남도 아산시 신창면 행목로 152 대주아파트 102동 106호"
+                                        "\r\n" + "- 납부방법 : " + responseBody.PayMethod + //: "신용카드"
+                                        "\r\n" + "- 납부자명 : " + responseBody.AccountName + //: "김두수"
+                                        "\r\n" + "- 납부자번호 : " + responseBody.AccountId + //: 1001155633
+                                        "\r\n" + "- 납부예정일 : " + responseBody.IssueDate + //: 15
+                                        // "\r\n" + "- 총 미납금액 : " + responseBody.SumAmtCurNonpmt + //: ""
+                                        "\r\n" + "- 과금시작일 :" + responseBody.Invoices.invoice.CalcStartDay + //: 20170701
+                                        "\r\n" + "- 과금종료일 :" + responseBody.Invoices.invoice.CalcEndDay + //: 20170731
+                                        "\r\n" + "- 상품명 :" + responseBody.Invoices.invoice.Name + //: "I-DIGITAL HD_2012"
+                                        "\r\n[당월 청구 정보]" + 
+                                        "\r\n" + "- 당월청구금액 :" + responseBody.Invoices.invoice.AmtCurInv + //: 6600
+                                        "\r\n" + "- 청구월 :" + responseBody.Invoices.invoice.YyyymmInv + //: 201708
+                                        "\r\n" + "- 서비스명 :" + responseBody.Invoices.invoice.Service + //: "디지털방송"
+                                        "\r\n" + "- 사용료 :" + responseBody.Invoices.invoice.AmtUse + //: 27600
+                                        "\r\n" + "- 할인금액 :" + responseBody.Invoices.invoice.AmtDc + //: -21000
+                                        "\r\n" + "- 청구금액 :" + responseBody.Invoices.invoice.AmtSupply + //: 6000
+                                        "\r\n" + "- 부가세 :" + responseBody.Invoices.invoice.AmtVat + //: 600
+                                        "\r\n" + "- 미납액 :" + responseBody.Invoices.invoice.AmtUnpmt + //: 0
+                                        "\r\n" + "- 절삭 :" + responseBody.Invoices.invoice.AmtTrunc + //: 0
+                                        "\r\n" + "- 납부금액 :" + responseBody.Invoices.invoice.AmtPmt; //: 6600
                                         re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
                                     }
                                 }
