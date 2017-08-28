@@ -471,20 +471,20 @@ export class KakaoSocket {
                                         "\r\n" + "- 납부자번호 : " + responseBody.AccountId + //: 1001155633
                                         "\r\n" + "- 납부예정일 : " + responseBody.IssueDate + //: 15
                                         // "\r\n" + "- 총 미납금액 : " + responseBody.SumAmtCurNonpmt + //: ""
-                                        "\r\n" + "- 과금시작일 :" + responseBody.Invoices.invoice.CalcStartDay + //: 20170701
-                                        "\r\n" + "- 과금종료일 :" + responseBody.Invoices.invoice.CalcEndDay + //: 20170731
-                                        "\r\n" + "- 상품명 :" + responseBody.Invoices.invoice.Name + //: "I-DIGITAL HD_2012"
+                                        "\r\n" + "- 과금시작일 : " + responseBody.Invoices.invoice.CalcStartDay + //: 20170701
+                                        "\r\n" + "- 과금종료일 : " + responseBody.Invoices.invoice.CalcEndDay + //: 20170731
+                                        "\r\n" + "- 상품명 : " + responseBody.Invoices.invoice.Name + //: "I-DIGITAL HD_2012"
                                         "\r\n\r\n[당월 청구 정보]" + 
-                                        "\r\n" + "- 당월청구금액 :" + responseBody.Invoices.invoice.AmtCurInv.toLocaleString() + //: 6600
-                                        "\r\n" + "- 청구월 :" + responseBody.Invoices.invoice.YyyymmInv + //: 201708
-                                        "\r\n" + "- 서비스명 :" + responseBody.Invoices.invoice.Service + //: "디지털방송"
-                                        "\r\n" + "- 사용료 :" + responseBody.Invoices.invoice.AmtUse + //: 27600
-                                        "\r\n" + "- 할인금액 :" + responseBody.Invoices.invoice.AmtDc.toLocaleString() + //: -21000
-                                        "\r\n" + "- 청구금액 :" + responseBody.Invoices.invoice.AmtSupply.toLocaleString() + //: 6000
-                                        "\r\n" + "- 부가세 :" + responseBody.Invoices.invoice.AmtVat.toLocaleString() + //: 600
-                                        "\r\n" + "- 미납액 :" + responseBody.Invoices.invoice.AmtUnpmt.toLocaleString() + //: 0
-                                        "\r\n" + "- 절삭 :" + responseBody.Invoices.invoice.AmtTrunc + //: 0
-                                        "\r\n" + "- 납부금액 :" + responseBody.Invoices.invoice.AmtPmt.toLocaleString(); //: 6600
+                                        "\r\n" + "- 당월청구금액 : " + responseBody.Invoices.invoice.AmtCurInv.toLocaleString() + "원" + //: 6600
+                                        "\r\n" + "- 청구월 : " + responseBody.Invoices.invoice.YyyymmInv + //: 201708
+                                        "\r\n" + "- 서비스명 : " + responseBody.Invoices.invoice.Service + //: "디지털방송"
+                                        "\r\n" + "- 사용료 : " + responseBody.Invoices.invoice.AmtUse +  "원" + //: 27600
+                                        "\r\n" + "- 할인금액 : " + responseBody.Invoices.invoice.AmtDc.toLocaleString() +  "원" + //: -21000
+                                        "\r\n" + "- 청구금액 : " + responseBody.Invoices.invoice.AmtSupply.toLocaleString() +  "원" + //: 6000
+                                        "\r\n" + "- 부가세 : " + responseBody.Invoices.invoice.AmtVat.toLocaleString() +  "원" + //: 600
+                                        "\r\n" + "- 미납액 : " + responseBody.Invoices.invoice.AmtUnpmt.toLocaleString() +  "원" + //: 0
+                                        "\r\n" + "- 절삭 : " + responseBody.Invoices.invoice.AmtTrunc +  "원" + //: 0
+                                        "\r\n" + "- 납부금액 : " + responseBody.Invoices.invoice.AmtPmt.toLocaleString() + "원" ; //: 6600
                                         "\r\n\r\n" + "감사합니다."
                                         re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
                                     }
@@ -713,7 +713,7 @@ export class KakaoSocket {
         console.log('CONNECTED TO: ' + mtIP + ':' + mtPort + "," + sendData);
         readBuffer = "";
         var client = new this.net.Socket();
-        client.setTimeout(1500);
+        client.setTimeout(1200);
         client.setEncoding('utf8');
         client.setNoDelay(true);
         // client.setKeepAlive(true,5000);
