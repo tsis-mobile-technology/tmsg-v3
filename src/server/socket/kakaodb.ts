@@ -55,6 +55,7 @@ export class KakaoDb {
 
   public dbClearCustomer(user_key: string): any {
     var defered = this.Q.defer();
+    console.log("dbClearCustomer:"+user_key);
     this.pool.query('DELETE FROM TB_AUTOCHAT_CUSTOMER WHERE UNIQUE_ID = ?', user_key, defered.makeNodeResolver());
     return defered.promise;
   }
