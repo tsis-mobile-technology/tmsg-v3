@@ -367,9 +367,7 @@ export class KakaoSocket {
                         } else if ( customerAuthOkInfo == null && customerAuthIngInfo != null ) {
                             /* Name 있니?, Phone 있니?, 인증번호가 있니? 확인해서 인증 처리를 한다. */
                             if( customerAuthIngInfo.PHONE == null ) {
-                                var phone: string;
-                                phone = customerAuthIngInfo.PHONE;
-                                if( validator.isDecimal(phone) != true ) { // 숫자 비교해서 같은면
+                                if( validator.isDecimal(content) != true ) { // 숫자 비교해서 같은면
                                     re = kakaoSocket.findScenario("PHONE_NOK");
                                 } else {
                                     Q.all([kakaoSocket.kakaoDb.dbSaveCustomer("Phone", content, user_key)]).then(function(results) {
