@@ -309,6 +309,7 @@ export class KakaoSocket {
     public clearCustomer(content: string, callback: any): void {
         var re;
         var Q = require('q');
+        console.log('clearCustomer:content : ' + content);
         Q.all([this.kakaoDb.dbClearCustomer(content)]).then(function(results){
             re = results[0][0][0];
         }).then(function() {
