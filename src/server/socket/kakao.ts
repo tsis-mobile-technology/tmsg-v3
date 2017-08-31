@@ -512,7 +512,7 @@ console.log("results:" + JSON.stringify(results));
                                         "\r\n\r\n[청구 정보]" + 
                                         "\r\n" + "- 납부자명 : " + responseBody.AccountName + //: "김두수"
                                         "\r\n" + "- 납부자번호 : " + responseBody.AccountId + //: 1001155633
-                                        "\r\n" + "- 상품정보 : " + responseBody.Products + //: ""
+                                        //"\r\n" + "- 상품정보 : " + responseBody.Products + //: ""
                                         "\r\n" + "- 청구매체 : " + responseBody.Media + //: "이메일"
                                         "\r\n" + "- 은행/카드명 : " + responseBody.FinancialName + //: "신한카드"
                                         "\r\n" + "- 주소 : " + responseBody.Address + //: "충청남도 아산시 신창면 행목로 152 대주아파트 102동 106호"
