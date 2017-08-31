@@ -156,7 +156,7 @@ class ApiServer {
         this.kakao_app.delete('/friend/:user_key', (request: express.Request, result: express.Response, next: express.NextFunction) => {
             console.log('friend del');
             console.log('user key : ' + request.params.user_key);
-            var user_key = request.body.user_key;
+            var user_key = request.params.user_key;
             var re;
             try {
                 // this.kakaoDb.dbClearCustomer(user_key);
