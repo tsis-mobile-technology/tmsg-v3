@@ -306,6 +306,17 @@ export class KakaoSocket {
         .done();
     }
 
+    public clearCustomer(content: string, callback: any): void {
+        var re;
+        var Q = require('q');
+        Q.all([this.kakaoDb.dbClearCustomer(content)]).then(function(results){
+            re = results[0][0][0];
+        }).then(function() {
+            callback(null, JSON.parse(re.RES_MESSAGE));
+        })
+        .done();
+    }
+
     public getMessageResponseNew(content: string, user_key: string, type: string, callback: any): void {
         var re;
         var etc3;
@@ -315,6 +326,8 @@ export class KakaoSocket {
         var customerHistoryInfo = null;
         var kakaoSocket = this;
         var Q = require('q');
+        var validator = require('validator');
+        var localeString = require('number-to-locale-string');
 
         if(user_key != null && content != null) {
 
@@ -353,14 +366,18 @@ export class KakaoSocket {
                         } else if ( customerAuthOkInfo == null && customerAuthIngInfo != null ) {
                             /* Name 있니?, Phone 있니?, 인증번호가 있니? 확인해서 인증 처리를 한다. */
                             if( customerAuthIngInfo.PHONE == null ) {
-                                Q.all([kakaoSocket.kakaoDb.dbSaveCustomer("Phone", content, user_key)]).then(function(results) {
-                                    console.log("dbSaveCustomer call!");
-                                }).then(function() {
-                                    re = kakaoSocket.findScenario("NAME");
-                                    console.log("dbSaveCustomer call! ==> " + JSON.stringify(re));
-                                }).then(function() {
-                                    if(re != null) kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
-                                }).done();
+                                if( validator.isDecimal(customerAuthIngInfo.PHONE) != true ) { // 숫자 비교해서 같은면
+                                    re = kakaoSocket.findScenario("PHONE_NOK");
+                                } else {
+                                    Q.all([kakaoSocket.kakaoDb.dbSaveCustomer("Phone", content, user_key)]).then(function(results) {
+                                        console.log("dbSaveCustomer call!");
+                                    }).then(function() {
+                                        re = kakaoSocket.findScenario("NAME");
+                                        console.log("dbSaveCustomer call! ==> " + JSON.stringify(re));
+                                    }).then(function() {
+                                        if(re != null) kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
+                                    }).done();
+                                }
                             } else if( customerAuthIngInfo.PHONE != null && customerAuthIngInfo.NAME == null ) {
                                 Q.all([kakaoSocket.kakaoDb.dbSaveCustomer("Name", content, user_key)]).then(function(results) {
                                     console.log("dbSaveCustomer call!");
@@ -438,13 +455,47 @@ export class KakaoSocket {
                                         //var responseBody = kakaoSocket.setTK002ResponseData(TK002Response, jsonData.list.customer, jsonData.list.code);
 // console.log("responseBody.code.Code:" + responseBody.code.Code);
 // console.log("responseBody.customer[0].Name:" + responseBody.customer[0].Name);
-                                           
+console.log("results:" + JSON.stringify(results));
+                                        var amtCurInv = new Number();
+                                        var amtUse = new Number();
+                                        var amtDc = new Number();
+                                        var amtSupply = new Number();
+                                        var amtVat = new Number();
+                                        var amtUnpmt = new Number();
+                                        var amtTrunc = new Number();
+                                        var amtPmt = new Number();
+                                        var service: string = "";
+                                        var name: string = "";
                                         if( jsonData != null && jsonData.list != null && jsonData.list.customer.length > 1 ) {
                                             var responseBody = jsonData.list.customer[0];
                                             console.log("responseBody:" + JSON.stringify(responseBody));
+
+                                            for ( var i = 0; i < jsonData.list.customer.length; i++ ) {
+                                                responseBody = jsonData.list.customer[i];
+                                                service = service + responseBody.Invoices.invoice.Service + ",";
+                                                name = name + responseBody.Invoices.invoice.Name + ",";
+                                                amtCurInv = amtCurInv + responseBody.Invoices.invoice.AmtCurInv;
+                                                amtUse = amtUse + responseBody.Invoices.invoice.AmtUse;
+                                                amtDc = amtDc + responseBody.Invoices.invoice.AmtDc;
+                                                amtSupply = amtSupply + responseBody.Invoices.invoice.AmtSupply;
+                                                amtVat = amtVat + responseBody.Invoices.invoice.AmtVat;
+                                                amtUnpmt = amtUnpmt + responseBody.Invoices.invoice.AmtUnpmt;
+                                                amtTrunc = amtTrunc + responseBody.Invoices.invoice.AmtTrunc;
+                                                amtPmt = amtPmt + responseBody.Invoices.invoice.AmtPmt;
+                                            }
                                         } else {
                                             var responseBody = jsonData.list.customer;
                                             console.log("responseBody:" + JSON.stringify(responseBody));
+                                            service = service + responseBody.Invoices.invoice.Service;
+                                            name = name + responseBody.Invoices.invoice.Name;
+                                            amtCurInv = amtCurInv + responseBody.Invoices.invoice.AmtCurInv;
+                                            amtUse = amtUse + responseBody.Invoices.invoice.AmtUse;
+                                            amtDc = amtDc + responseBody.Invoices.invoice.AmtDc;
+                                            amtSupply = amtSupply + responseBody.Invoices.invoice.AmtSupply;
+                                            amtVat = amtVat + responseBody.Invoices.invoice.AmtVat;
+                                            amtUnpmt = amtUnpmt + responseBody.Invoices.invoice.AmtUnpmt;
+                                            amtTrunc = amtTrunc + responseBody.Invoices.invoice.AmtTrunc;
+                                            amtPmt = amtPmt + responseBody.Invoices.invoice.AmtPmt;
                                         }
 
 
@@ -454,40 +505,51 @@ export class KakaoSocket {
                                         "\r\n" + "- 고객명 : " + responseBody.Name + //: "김두수"
                                         "\r\n" + "- 고객번호 : " + responseBody.Id + //: 1006218626
                                         "\r\n" + "- 서비스 상태 : " + responseBody.Status + //: "사용중"
-                                        // "\r\n" + "- 상품정보 : " + responseBody.Products + //: ""
                                         "\r\n" + "- 전화번호(1) : " + responseBody.Phone + //: "041-549-5938"
-                                        //"\r\n" + "- 상품정보 : " + responseBody.Products + //: ""
-                                        // "\r\n" + "Social    : " + responseBody.Social + //: "N"
                                         "\r\n" + "- 전화번호(2) : " + responseBody.HandPhone + //: "010-4417-5938"
-                                        // "\r\n" + "- 총 청구금액 : " + responseBody.SumAmtCurInv + //: ""
                                         "\r\n" + "- 이메일 : " + responseBody.Email + //: "dskim@tbroad.com"
-                                        //"\r\n" + "계열사코드   : " + responseBody.IdSo + //: 4200
                                         "\r\n\r\n[청구 정보]" + 
                                         "\r\n" + "- 납부자명 : " + responseBody.AccountName + //: "김두수"
                                         "\r\n" + "- 납부자번호 : " + responseBody.AccountId + //: 1001155633
                                         "\r\n" + "- 상품정보 : " + responseBody.Products + //: ""
                                         "\r\n" + "- 청구매체 : " + responseBody.Media + //: "이메일"
-                                        //"\r\n" + "은행/카드번호 : " + responseBody.Account + //: "451842120342****"
                                         "\r\n" + "- 은행/카드명 : " + responseBody.FinancialName + //: "신한카드"
                                         "\r\n" + "- 주소 : " + responseBody.Address + //: "충청남도 아산시 신창면 행목로 152 대주아파트 102동 106호"
                                         "\r\n" + "- 납부방법 : " + responseBody.PayMethod + //: "신용카드"
                                         "\r\n" + "- 납부예정일 : " + responseBody.IssueDate + //: 15
-                                        // "\r\n" + "- 총 미납금액 : " + responseBody.SumAmtCurNonpmt + //: ""
                                         "\r\n" + "- 과금시작일 : " + responseBody.Invoices.invoice.CalcStartDay + //: 20170701
                                         "\r\n" + "- 과금종료일 : " + responseBody.Invoices.invoice.CalcEndDay + //: 20170731
                                         "\r\n\r\n[당월 청구 정보]" + 
-                                        "\r\n" + "- 당월청구금액 : " + responseBody.Invoices.invoice.AmtCurInv.toLocaleString() + "원" + //: 6600
+                                         // "\r\n" + "- 당월청구금액 : " + responseBody.Invoices.invoice.AmtCurInv.toLocaleString() + "원" + //: 6600
+                                        "\r\n" + "- 당월청구금액 : " + amtCurInv.toLocaleString("krw") + "원" + //: 6600 
                                         "\r\n" + "- 청구월 : " + responseBody.Invoices.invoice.YyyymmInv + //: 201708
-                                        "\r\n" + "- 서비스명 : " + responseBody.Invoices.invoice.Service + //: "디지털방송"
-                                        "\r\n" + "- 상품명 : " + responseBody.Invoices.invoice.Name + //: "I-DIGITAL HD_2012"
-                                        "\r\n" + "- 사용료 : " + responseBody.Invoices.invoice.AmtUse.toLocaleString() +  "원" + //: 27600
-                                        "\r\n" + "- 할인금액 : " + responseBody.Invoices.invoice.AmtDc.toLocaleString() +  "원" + //: -21000
-                                        "\r\n" + "- 청구금액 : " + responseBody.Invoices.invoice.AmtSupply.toLocaleString() +  "원" + //: 6000
-                                        "\r\n" + "- 부가세 : " + responseBody.Invoices.invoice.AmtVat.toLocaleString() +  "원" + //: 600
-                                        "\r\n" + "- 미납액 : " + responseBody.Invoices.invoice.AmtUnpmt.toLocaleString() +  "원" + //: 0
-                                        "\r\n" + "- 절삭 : " + responseBody.Invoices.invoice.AmtTrunc +  "원" + //: 0
-                                        "\r\n" + "- 납부금액 : " + responseBody.Invoices.invoice.AmtPmt.toLocaleString() + "원" ; //: 6600
-                                        "\r\n\r\n" + "감사합니다."
+                                        "\r\n" + "- 서비스명 : " + service + //: "디지털방송"
+                                        "\r\n" + "- 상품명 : " + name + //: "I-DIGITAL HD_2012"
+                                        "\r\n" + "- 사용료 : " + amtUse.toLocaleString("krw") +  "원" + //: 27600
+                                        "\r\n" + "- 할인금액 : " + amtDc.toLocaleString("krw") +  "원" + //: -21000
+                                        "\r\n" + "- 청구금액 : " + amtSupply.toLocaleString("krw") +  "원" + //: 6000
+                                        "\r\n" + "- 부가세 : " + amtVat.toLocaleString("krw") +  "원" + //: 600
+                                        "\r\n" + "- 미납액 : " + amtUnpmt.toLocaleString("krw") +  "원" + //: 0
+                                        "\r\n" + "- 절삭 : " + amtTrunc.toLocaleString("krw") +  "원" + //: 0
+                                        "\r\n" + "- 납부금액 : " + amtPmt.toLocaleString("krw") + "원" + //: 6600
+                                        "\r\n\r\n" + "감사합니다.";
+
+                                        // "\r\n" + "- 서비스명 : " + responseBody.Invoices.invoice.Service + //: "디지털방송"
+                                        // "\r\n" + "- 상품명 : " + responseBody.Invoices.invoice.Name + //: "I-DIGITAL HD_2012"
+                                        // "\r\n" + "- 사용료 : " + responseBody.Invoices.invoice.AmtUse.toLocaleString() +  "원" + //: 27600
+                                        //  "\r\n" + "- 할인금액 : " + responseBody.Invoices.invoice.AmtDc.toLocaleString() +  "원" + //: -21000
+                                        //  "\r\n" + "- 청구금액 : " + responseBody.Invoices.invoice.AmtSupply.toLocaleString() +  "원" + //: 6000
+                                        //  "\r\n" + "- 부가세 : " + responseBody.Invoices.invoice.AmtVat.toLocaleString() +  "원" + //: 600
+                                        //  "\r\n" + "- 미납액 : " + responseBody.Invoices.invoice.AmtUnpmt.toLocaleString() +  "원" + //: 0
+                                        //  "\r\n" + "- 절삭 : " + responseBody.Invoices.invoice.AmtTrunc +  "원" + //: 0
+                                        //  "\r\n" + "- 납부금액 : " + responseBody.Invoices.invoice.AmtPmt.toLocaleString() + "원" ; //: 6600
+                                        // "\r\n" + "- 상품정보 : " + responseBody.Products + //: ""
+                                        //"\r\n" + "- 상품정보 : " + responseBody.Products + //: ""
+                                        // "\r\n" + "Social    : " + responseBody.Social + //: "N"
+                                        // "\r\n" + "- 총 청구금액 : " + responseBody.SumAmtCurInv + //: ""
+                                        //"\r\n" + "계열사코드   : " + responseBody.IdSo + //: 4200
+                                        //"\r\n" + "은행/카드번호 : " + responseBody.Account + //: "451842120342****"
+                                        // "\r\n" + "- 총 미납금액 : " + responseBody.SumAmtCurNonpmt + //: ""
                                         re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
                                     }
                                 }

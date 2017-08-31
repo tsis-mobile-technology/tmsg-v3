@@ -10,7 +10,7 @@ import { KakaoSocket, KakaoDb } from "./socket";
 var mysql  = require('mysql');
 var net    = require('net');
 var fastXmlParser = require('fast-xml-parser');
-var validator     = require('validator');
+// var validator     = require('validator');
 var spawn         = require('child_process').spawn;
 var bodyParser    = require('body-parser');
 
@@ -159,8 +159,21 @@ class ApiServer {
             var user_key = request.body.user_key;
             var re;
             try {
-                this.kakaoDb.dbClearCustomer(user_key);
-                re = {text:'param : ' + user_key};
+                // this.kakaoDb.dbClearCustomer(user_key);
+                
+                this.kakaoSocket.clearCustomer(user_key, function(err, data) {
+                    if(err) {
+                        // console.log('message:응답 에러:'+err);
+                        re = {text:'param : ' + user_key};
+                        result.status(200).send(re);
+                    } else {
+                        re = {text:'param : ' + user_key};
+                        // console.log("response:" + JSON.stringify(re));
+                        result.status(200).send(re);
+                        console.log('friend:응답 성공');
+                    }
+                });
+                // re = {text:'param : ' + user_key};
             } catch (exception) {
                 console.log('friend del:응답 에러');
             } finally {
