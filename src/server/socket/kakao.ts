@@ -369,6 +369,7 @@ export class KakaoSocket {
                             if( customerAuthIngInfo.PHONE == null ) {
                                 if( validator.isDecimal(content) != true ) { // 숫자 비교해서 같은면
                                     re = kakaoSocket.findScenario("PHONE_NOK");
+                                    if(re != null) kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
                                 } else {
                                     Q.all([kakaoSocket.kakaoDb.dbSaveCustomer("Phone", content, user_key)]).then(function(results) {
                                         console.log("dbSaveCustomer call!");
