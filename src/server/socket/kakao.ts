@@ -457,7 +457,7 @@ export class KakaoSocket {
                                         //var responseBody = kakaoSocket.setTK002ResponseData(TK002Response, jsonData.list.customer, jsonData.list.code);
 // console.log("responseBody.code.Code:" + responseBody.code.Code);
 // console.log("responseBody.customer[0].Name:" + responseBody.customer[0].Name);
-console.log("results:" + JSON.stringify(results));
+// console.log("results:" + JSON.stringify(results));
                                         var amtCurInv = new Number();
                                         var amtUse = new Number();
                                         var amtDc = new Number();
@@ -474,8 +474,8 @@ console.log("results:" + JSON.stringify(results));
 
                                             for ( var i = 0; i < jsonData.list.customer.length; i++ ) {
                                                 responseBody = jsonData.list.customer[i];
-                                                service = service + responseBody.Invoices.invoice.Service + ",";
-                                                name = name + responseBody.Invoices.invoice.Name + ",";
+                                                service = service + responseBody.Invoices.invoice.Service;
+                                                name = name + responseBody.Invoices.invoice.Name;
                                                 amtCurInv = amtCurInv + responseBody.Invoices.invoice.AmtCurInv;
                                                 amtUse = amtUse + responseBody.Invoices.invoice.AmtUse;
                                                 amtDc = amtDc + responseBody.Invoices.invoice.AmtDc;
@@ -484,6 +484,10 @@ console.log("results:" + JSON.stringify(results));
                                                 amtUnpmt = amtUnpmt + responseBody.Invoices.invoice.AmtUnpmt;
                                                 amtTrunc = amtTrunc + responseBody.Invoices.invoice.AmtTrunc;
                                                 amtPmt = amtPmt + responseBody.Invoices.invoice.AmtPmt;
+                                                if ( i+1 < jsonData.list.customer.length ) {
+                                                    service = service + ",";
+                                                    name = name + ",";
+                                                }
                                             }
                                         } else {
                                             var responseBody = jsonData.list.customer;
@@ -500,9 +504,8 @@ console.log("results:" + JSON.stringify(results));
                                             amtPmt = amtPmt + responseBody.Invoices.invoice.AmtPmt;
                                         }
 
-
                                         var printString = "고객님 안녕하세요!" +
-                                        "\r\n당월 요금내역은 다음과 같습니다" +
+                                        "\r\n" + kakaoSocket.getNowmSevendays() + " 요금내역은 다음과 같습니다" +
                                         "\r\n\r\n[기본 정보]" + 
                                         "\r\n" + "- 고객명 : " + responseBody.Name + //: "김두수"
                                         "\r\n" + "- 고객번호 : " + responseBody.Id + //: 1006218626
@@ -513,20 +516,16 @@ console.log("results:" + JSON.stringify(results));
                                         "\r\n\r\n[청구 정보]" + 
                                         "\r\n" + "- 납부자명 : " + responseBody.AccountName + //: "김두수"
                                         "\r\n" + "- 납부자번호 : " + responseBody.AccountId + //: 1001155633
-                                        //"\r\n" + "- 상품정보 : " + responseBody.Products + //: ""
                                         "\r\n" + "- 청구매체 : " + responseBody.Media + //: "이메일"
                                         "\r\n" + "- 은행/카드명 : " + responseBody.FinancialName + //: "신한카드"
-                                        "\r\n" + "- 주소 : " + responseBody.Address + //: "충청남도 아산시 신창면 행목로 152 대주아파트 102동 106호"
                                         "\r\n" + "- 납부방법 : " + responseBody.PayMethod + //: "신용카드"
                                         "\r\n" + "- 납부예정일 : " + responseBody.IssueDate + //: 15
                                         "\r\n" + "- 과금시작일 : " + responseBody.Invoices.invoice.CalcStartDay + //: 20170701
                                         "\r\n" + "- 과금종료일 : " + responseBody.Invoices.invoice.CalcEndDay + //: 20170731
-                                        "\r\n\r\n[당월 청구 정보]" + 
-                                         // "\r\n" + "- 당월청구금액 : " + responseBody.Invoices.invoice.AmtCurInv.toLocaleString() + "원" + //: 6600
+                                        "\r\n\r\n[" + kakaoSocket.getNowmSevendays() + " 청구 정보]" + 
                                         "\r\n" + "- 당월청구금액 : " + amtCurInv.toLocaleString("krw") + "원" + //: 6600 
                                         "\r\n" + "- 청구월 : " + responseBody.Invoices.invoice.YyyymmInv + //: 201708
                                         "\r\n" + "- 서비스명 : " + service + //: "디지털방송"
-                                        "\r\n" + "- 상품명 : " + name + //: "I-DIGITAL HD_2012"
                                         "\r\n" + "- 사용료 : " + amtUse.toLocaleString("krw") +  "원" + //: 27600
                                         "\r\n" + "- 할인금액 : " + amtDc.toLocaleString("krw") +  "원" + //: -21000
                                         "\r\n" + "- 청구금액 : " + amtSupply.toLocaleString("krw") +  "원" + //: 6000
@@ -535,7 +534,10 @@ console.log("results:" + JSON.stringify(results));
                                         "\r\n" + "- 절삭 : " + amtTrunc.toLocaleString("krw") +  "원" + //: 0
                                         "\r\n" + "- 납부금액 : " + amtPmt.toLocaleString("krw") + "원" + //: 6600
                                         "\r\n\r\n" + "감사합니다.";
-
+                                        // "\r\n" + "- 상품명 : " + name + //: "I-DIGITAL HD_2012"
+                                        //"\r\n" + "- 상품정보 : " + responseBody.Products + //: ""
+                                        //"\r\n" + "- 주소 : " + responseBody.Address + //: "충청남도 아산시 신창면 행목로 152 대주아파트 102동 106호"
+                                        // "\r\n" + "- 당월청구금액 : " + responseBody.Invoices.invoice.AmtCurInv.toLocaleString() + "원" + //: 6600
                                         // "\r\n" + "- 서비스명 : " + responseBody.Invoices.invoice.Service + //: "디지털방송"
                                         // "\r\n" + "- 상품명 : " + responseBody.Invoices.invoice.Name + //: "I-DIGITAL HD_2012"
                                         // "\r\n" + "- 사용료 : " + responseBody.Invoices.invoice.AmtUse.toLocaleString() +  "원" + //: 27600
@@ -868,6 +870,18 @@ console.log("results:" + JSON.stringify(results));
         return "".concat("" + yyyy).concat("" + mm).concat("" + dd).concat("" + hh).concat("" + min).concat("" + ss);
     }
 
+    public getNowmSevendays(): string {
+        var now = new Date();
+        var mm;        
+
+        if( now.getDate() > 7 ) {
+            mm = now.getMonth() < 9 ? "0" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based
+        } else {
+            mm = (now.getMonth() -1) < 9 ? "0" + ((now.getMonth() - 1) + 1) : ((now.getMonth() - 1) + 1); // getMonth() is zero-based
+        }
+        
+        return "".concat("" + mm).concat("" + "월");
+    }
 
     public setTK001RequestHeader(requestBody: string ): string {
         var bytes = require('utf8-length');
