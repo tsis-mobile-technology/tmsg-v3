@@ -7,11 +7,11 @@ import * as socketIo from "socket.io";
 import { KakaoSocket, KakaoDb } from "./socket";
 
 // var Q = require('q');
-var mysql  = require('mysql');
-var net    = require('net');
-var fastXmlParser = require('fast-xml-parser');
+// var mysql  = require('mysql');
+// var net    = require('net');
+// var fastXmlParser = require('fast-xml-parser');
 // var validator     = require('validator');
-var spawn         = require('child_process').spawn;
+// var spawn         = require('child_process').spawn;
 var bodyParser    = require('body-parser');
 
 declare var process, __dirname;

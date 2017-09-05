@@ -223,21 +223,21 @@ export class TK002Response implements TK002_RESPONSE_list {
 
 export class KakaoSocket {
     private mtIP: string;
-    private mtURL: string;
+    // private mtURL: string;
     private mtPort: number;
-    private hpURL: string;
-    private IN0002_URL: string;
-    private IN0002_PARAM: string;
+    // private hpURL: string;
+    // private IN0002_URL: string;
+    // private IN0002_PARAM: string;
     private ls: any;
     private nOTP: any;
-    private options: any;
+    // private options: any;
     private kakaoDb: any;
     private inputDatas: TB_AUTOCHAT_SCENARIO[];
     // public  Q             = require("q");
-    private validator     = require('validator');
+    // private validator     = require('validator');
     private net           = require('net');
     private spawn         = require('child_process').spawn;
-    private fastXmlParser = require('fast-xml-parser');
+    // private fastXmlParser = require('fast-xml-parser');
     private errorSuccess  = '{"keyboard":{"type":"text"}, "message":{"text":"고객님의 죄송합니다!. 시스템 점검중으로 잠시후 다시 시도하여 주십시요.\n 처음으로 가시려면 "#"을 입력해 주세요."}}';
                         //  위 시스템 회신 문자는  SYS_ERR
 
@@ -248,25 +248,25 @@ export class KakaoSocket {
      constructor( private io: any, private db: any) {
         this.inputDatas = io;
         this.kakaoDb = db;
-        this.mtURL = "http://125.132.2.120:30063";
+        // this.mtURL = "http://125.132.2.120:30063";
         // this.mtIP = "125.132.2.120";
         // this.mtPort = 30063;
         this.mtIP = "125.132.2.111";
         this.mtPort = 30063;
 
-        this.hpURL = "http://172.16.180.224:30034"; //dev
+        // this.hpURL = "http://172.16.180.224:30034"; //dev
         // this.hpURL = "http://172.16.28.27:30034"; //live
-        this.IN0002_URL = "/interface/tbroad/xml_module/CustInvoiceDtlXml";
+        // this.IN0002_URL = "/interface/tbroad/xml_module/CustInvoiceDtlXml";
         //this.IN0002_PARAM = "KEY_NUM=1234561234567&MONTH_CNT=2&NM_CUST=홍길동&CORP=3200&ID_INSERT=U000000000";
-        this.IN0002_PARAM = "CORP=TBRD&KEY_NUM=MC0GCCqGSIb3DQIJAyEAgw8aXEa%2FEaSbidYQzkCI9WfamqzaFtL%2F7NOaD8JNWGU%3D&NM_CUST=%C1%A4%BC%B1%BF%B5&MONTH_CNT=2";
-        this.options = {
-                            attrPrefix: "@_",
-                            textNodeName: "#text",
-                            ignoreNonTextNodeAttr: true,
-                            ignoreTextNodeAttr: true,
-                            ignoreNameSpace: true,
-                            textNodeConversion: true
-                        };
+        // this.IN0002_PARAM = "CORP=TBRD&KEY_NUM=MC0GCCqGSIb3DQIJAyEAgw8aXEa%2FEaSbidYQzkCI9WfamqzaFtL%2F7NOaD8JNWGU%3D&NM_CUST=%C1%A4%BC%B1%BF%B5&MONTH_CNT=2";
+        // this.options = {
+        //                     attrPrefix: "@_",
+        //                     textNodeName: "#text",
+        //                     ignoreNonTextNodeAttr: true,
+        //                     ignoreTextNodeAttr: true,
+        //                     ignoreNameSpace: true,
+        //                     textNodeConversion: true
+        //                 };
 
     }
 
@@ -328,7 +328,7 @@ export class KakaoSocket {
         var kakaoSocket = this;
         var Q = require('q');
         var validator = require('validator');
-        var localeString = require('number-to-locale-string');
+        // var localeString = require('number-to-locale-string');
 
         if(user_key != null && content != null) {
 
@@ -605,36 +605,36 @@ export class KakaoSocket {
         }).done();
     }
 
-    public checkCustomerInfo(rtnStr: any): any {
-        var updateType = null;
-        var contentValidation = null;
-        var re = null;
+    // public checkCustomerInfo(rtnStr: any): any {
+    //     var updateType = null;
+    //     var contentValidation = null;
+    //     var re = null;
 
-        if( rtnStr == null) {
-            updateType = "INS_PHONE";
-            re = this.findScenario("PHONE");
-            return re;
-        } else if (rtnStr != null && rtnStr.PHONE == null ) {
-            updateType = "UPD_PHONE";
-            re = this.findScenario("PHONE");
-            return re;
-        } else if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME == null ) {
-            updateType = "NAME";
-            re = this.findScenario("NAME");
-            return re;
-        } else if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == 'N' ) {
-            updateType = "AUTH";
-            re = this.findScenario("AUTH");
-        } else if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == 'Y' ) {
-            updateType = "AUTH_OK";
-            re = null;
-            return re;
-        } else {
-            re = this.findScenario("AUTH_NOK");
-        }
+    //     if( rtnStr == null) {
+    //         updateType = "INS_PHONE";
+    //         re = this.findScenario("PHONE");
+    //         return re;
+    //     } else if (rtnStr != null && rtnStr.PHONE == null ) {
+    //         updateType = "UPD_PHONE";
+    //         re = this.findScenario("PHONE");
+    //         return re;
+    //     } else if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME == null ) {
+    //         updateType = "NAME";
+    //         re = this.findScenario("NAME");
+    //         return re;
+    //     } else if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == 'N' ) {
+    //         updateType = "AUTH";
+    //         re = this.findScenario("AUTH");
+    //     } else if (rtnStr != null && rtnStr.PHONE != null && rtnStr.NAME != null && rtnStr.YN_AUTH == 'Y' ) {
+    //         updateType = "AUTH_OK";
+    //         re = null;
+    //         return re;
+    //     } else {
+    //         re = this.findScenario("AUTH_NOK");
+    //     }
 
-        return re;
-    }
+    //     return re;
+    // }
 
     public getMTEventJSONTypeTK001Request(name:string, phone:string, uniqueid:string, pool:any, rtnStr:any): string {
         var Q      = require("q");
@@ -923,33 +923,33 @@ export interface TB_AUTOCHAT_SCENARIO {
     ETC3: string;
 }
 
-export interface IN_CODE {
-    Code: string; //<Code>0000</Code>  
-}
+// export interface IN_CODE {
+//     Code: string; //<Code>0000</Code>  
+// }
 
-export interface IN0002_CUSTOMER {
-    Name: string;
-    Id: string;
-    IdSo: string;
-    Address: string;
-    Phone: string;
-    HandPhone: string;
-    Email: string;
-    AccountName: string;
-    AccountId: string;
-    IssueDate: string;
-    PayMethod: string;
-    Media: string;
-    FinancialName: string;
-    Account: string;
-    Status: string;
-    Social: string;
-    Products: string;
-    SumAmtCurInv: string;
-    SumAmtCurNonpmt: string;
-}
+// export interface IN0002_CUSTOMER {
+//     Name: string;
+//     Id: string;
+//     IdSo: string;
+//     Address: string;
+//     Phone: string;
+//     HandPhone: string;
+//     Email: string;
+//     AccountName: string;
+//     AccountId: string;
+//     IssueDate: string;
+//     PayMethod: string;
+//     Media: string;
+//     FinancialName: string;
+//     Account: string;
+//     Status: string;
+//     Social: string;
+//     Products: string;
+//     SumAmtCurInv: string;
+//     SumAmtCurNonpmt: string;
+// }
 
-export interface IN0002_RESULT {
-    customer: IN0002_CUSTOMER[]; 
-    code: IN_CODE[];   
-}
+// export interface IN0002_RESULT {
+//     customer: IN0002_CUSTOMER[]; 
+//     code: IN_CODE[];   
+// }
