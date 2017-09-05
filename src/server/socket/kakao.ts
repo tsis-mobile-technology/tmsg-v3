@@ -435,7 +435,7 @@ export class KakaoSocket {
                                     if( results == "E99999" || results == "E00001" || results == "E00002" ||
                                         results == "E00003" || results == "E00004" || results == "E10000" ) {
                                           re = kakaoSocket.findScenario(results);
-                                    } else {
+                                    } else if( String(results).length > 6) {
                                         var jsonData = JSON.parse(results);
                                         var amtCurInv = new Number();
                                         var amtUse = new Number();
@@ -547,6 +547,8 @@ export class KakaoSocket {
                                         //"\r\n" + "은행/카드번호 : " + responseBody.Account + //: "451842120342****"
                                         // "\r\n" + "- 총 미납금액 : " + responseBody.SumAmtCurNonpmt + //: ""
                                         re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
+                                    } else {
+                                        re = kakaoSocket.findScenario("SYS_ERR");
                                     }
                                 }
                             }).then(function() {
@@ -762,9 +764,10 @@ export class KakaoSocket {
                 var returnJSON = readBuffer.substring(100).substring(0);
                 deferred.resolve(returnJSON);
             }
-            else if( returnCode.length > 1 ) {
+            else if( String(returnCode).length > 1 ) {
                 deferred.resolve(returnCode);
             } else {
+                //client.setNoDelay(true); 동 코드를 넣지 않을 경우 Timeout이 두번 발생할 경우 문제가 있다. 
                 //deferred.resolve("E99999");
             }
         });
