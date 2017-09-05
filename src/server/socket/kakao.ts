@@ -525,7 +525,7 @@ export class KakaoSocket {
                                         "\r\n\r\n[" + kakaoSocket.getNowmSevendays() + " 청구 정보]" + 
                                         "\r\n" + "- 당월청구금액 : " + amtCurInv.toLocaleString("krw") + "원" + //: 6600 
                                         "\r\n" + "- 청구월 : " + responseBody.Invoices.invoice.YyyymmInv + //: 201708
-                                        "\r\n" + "- 서비스명 : " + service + //: "디지털방송"
+                                        "\r\n" + "- 서비스명 : " + kakaoSocket.convertArrayCount(service) + //: "디지털방송"
                                         "\r\n" + "- 사용료 : " + amtUse.toLocaleString("krw") +  "원" + //: 27600
                                         "\r\n" + "- 할인금액 : " + amtDc.toLocaleString("krw") +  "원" + //: -21000
                                         "\r\n" + "- 청구금액 : " + amtSupply.toLocaleString("krw") +  "원" + //: 6000
@@ -881,6 +881,37 @@ export class KakaoSocket {
         }
         
         return "".concat("" + mm).concat("" + "월");
+    }
+
+    public convertArrayCount(input: string): string { 
+
+        var array = input.split(",");
+        var results = new Array();
+        for (var j=0; j<array.length; j++) {
+
+            var key = array[j].toString();
+            if( results.indexOf(key) == -1 )
+                results.push(key);
+            if (results[key] != null) {
+
+                results[key] = results[key] + 1;
+            } else {
+
+                results[key] = 1;
+            }
+        }
+
+        var str = "";
+
+        for (var i = 0; i < results.length; i++) {
+            // str = str + "\t" + results[results[i].toString()] + ": " + "\t" + results[i] + "\n";
+            str = str + results[i] + " " + results[results[i].toString()] + "개";
+            if ( i+1 < results.length ) {
+                str = str + ",";
+            }
+        }
+
+        return str;
     }
 
     public setTK001RequestHeader(requestBody: string ): string {
