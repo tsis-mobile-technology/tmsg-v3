@@ -431,11 +431,11 @@ export class KakaoSocket {
                             re = null;
                             Q.all([kakaoSocket.getMTEventJSONTypeTK002Request( user_key, kakaoSocket.kakaoDb, null)]).then(function(results) {
                                 if( results != null ) {
-                                    console.log("rtnStr:" + results);
+                                    console.log("rtnStr:" + results.length);
                                     if( results == "E99999" || results == "E00001" || results == "E00002" ||
                                         results == "E00003" || results == "E00004" || results == "E10000" ) {
                                           re = kakaoSocket.findScenario(results);
-                                    } else if ( results.length > 6 ) {
+                                    } else {
                                         var jsonData = JSON.parse(results);
                                         var amtCurInv = new Number();
                                         var amtUse = new Number();
@@ -547,8 +547,6 @@ export class KakaoSocket {
                                         //"\r\n" + "은행/카드번호 : " + responseBody.Account + //: "451842120342****"
                                         // "\r\n" + "- 총 미납금액 : " + responseBody.SumAmtCurNonpmt + //: ""
                                         re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
-                                    } else {
-                                        re = kakaoSocket.findScenario("SYS_ERR");
                                     }
                                 }
                             }).then(function() {
@@ -735,7 +733,7 @@ export class KakaoSocket {
         client.setTimeout(1200);
         client.setEncoding('utf8');
         client.setNoDelay(true);
-        // client.setKeepAlive(true,5000);
+        //client.setKeepAlive(true,1200);
         client.connect(mtPort, mtIP, function () {
             // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
             client.write(sendData);
@@ -746,6 +744,7 @@ export class KakaoSocket {
         client.on('data', function (data) {
             
             readBuffer = readBuffer + data;
+            console.log(readBuffer);
             //client.destroy();
         });//.resume().on('data', function (data) {console.log("2nd data:" + data.toString());});
         // Add a 'close' event handler for the client socket
@@ -763,8 +762,11 @@ export class KakaoSocket {
                 var returnJSON = readBuffer.substring(100).substring(0);
                 deferred.resolve(returnJSON);
             }
-            else
+            else if( returnCode.length > 1 ) {
                 deferred.resolve(returnCode);
+            } else {
+                //deferred.resolve("E99999");
+            }
         });
 
         client.on('error', function(error) {
