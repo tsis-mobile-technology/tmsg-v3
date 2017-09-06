@@ -164,11 +164,10 @@ class ApiServer {
                 this.kakaoSocket.clearCustomer(user_key, function(err, data) {
                     if(err) {
                         // console.log('message:응답 에러:'+err);
-                        re = {text:'param : ' + user_key};
+                        re = {text:'failure'};
                         result.status(200).send(re);
                     } else {
-                        re = {text:'param : ' + user_key};
-                        // console.log("response:" + JSON.stringify(re));
+                        re = {text:'success'};
                         result.status(200).send(re);
                         console.log('friend:응답 성공');
                     }
@@ -177,7 +176,8 @@ class ApiServer {
             } catch (exception) {
                 console.log('friend del:응답 에러');
             } finally {
-                result.status(200).send(re);
+                // re = {text:'success'};
+                // result.status(200).send(re);
                 console.log('friend del:응답 성공');
             }
         });
@@ -189,7 +189,7 @@ class ApiServer {
             var user_key = request.body.user_key;
             var re;
             try {
-                re = {text:'param : ' + user_key};
+                re = {text:'param>' + user_key};
             } catch (exception) {
                 console.log('chat_room del:응답 에러');
             } finally {
