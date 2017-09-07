@@ -36,6 +36,18 @@ var pool = mysql.createPool({
 //});
 var bodyParser = require('body-parser');
 
+var redirect_html = '<!DOCTYPE html>' +
+'<html lang="ko">' +
+'<head>' +
+'    <meta charset="utf-8">' +
+'    <meta http-equiv="X-UA-Compatible" content="IE=Edge">' +
+'    <title>스마트메시징</title>' +
+'</head>' +
+'<body>' +
+'    <iframe id="my_iframe" src="http://tbroad.com/" width="100%" height="100%" ></iframe>' +
+'</body>' +
+'</html>';
+
 //'    <form action="http://14.63.213.246:2582/auth/" method="post">' +
 var auth_html = '<!DOCTYPE html>' +
 '<html lang="ko">' +
@@ -225,18 +237,18 @@ class ShorturlServer {
                         link_cnt = results[0][0][0].LINK_CNT;
                     }
                 }).then(function() {
-                    if(link_cnt != '0' && link_cnt < call_cnt) 
+                    if(link_cnt != '0' && link_cnt > call_cnt) 
                         bRedirect = true;
                     else bRedirect = false;
                 }).then(function() {
                     var old_date = new Date(write_date);
                     var limit_date = new Date(old_date.getFullYear(),old_date.getMonth(),old_date.getDate() + Number(link_limit));
 
-                    if(write_date != null && limit_date.valueOf() > now_date.valueOf() ) 
+                    if(bRedirect == true && write_date != null && limit_date.valueOf() > now_date.valueOf() ) 
                         bRedirect = true;
                     else bRedirect = false;
                 }).then(function() {
-                    if(link_auth != null && link_auth.length > 0 && link_auth == inputBth ) {
+                    if(bRedirect == true && link_auth != null && link_auth.length > 0 && link_auth == inputBth ) {
                         if(bRedirect == true) {
                             result.redirect(long_url);
                             pool.query('UPDATE TB_SHORTURL SET CALL_CNT = CALL_CNT + 1 WHERE SHORT_URL = ? AND ETC1 is null', short_url);
