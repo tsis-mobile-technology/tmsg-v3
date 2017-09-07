@@ -521,9 +521,9 @@ export class KakaoSocket {
                                         "\r\n\r\n[청구 정보]" + 
                                         "\r\n" + "- 납부자명 : " + responseBody.AccountName + //: "김두수"
                                         "\r\n" + "- 납부자번호 : " + responseBody.AccountId + //: 1001155633
-                                        "\r\n" + "- 청구매체 : " + kakaoSocket.convertArrayCount(media);//responseBody.Media + //: "이메일"
-                                        "\r\n" + "- 은행/카드명 : " + kakaoSocket.convertArrayCount(financialName);//responseBody.FinancialName + //: "신한카드"
-                                        "\r\n" + "- 납부방법 : " + kakaoSocket.convertArrayCount(payMethod); //responseBody.PayMethod + //: "신용카드"
+                                        "\r\n" + "- 청구매체 : " + kakaoSocket.convertArrayCount(media) + //responseBody.Media + //: "이메일"
+                                        "\r\n" + "- 은행/카드명 : " + kakaoSocket.convertArrayCount(financialName) + //responseBody.FinancialName + //: "신한카드"
+                                        "\r\n" + "- 납부방법 : " + kakaoSocket.convertArrayCount(payMethod) +  //responseBody.PayMethod + //: "신용카드"
                                         "\r\n" + "- 납부예정일 : " + responseBody.IssueDate + //: 15
                                         "\r\n\r\n[" + kakaoSocket.getNowmSevendays() + " 청구 정보]" + 
                                         "\r\n" + "- 사용일 : " + calcStartDay + " ~ " + calcEndDay + //: 20170731
