@@ -74,7 +74,7 @@ var error_html = '<!DOCTYPE html>' +
 '<body>' +
 '<div class="errorbox">' +
 '    <h1>스마트메시징</h1>' +
-'    <h2>사용이 제한되었거나 인증정보가 올바르지 않습니다 !</h2>' +
+'    <h2>사용이 제한되었습니다!</h2>' +
 '</div>' +
 '</body>' +
 '</html>';
@@ -282,18 +282,22 @@ class ShorturlServer {
                         link_cnt = results[0][0][0].LINK_CNT;
                     }
                 }).then(function() {
-                    if(link_cnt != '0' && link_cnt < call_cnt) 
+                    
+                    if(link_cnt != '0' && link_cnt > call_cnt) {
                         bRedirect = true;
+                    } else if(link_cnt == '0') {
+                        bRedirect = true;
+                    }
                     else bRedirect = false;
                 }).then(function() {
                     var old_date = new Date(write_date);
                     var limit_date = new Date(old_date.getFullYear(),old_date.getMonth(),old_date.getDate() + Number(link_limit));
 
-                    if(write_date != null && limit_date.valueOf() > now_date.valueOf() ) 
+                    if(bRedirect == true && write_date != null && limit_date.valueOf() > now_date.valueOf() ) 
                         bRedirect = true;
                     else bRedirect = false;
                 }).then(function() {
-                    if(link_auth != null && link_auth.length > 0 ) {
+                    if(bRedirect == true && link_auth != null && link_auth.length > 0 ) {
                         //result.redirect("http://14.63.213.246:2582/auth?short_url=" + short_url);
                         result.header("Access-Control-Allow-Origin", "*"); 
                         result.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
