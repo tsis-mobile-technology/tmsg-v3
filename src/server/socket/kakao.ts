@@ -437,6 +437,7 @@ export class KakaoSocket {
                                         results == "E00003" || results == "E00004" || results == "E10000" ) {
                                           re = kakaoSocket.findScenario(results);
                                     } else if( String(results).length > 6) {
+console.log(JSON.stringify(results));
                                         var jsonData = JSON.parse(results);
                                         var amtCurInv = new Number();
                                         var amtUse = new Number();
