@@ -537,7 +537,6 @@ console.log(JSON.stringify(results));
                                         "\r\n" + "- 부가세 : " + amtVat.toLocaleString("krw") +  "원" + //: 600
                                         "\r\n" + "- 미납액 : " + amtUnpmt.toLocaleString("krw") +  "원" + //: 0
                                         "\r\n" + "- 절사 : " + amtTrunc.toLocaleString("krw") +  "원" + //: 0
-                                        "\r\n" + "- 납부금액 : " + amtPmt.toLocaleString("krw") + "원" + //: 6600
                                         "\r\n\r\n" + "감사합니다.";
                                         // "\r\n" + "- 상품명 : " + name + //: "I-DIGITAL HD_2012"
                                         //"\r\n" + "- 상품정보 : " + responseBody.Products + //: ""
@@ -559,6 +558,7 @@ console.log(JSON.stringify(results));
                                         //"\r\n" + "계열사코드   : " + responseBody.IdSo + //: 4200
                                         //"\r\n" + "은행/카드번호 : " + responseBody.Account + //: "451842120342****"
                                         // "\r\n" + "- 총 미납금액 : " + responseBody.SumAmtCurNonpmt + //: ""
+                                        // "\r\n" + "- 납부금액 : " + amtPmt.toLocaleString("krw") + "원" + //: 6600
                                         re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
                                     } else {
                                         re = kakaoSocket.findScenario("SYS_ERR");
