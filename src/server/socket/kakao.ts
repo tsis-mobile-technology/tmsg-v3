@@ -876,7 +876,7 @@ console.log("Length:" + Length + "(" + (100 + requestBody.length) + ")");
     }
 
     public setTK001RequestData(reqJsondata: TK001RequestConstructor, name:string, phone:string, uniqueid:string, otpnum:number): TK001Request {
-        return new reqJsondata(name, phone, uniqueid, "SMS", "KAKAO", "인증문자 번호는 " + otpnum + "입니다! 5분이내 입력을 부탁 드립니다.", phone, "07081870000");
+        return new reqJsondata(name, phone, uniqueid, "SMS", "KAKAO", "인증문자 번호는 " + otpnum + "입니다! 5분이내 입력을 부탁 드립니다.", phone, "18777000");
 
     }
 
