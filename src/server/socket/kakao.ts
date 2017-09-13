@@ -380,7 +380,8 @@ export class KakaoSocket {
                                             }).done();
                                         } else {
                                             if( results == "E99999" || results == "E00001" || results == "E00002" ||
-                                                results == "E00003" || results == "E00004" || results == "E10000" ) {
+                                                results == "E00003" || results == "E00004" || results == "E10000" ||
+                                                results == "E00005" || results == "E00006") {
                                                 re = kakaoSocket.findScenario(results);
                                             } else {
                                                 re = kakaoSocket.findScenario("SYS_ERR");
@@ -535,7 +536,6 @@ console.log(JSON.stringify(results));
                                         "\r\n" + "- 할인금액 : " + amtDc.toLocaleString("krw") +  "원" + //: -21000
                                         "\r\n" + "- 청구금액 : " + amtSupply.toLocaleString("krw") +  "원" + //: 6000
                                         "\r\n" + "- 부가세 : " + amtVat.toLocaleString("krw") +  "원" + //: 600
-                                        "\r\n" + "- 미납액 : " + amtUnpmt.toLocaleString("krw") +  "원" + //: 0
                                         "\r\n" + "- 절사 : " + amtTrunc.toLocaleString("krw") +  "원" + //: 0
                                         "\r\n\r\n" + "감사합니다.";
                                         // "\r\n" + "- 상품명 : " + name + //: "I-DIGITAL HD_2012"
@@ -559,6 +559,7 @@ console.log(JSON.stringify(results));
                                         //"\r\n" + "은행/카드번호 : " + responseBody.Account + //: "451842120342****"
                                         // "\r\n" + "- 총 미납금액 : " + responseBody.SumAmtCurNonpmt + //: ""
                                         // "\r\n" + "- 납부금액 : " + amtPmt.toLocaleString("krw") + "원" + //: 6600
+                                        // "\r\n" + "- 미납액 : " + amtUnpmt.toLocaleString("krw") +  "원" + //: 0
                                         re = {"keyboard":{"buttons":["처음으로"], "type":"buttons"},"message":{"text":printString}};
                                     } else {
                                         re = kakaoSocket.findScenario("SYS_ERR");
