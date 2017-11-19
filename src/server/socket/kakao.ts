@@ -379,7 +379,7 @@ export class KakaoSocket {
                                             Q.all([kakaoSocket.kakaoDb.dbSaveCustomer("Otp", kakaoSocket.nOTP, user_key)]).then(function(results) {
                                                 console.log("dbSaveCustomer call!");
                                             }).done();
-                                        } else {
+                                        } else if( results != null && results != "success" ) {
                                             if( results == "E99999" || results == "E00001" || results == "E00002" ||
                                                 results == "E00003" || results == "E00004" || results == "E10000" ||
                                                 results == "E00005" || results == "E00006") {
@@ -388,6 +388,12 @@ export class KakaoSocket {
                                                 re = kakaoSocket.findScenario("SYS_ERR");
                                             }
                                             console.log("rtnStr:" + results + "," + kakaoSocket.nOTP);
+                                            if( re != null ) {
+                                                kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
+                                            }
+                                        } else {
+                                            re = kakaoSocket.findScenario("SYS_ERR");
+
                                             if( re != null ) {
                                                 kakaoSocket.insertHistoryAndCallback(content, user_key, re, null, function(err, data){callback(err, data);});
                                             }
@@ -440,7 +446,6 @@ export class KakaoSocket {
                                         results == "E00005" || results == "E00006") {
                                           re = kakaoSocket.findScenario(results);
                                     } else if( String(results).length > 6) {
-console.log(JSON.stringify(results));
                                         var jsonData = JSON.parse(results);
                                         var amtCurInv = new Number();
                                         var amtUse = new Number();
